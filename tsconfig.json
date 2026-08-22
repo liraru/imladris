@@ -14,8 +14,8 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@constants": ["src/app/constants/index.ts"],
-      "@models": ["src/app/models/index.ts"]
+      "@constants": ["./src/app/constants/index.ts"],
+      "@models": ["./src/app/models/index.ts"]
     }
   },
   "angularCompilerOptions": {

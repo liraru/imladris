@@ -1,0 +1,22 @@
+@use '@angular/material' as mat;
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600&display=swap');
+
+@include mat.core();
+
+html {
+  --mat-sys-surface: var(--ink-900, #0d1017);
+  --mat-sys-surface-dim: var(--ink-950, #090a0f);
+  --mat-sys-surface-bright: var(--ink-700, #1b2030);
+  --mat-sys-surface-container-lowest: var(--ink-950, #090a0f);
+  --mat-sys-surface-container-low: var(--ink-900, #0d1017);
+  --mat-sys-surface-container: var(--ink-800, #141824);
+  --mat-sys-surface-container-high: var(--ink-700, #1b2030);
+  --mat-sys-on-surface: var(--cream, #eae4d3);
+  --mat-sys-on-surface-variant: var(--cream-dim, #9b9788);
+
+  --mat-sys-primary: var(--gold, #c9a86a);
+  --mat-sys-on-primary: #201704; /* texto oscuro sobre botón dorado, como tu .btn-primary */
+
+  --mat-sys-corner-medium: var(--radius, 10px);
+  --mat-sys-corner-small: 8px;
+}
