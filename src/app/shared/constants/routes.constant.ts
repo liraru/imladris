@@ -1,0 +1,12 @@
+enum ROUTES {
+  CALCULATOR = 'calculator',
+  LIBRARY = 'library',
+  YEARLY_READINGS = 'yearly-readings',
+}
+
+export const APP_ROUTES = {
+  HOME: '',
+  CALCULATOR: ROUTES.CALCULATOR,
+  LIBRARY: ROUTES.LIBRARY,
+  YEARLY_READINGS: ROUTES.YEARLY_READINGS,
+};
