@@ -44,6 +44,7 @@ const DEFAULT_STATE: FolioState = {
     MatToolbarModule,
   ],
   templateUrl: './pages-calculator.component.html',
+  styleUrl: './pages-calculator.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PagesCalculatorComponent {
