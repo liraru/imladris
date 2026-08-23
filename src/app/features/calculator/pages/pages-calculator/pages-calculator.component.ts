@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { firstValueFrom } from 'rxjs';
-import { CalculatorConfirmDialogComponent } from '../../components/calculator-confirm-dialog/calculator-confirm-dialog.component';
+import { CalculatorConfirmDialogData, CalculatorConfirmDialogComponent } from '../../components/calculator-confirm-dialog/calculator-confirm-dialog.component';
 
 interface HistoryEntry {
   detail: string;
@@ -32,12 +36,14 @@ const DEFAULT_STATE: FolioState = {
   imports: [
     FormsModule,
     MatButtonModule,
-    MatDialogModule,
+    MatCardModule,
+    MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
+    MatListModule,
+    MatToolbarModule,
   ],
   templateUrl: './pages-calculator.component.html',
-  styleUrl: './pages-calculator.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PagesCalculatorComponent {
@@ -91,7 +97,7 @@ export class PagesCalculatorComponent {
     } catch (e) {
       console.error('No se pudo guardar el estado:', e);
       this.errorPaginas.set(
-        'No se ha podido guardar el dato en este navegador (¿modo incógnito o almacenamiento bloqueado?).'
+        'No se ha podido guardar el dato en este navegador (¿modo incógnito o almacenamiento bloqueado?).',
       );
     }
   }
@@ -121,19 +127,8 @@ export class PagesCalculatorComponent {
 
   // ---------- Diálogo de confirmación (Angular Material) ----------
 
-  private async confirm(
-    title: string,
-    message: string,
-    confirmText: string,
-    cancelText: string,
-    confirmColor: 'tertiary' | 'secondary'
-  ): Promise<boolean> {
-    const dialogRef = this.dialog.open(CalculatorConfirmDialogComponent, {
-      data: { title, message, confirmText, cancelText, confirmColor },
-      autoFocus: 'dialog',
-      width: '420px',
-      maxWidth: '92vw',
-    });
+  private async showConfirmModal(data: CalculatorConfirmDialogData): Promise<boolean> {
+    const dialogRef = this.dialog.open(CalculatorConfirmDialogComponent, { data, autoFocus: 'dialog' });
     const result = await firstValueFrom(dialogRef.afterClosed());
     return result === true;
   }
@@ -146,11 +141,15 @@ export class PagesCalculatorComponent {
     this.errorPaginas.set(null);
 
     if (
-      palabras == null || !Number.isFinite(palabras) || palabras < 0 ||
-      capitulos == null || !Number.isFinite(capitulos) || capitulos < 0
+      palabras == null ||
+      !Number.isFinite(palabras) ||
+      palabras < 0 ||
+      capitulos == null ||
+      !Number.isFinite(capitulos) ||
+      capitulos < 0
     ) {
       this.errorPaginas.set(
-        'Introduce el número de palabras y de capítulos (valores válidos y positivos).'
+        'Introduce el número de palabras y de capítulos (valores válidos y positivos).',
       );
       return;
     }
@@ -158,24 +157,25 @@ export class PagesCalculatorComponent {
     const paginas = Math.ceil(palabras / 300 + capitulos * 0.6);
     this.resultPaginasValue.set(paginas);
 
-    // Verde (terciario) = confirmar una acción afirmativa de guardado.
-    const persistir = await this.confirm(
-      `${this.fmt(paginas)} páginas`,
-      '¿Quieres guardar este valor como páginas totales para usarlo en el cálculo de la página actual? Si no, se queda solo como resultado de esta consulta.',
-      'Guardar y usar',
-      'Solo ver resultado',
-      'tertiary'
-    );
+    // Verde (terciario): confirmar una acción afirmativa de guardado.
+    const persistir = await this.showConfirmModal({
+      title: `${this.fmt(paginas)} páginas`,
+      message:
+        '¿Quieres guardar este valor como páginas totales para usarlo en el cálculo de la página actual? Si no, se queda solo como resultado de esta consulta.',
+      confirmText: 'Guardar y usar',
+      cancelText: 'Solo ver resultado',
+      confirmColor: 'tertiary',
+    });
 
     if (persistir) {
       this.paginasTotalesStored.set(paginas);
       this.saveState();
       this.addHistory(
-        `<strong>${this.fmt(paginas)} páginas</strong> · ${this.fmt(palabras)} palabras, ${this.fmt(capitulos)} capítulos <em>(guardado)</em>`
+        `<strong>${this.fmt(paginas)} páginas</strong> · ${this.fmt(palabras)} palabras, ${this.fmt(capitulos)} capítulos <em>(guardado)</em>`,
       );
     } else {
       this.addHistory(
-        `${this.fmt(paginas)} páginas · ${this.fmt(palabras)} palabras, ${this.fmt(capitulos)} capítulos <em>(sin guardar)</em>`
+        `${this.fmt(paginas)} páginas · ${this.fmt(palabras)} palabras, ${this.fmt(capitulos)} capítulos <em>(sin guardar)</em>`,
       );
       this.saveState();
     }
@@ -194,11 +194,15 @@ export class PagesCalculatorComponent {
       return;
     }
     if (
-      posicionTotal == null || !Number.isFinite(posicionTotal) || posicionTotal <= 0 ||
-      paginasTotales == null || !Number.isFinite(paginasTotales) || paginasTotales <= 0
+      posicionTotal == null ||
+      !Number.isFinite(posicionTotal) ||
+      posicionTotal <= 0 ||
+      paginasTotales == null ||
+      !Number.isFinite(paginasTotales) ||
+      paginasTotales <= 0
     ) {
       this.errorPagina.set(
-        'Faltan la posición total o las páginas totales. Complétalas (o calcúlalas primero en el bloque I).'
+        'Faltan la posición total o las páginas totales. Complétalas (o calcúlalas primero en el bloque I).',
       );
       return;
     }
@@ -212,7 +216,7 @@ export class PagesCalculatorComponent {
     });
 
     this.addHistory(
-      `<strong>Página ${this.fmt(paginaActual)}</strong> de ${this.fmt(paginasTotales)} · pos. ${this.fmt(posicionActual)}/${this.fmt(posicionTotal)}`
+      `<strong>Página ${this.fmt(paginaActual)}</strong> de ${this.fmt(paginasTotales)} · pos. ${this.fmt(posicionActual)}/${this.fmt(posicionTotal)}`,
     );
     this.saveState();
   }
@@ -231,27 +235,27 @@ export class PagesCalculatorComponent {
 
   async vaciarHistorial(): Promise<void> {
     if (!this.history().length) return;
-    // Vino (secundario) = confirmar una acción destructiva.
-    const ok = await this.confirm(
-      'Vaciar historial',
-      'Esta acción no se puede deshacer. ¿Seguro que quieres borrar todo el historial?',
-      'Vaciar',
-      'Cancelar',
-      'secondary'
-    );
+    // Vino (secundario): confirmar una acción destructiva.
+    const ok = await this.showConfirmModal({
+      title: 'Vaciar historial',
+      message: 'Esta acción no se puede deshacer. ¿Seguro que quieres borrar todo el historial?',
+      confirmText: 'Vaciar',
+      cancelText: 'Cancelar',
+      confirmColor: 'secondary',
+    });
     if (!ok) return;
     this.history.set([]);
     this.saveState();
   }
 
   async reiniciar(): Promise<void> {
-    const ok = await this.confirm(
-      'Reiniciar valores',
-      '¿Seguro que quieres reiniciar la posición total y las páginas totales guardadas?',
-      'Reiniciar',
-      'Cancelar',
-      'secondary'
-    );
+    const ok = await this.showConfirmModal({
+      title: 'Reiniciar valores',
+      message: '¿Seguro que quieres reiniciar la posición total y las páginas totales guardadas?',
+      confirmText: 'Reiniciar',
+      cancelText: 'Cancelar',
+      confirmColor: 'secondary',
+    });
     if (!ok) return;
     this.posicionTotal.set(null);
     this.paginasTotalesStored.set(null);
