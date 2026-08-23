@@ -27,7 +27,7 @@
   },
   "peacock.color": "#440319",
   "files.exclude": {
-    "**/*.spec.ts": true,
-    "**/*.scss": true
+    "**/*.spec.ts": false,
+    "**/*.scss": false
   }
 }

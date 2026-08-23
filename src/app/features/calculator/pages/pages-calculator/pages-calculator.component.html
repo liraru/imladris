@@ -1,0 +1,188 @@
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Folio</div>
+    <h1>Calculadora de lectura</h1>
+    <p>Estima las páginas de un libro y sigue tu progreso real en el Kindle.</p>
+  </header>
+
+  <div class="grid">
+    <!-- BLOQUE 1: PÁGINAS TOTALES -->
+    <section class="card">
+      <div class="card-head">
+        <span class="num">I</span>
+        <h2>Páginas totales</h2>
+      </div>
+
+      <div class="row-2">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Palabras totales</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            step="1"
+            inputmode="numeric"
+            placeholder="ej. 95000"
+            [ngModel]="palabras()"
+            (ngModelChange)="palabras.set($event)"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Nº de capítulos</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            step="1"
+            inputmode="numeric"
+            placeholder="ej. 24"
+            [ngModel]="capitulos()"
+            (ngModelChange)="capitulos.set($event)"
+          />
+        </mat-form-field>
+      </div>
+
+      @if (errorPaginas()) {
+        <p class="field-error">{{ errorPaginas() }}</p>
+      }
+
+      <button
+        mat-flat-button
+        color="primary"
+        class="btn-block"
+        type="button"
+        (click)="calcularPaginas()"
+      >
+        Calcular páginas
+      </button>
+
+      @if (resultPaginasValue() !== null) {
+        <div class="result show">
+          <div class="label">Páginas estimadas</div>
+          <div class="value">{{ fmt(resultPaginasValue()!) }}</div>
+          <div class="sub">(palabras ÷ 300) + (capítulos × 0.6)</div>
+        </div>
+      }
+    </section>
+
+    <div class="divider-desktop"></div>
+    <div class="asterism">⁂</div>
+
+    <!-- BLOQUE 2: PÁGINA ACTUAL -->
+    <section class="card">
+      <div class="card-head">
+        <span class="num">II</span>
+        <h2>Página actual</h2>
+      </div>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Posición actual (Kindle)</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          step="1"
+          inputmode="numeric"
+          placeholder="ej. 3120"
+          [ngModel]="posicionActual()"
+          (ngModelChange)="posicionActual.set($event)"
+        />
+      </mat-form-field>
+
+      <div class="row-2">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Posición total</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            step="1"
+            inputmode="numeric"
+            placeholder="ej. 6840"
+            [ngModel]="posicionTotal()"
+            (ngModelChange)="posicionTotal.set($event)"
+            (change)="onPosicionTotalChange()"
+          />
+          <mat-hint>Guardado</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Páginas totales</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            step="1"
+            inputmode="numeric"
+            placeholder="del bloque I"
+            [ngModel]="paginasTotalesStored()"
+            (ngModelChange)="paginasTotalesStored.set($event)"
+            (change)="onPaginasTotalesStoredChange()"
+          />
+          <mat-hint>Guardado</mat-hint>
+        </mat-form-field>
+      </div>
+      <p class="stored-note">
+        Estos dos valores se recuerdan entre visitas. Se rellenan solos al calcular en el bloque I,
+        pero puedes editarlos a mano en cualquier momento.
+      </p>
+
+      @if (errorPagina()) {
+        <p class="field-error">{{ errorPagina() }}</p>
+      }
+
+      <button
+        mat-flat-button
+        color="primary"
+        class="btn-block"
+        type="button"
+        (click)="calcularPaginaActual()"
+      >
+        Calcular página actual
+      </button>
+
+      @if (resultPagina(); as resultado) {
+        <div class="result show">
+          <div class="label">Estás en la página</div>
+          <div class="value">{{ fmt(resultado.pagina) }}</div>
+          <div class="sub">{{ resultado.sub }}</div>
+        </div>
+      }
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="card history-card">
+      <div class="history-head">
+        <h2>Historial</h2>
+        <button mat-button color="secondary" type="button" (click)="vaciarHistorial()">
+          Vaciar historial
+        </button>
+      </div>
+      <ul class="history-list">
+        @if (history().length === 0) {
+          <li class="empty-state">Aún no hay cálculos guardados.</li>
+        } @else {
+          @for (entry of historyReversed(); track entry.time + entry.detail) {
+            <li>
+              <span class="h-detail" [innerHTML]="entry.detail"></span>
+              <span class="h-time">{{ entry.time }}</span>
+            </li>
+          }
+        }
+      </ul>
+    </section>
+  </div>
+
+  <div class="reset-zone">
+    <button mat-stroked-button color="secondary" type="button" (click)="reiniciar()">
+      Reiniciar posición y páginas totales
+    </button>
+    <p>
+      Borra únicamente la posición total y las páginas totales guardadas. El historial no se ve
+      afectado.
+    </p>
+  </div>
+
+  <footer class="foot">Los datos se guardan de forma persistente en este dispositivo.</footer>
+</div>

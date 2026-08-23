@@ -1,10 +1,11 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  HostListener,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { firstValueFrom } from 'rxjs';
+import { CalculatorConfirmDialogComponent } from '../../components/calculator-confirm-dialog/calculator-confirm-dialog.component';
 
 interface HistoryEntry {
   detail: string;
@@ -15,13 +16,6 @@ interface FolioState {
   totalPages: number | null;
   totalPosition: number | null;
   history: HistoryEntry[];
-}
-
-interface ModalOptions {
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
 }
 
 const STORAGE_KEY = 'folio:kindle-data';
@@ -35,12 +29,20 @@ const DEFAULT_STATE: FolioState = {
 @Component({
   selector: 'app-pages-calculator',
   standalone: true,
-  imports: [FormsModule],
-  templateUrl: './pages-calculator.html',
-  styleUrl: './pages-calculator.scss',
+  imports: [
+    FormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+  ],
+  templateUrl: './pages-calculator.component.html',
+  styleUrl: './pages-calculator.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PagesCalculatorComponent {
+  private readonly dialog = inject(MatDialog);
+
   // --- Bloque I: páginas totales ---
   palabras = signal<number | null>(null);
   capitulos = signal<number | null>(null);
@@ -56,14 +58,6 @@ export class PagesCalculatorComponent {
 
   // --- Historial ---
   history = signal<HistoryEntry[]>([]);
-
-  // --- Modal de confirmación ---
-  modalVisible = signal(false);
-  modalTitle = signal('');
-  modalMessage = signal('');
-  modalConfirmText = signal('Aceptar');
-  modalCancelText = signal('Cancelar');
-  private modalResolver: ((value: boolean) => void) | null = null;
 
   constructor() {
     this.loadState();
@@ -125,40 +119,23 @@ export class PagesCalculatorComponent {
     return [...this.history()].reverse();
   }
 
-  // ---------- Modal de confirmación (reemplaza los confirm()/alert() nativos) ----------
+  // ---------- Diálogo de confirmación (Angular Material) ----------
 
-  private showConfirmModal(options: ModalOptions): Promise<boolean> {
-    return new Promise((resolve) => {
-      this.modalTitle.set(options.title);
-      this.modalMessage.set(options.message);
-      this.modalConfirmText.set(options.confirmText ?? 'Aceptar');
-      this.modalCancelText.set(options.cancelText ?? 'Cancelar');
-      this.modalResolver = resolve;
-      this.modalVisible.set(true);
+  private async confirm(
+    title: string,
+    message: string,
+    confirmText: string,
+    cancelText: string,
+    confirmColor: 'tertiary' | 'secondary'
+  ): Promise<boolean> {
+    const dialogRef = this.dialog.open(CalculatorConfirmDialogComponent, {
+      data: { title, message, confirmText, cancelText, confirmColor },
+      autoFocus: 'dialog',
+      width: '420px',
+      maxWidth: '92vw',
     });
-  }
-
-  onModalConfirm(): void {
-    this.modalVisible.set(false);
-    this.modalResolver?.(true);
-    this.modalResolver = null;
-  }
-
-  onModalCancel(): void {
-    this.modalVisible.set(false);
-    this.modalResolver?.(false);
-    this.modalResolver = null;
-  }
-
-  onModalOverlayClick(): void {
-    this.onModalCancel();
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscapeKey(): void {
-    if (this.modalVisible()) {
-      this.onModalCancel();
-    }
+    const result = await firstValueFrom(dialogRef.afterClosed());
+    return result === true;
   }
 
   // ---------- Bloque I: calcular páginas totales ----------
@@ -181,13 +158,14 @@ export class PagesCalculatorComponent {
     const paginas = Math.ceil(palabras / 300 + capitulos * 0.6);
     this.resultPaginasValue.set(paginas);
 
-    const persistir = await this.showConfirmModal({
-      title: `${this.fmt(paginas)} páginas`,
-      message:
-        '¿Quieres guardar este valor como páginas totales para usarlo en el cálculo de la página actual? Si no, se queda solo como resultado de esta consulta.',
-      confirmText: 'Guardar y usar',
-      cancelText: 'Solo ver resultado',
-    });
+    // Verde (terciario) = confirmar una acción afirmativa de guardado.
+    const persistir = await this.confirm(
+      `${this.fmt(paginas)} páginas`,
+      '¿Quieres guardar este valor como páginas totales para usarlo en el cálculo de la página actual? Si no, se queda solo como resultado de esta consulta.',
+      'Guardar y usar',
+      'Solo ver resultado',
+      'tertiary'
+    );
 
     if (persistir) {
       this.paginasTotalesStored.set(paginas);
@@ -253,24 +231,27 @@ export class PagesCalculatorComponent {
 
   async vaciarHistorial(): Promise<void> {
     if (!this.history().length) return;
-    const ok = await this.showConfirmModal({
-      title: 'Vaciar historial',
-      message: 'Esta acción no se puede deshacer. ¿Seguro que quieres borrar todo el historial?',
-      confirmText: 'Vaciar',
-      cancelText: 'Cancelar',
-    });
+    // Vino (secundario) = confirmar una acción destructiva.
+    const ok = await this.confirm(
+      'Vaciar historial',
+      'Esta acción no se puede deshacer. ¿Seguro que quieres borrar todo el historial?',
+      'Vaciar',
+      'Cancelar',
+      'secondary'
+    );
     if (!ok) return;
     this.history.set([]);
     this.saveState();
   }
 
   async reiniciar(): Promise<void> {
-    const ok = await this.showConfirmModal({
-      title: 'Reiniciar valores',
-      message: '¿Seguro que quieres reiniciar la posición total y las páginas totales guardadas?',
-      confirmText: 'Reiniciar',
-      cancelText: 'Cancelar',
-    });
+    const ok = await this.confirm(
+      'Reiniciar valores',
+      '¿Seguro que quieres reiniciar la posición total y las páginas totales guardadas?',
+      'Reiniciar',
+      'Cancelar',
+      'secondary'
+    );
     if (!ok) return;
     this.posicionTotal.set(null);
     this.paginasTotalesStored.set(null);
