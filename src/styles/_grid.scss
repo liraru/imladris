@@ -1,0 +1,98 @@
+// ============================================================
+// _grid.scss
+// Sistema de 12 columnas basado en CSS Grid
+// Pensado para integrarse con Angular Material (M3) y SCSS
+// ============================================================
+
+// -------------------------------
+// 1. Variables configurables
+// -------------------------------
+$grid-columns: 12;
+$grid-gap: 1rem;
+$grid-max-width: 1280px;
+
+$breakpoints: (
+  sm: 576px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+);
+
+// -------------------------------
+// 2. Contenedor
+// -------------------------------
+.container {
+  width: 100%;
+  max-width: $grid-max-width;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+// -------------------------------
+// 3. Grid principal
+// -------------------------------
+.grid {
+  display: grid;
+  grid-template-columns: repeat($grid-columns, 1fr);
+  gap: $grid-gap;
+}
+
+// Variante con gap más ajustado, útil para tarjetas de libros/portadas
+.grid--tight {
+  display: grid;
+  grid-template-columns: repeat($grid-columns, 1fr);
+  gap: 0.5rem;
+}
+
+// -------------------------------
+// 4. Clases de columnas (col-1 a col-12)
+// -------------------------------
+@for $i from 1 through $grid-columns {
+  .col-#{$i} {
+    grid-column: span #{$i};
+  }
+}
+
+// -------------------------------
+// 5. Clases de offset (empezar en una columna concreta)
+// -------------------------------
+@for $i from 1 through $grid-columns {
+  .col-offset-#{$i} {
+    grid-column-start: #{$i + 1};
+  }
+}
+
+// -------------------------------
+// 6. Variantes responsive por breakpoint
+// Genera .col-md-6, .col-lg-4, etc.
+// -------------------------------
+@each $name, $size in $breakpoints {
+  @media (min-width: $size) {
+    @for $i from 1 through $grid-columns {
+      .col-#{$name}-#{$i} {
+        grid-column: span #{$i};
+      }
+    }
+
+    // Ocultar/mostrar por breakpoint (útil para el dashboard)
+    .hide-#{$name} {
+      display: none;
+    }
+    .show-#{$name} {
+      display: block;
+    }
+  }
+}
+
+// -------------------------------
+// 7. Utilidad de alineación dentro del grid
+// -------------------------------
+.grid--center {
+  align-items: center;
+}
+.grid--start {
+  align-items: start;
+}
+.grid--stretch {
+  align-items: stretch;
+}
