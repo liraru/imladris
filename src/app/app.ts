@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, MatToolbarModule, MatTabsModule],
   templateUrl: './app.html',
-  styleUrls: ['./app.css'],
+  styleUrl: './app.css',
 })
-export class App {}
+export class App {
+  title = 'imladris';
+}

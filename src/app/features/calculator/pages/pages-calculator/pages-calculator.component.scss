@@ -1,19 +1,22 @@
 .calculator-controllers-container {
-  display: flex;
-  flex-direction: row;
   gap: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+mat-card {
+  padding: 1.5rem;
+  gap: 1.5rem;
 }
 
 mat-card-header {
   margin-bottom: 1.5rem;
 }
 
-mat-card {
-  padding: 1rem;
-  margin-bottom: 0.5rem;
+mat-card-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  flex: 1;
+  gap: 1.5rem;
 }
 
 .kindle-position-form {
