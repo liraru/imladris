@@ -20,4 +20,31 @@ html {
 
   --mat-sys-corner-medium: var(--radius, 10px);
   --mat-sys-corner-small: 8px;
+
+  @include mat.theme((
+    typography: (
+      brand-family: 'Inter',
+      plain-family: 'Inter',
+      bold-weight: 600,
+      medium-weight: 500,
+      regular-weight: 400,
+    ),
+  ));
+}
+
+html, body {
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3,
+.mat-headline-large, .mat-headline-medium, .mat-headline-small,
+.section-title /* o la clase que uses para "I. Páginas totales" */ {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-optical-sizing: auto;
+}
+
+mat-card-title {
+  font-family: 'Fraunces', serif !important;
+  font-style: italic;
 }
