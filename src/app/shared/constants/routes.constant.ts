@@ -1,6 +1,6 @@
 import { MenuRoute } from '../models/menu.model';
 
-enum ROUTES {
+export enum ROUTES {
   HOME = '',
   CALCULATOR = 'calculator',
   LIBRARY = 'library',
