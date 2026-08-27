@@ -7,7 +7,7 @@ enum ROUTES {
   YEARLY_READINGS = 'yearly-readings',
 }
 
-export const APP_ROUTES: { [key in ROUTES]: MenuRoute } = {
+export const APP_ROUTES: { [key: string]: MenuRoute } = {
   HOME: { title: 'Inicio', path: ROUTES.HOME },
   CALCULATOR: { title: 'Calculadora', path: ROUTES.CALCULATOR },
   LIBRARY: { title: 'Biblioteca', path: ROUTES.LIBRARY },
