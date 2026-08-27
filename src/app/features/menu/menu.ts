@@ -12,5 +12,8 @@ import { NgForOf } from '../../../../node_modules/@angular/common/types/_common_
   templateUrl: './menu.html',
 })
 export class Menu {
-  protected readonly ROUTES = Object.entries(APP_ROUTES).map(([key, value]) => value);
+  protected readonly ROUTES = Object.entries(APP_ROUTES).map(([key, value]) => ({
+    title: value.title,
+    path: value.path,
+  }));
 }
