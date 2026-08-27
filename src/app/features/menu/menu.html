@@ -1,43 +1,51 @@
-<mat-toolbar class="app-toolbar">
-  <span class="brand">Imladris</span>
+<nav mat-tab-nav-bar [tabPanel]="tabPanel" class="app-nav" mat-stretch-tabs="false">
+  <!-- <a
+    mat-tab-link
+    routerLink="/"
+    routerLinkActive
+    #rlaHome="routerLinkActive"
+    [routerLinkActiveOptions]="{ exact: true }"
+    [active]="rlaHome.isActive"
+  >
+    Inicio
+  </a>
+  <a
+    mat-tab-link
+    routerLink="/dashboard"
+    routerLinkActive
+    #rlaDash="routerLinkActive"
+    [active]="rlaDash.isActive"
+  >
+    Dashboard
+  </a>
+  <a
+    mat-tab-link
+    routerLink="/biblioteca"
+    routerLinkActive
+    #rlaBib="routerLinkActive"
+    [active]="rlaBib.isActive"
+  >
+    Biblioteca
+  </a>
+  <a
+    mat-tab-link
+    routerLink="/calculator"
+    routerLinkActive
+    #rlaCalc="routerLinkActive"
+    [active]="rlaCalc.isActive"
+  >
+    Calculadora
+  </a> -->
 
-  <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="app-nav" mat-stretch-tabs="false">
+  @for (route of ROUTES; track $index) {
     <a
       mat-tab-link
-      routerLink="/"
-      routerLinkActive
-      #rlaHome="routerLinkActive"
-      [routerLinkActiveOptions]="{ exact: true }"
-      [active]="rlaHome.isActive"
-    >
-      Inicio
-    </a>
-    <a
-      mat-tab-link
-      routerLink="/dashboard"
-      routerLinkActive
-      #rlaDash="routerLinkActive"
-      [active]="rlaDash.isActive"
-    >
-      Dashboard
-    </a>
-    <a
-      mat-tab-link
-      routerLink="/biblioteca"
-      routerLinkActive
-      #rlaBib="routerLinkActive"
-      [active]="rlaBib.isActive"
-    >
-      Biblioteca
-    </a>
-    <a
-      mat-tab-link
-      routerLink="/calculator"
+      routerLink="/{{ route.path }}"
       routerLinkActive
       #rlaCalc="routerLinkActive"
       [active]="rlaCalc.isActive"
     >
-      Calculadora
+      {{ route.title }}
     </a>
-  </nav>
-</mat-toolbar>
+  }
+</nav>

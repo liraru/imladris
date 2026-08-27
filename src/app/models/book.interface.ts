@@ -1,4 +1,4 @@
-import { EDITORIAL, LANGUAGE } from '@constants';
+import { EDITORIAL, LANGUAGE } from '../shared/constants';
 
 export interface Book {
   title: string;
