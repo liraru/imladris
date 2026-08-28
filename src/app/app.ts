@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { APP_ROUTES } from '@constants';
+import { APP_ROUTES } from '@shared/constants';
 import { filter, map, startWith } from 'rxjs';
 
 @Component({

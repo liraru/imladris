@@ -14,8 +14,8 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@constants": ["./src/app/shared/constants/index.ts"],
-      "@models": ["src/app/shared/models/index.ts"]
+      "@shared/constants": ["./src/app/shared/constants/index.ts"],
+      "@shared/models": ["./src/app/shared/models/index.ts"]
     }
   },
   "angularCompilerOptions": {
