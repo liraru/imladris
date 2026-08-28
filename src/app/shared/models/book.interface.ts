@@ -2,21 +2,11 @@ import { LANGUAGE } from '@shared/constants';
 import { Editorial } from './editorial.interface';
 import { Author } from './author.interface';
 import { READING_STATUS } from '../constants/reading-status.constant';
+import { Volume } from './volume.interfate';
 
-export interface Book {
-  id: number;
-  title: string;
-  author: Author;
+export interface Book extends Volume {
   serie?: BookSerie;
   serieVolume?: number;
-  editorial: Editorial;
-  language: LANGUAGE;
-  readingStatus: READING_STATUS;
-  cover?: string;
-  adquisitionDate?: Date;
-  startDate?: Date;
-  finishDate?: Date;
-  notes?: string;
 }
 
 export interface BookSerie {

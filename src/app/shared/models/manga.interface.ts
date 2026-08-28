@@ -1,4 +1,5 @@
 import { Author } from './author.interface';
+import { Volume } from './volume.interfate';
 
 export interface Manga {
   id: number;
@@ -7,11 +8,7 @@ export interface Manga {
   demographic: string;
 }
 
-export interface MangaVolume {
-  id: number;
+export interface MangaVolume extends Volume {
   mangaId: number;
   volumeNumber: number;
-  title: string;
-  releaseDate: Date;
-  coverImageUrl: string;
 }
