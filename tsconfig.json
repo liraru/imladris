@@ -15,7 +15,7 @@
     "module": "preserve",
     "paths": {
       "@constants": ["./src/app/shared/constants/index.ts"],
-      "@models": ["./src/app/models/index.ts"]
+      "@models": ["src/app/shared/models/index.ts"]
     }
   },
   "angularCompilerOptions": {

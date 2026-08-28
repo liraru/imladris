@@ -23,6 +23,10 @@ export const routes: Routes = [
       import('./features/yearly-readings/yearly-readings').then((m) => m.YearlyReadings),
   },
   {
+    path: ROUTES.MANAGEMENT,
+    loadComponent: () => import('./features/management/management').then((m) => m.Management),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
