@@ -1,11 +1,15 @@
-import { EDITORIAL, LANGUAGE } from '../constants';
+import { GENRE } from '../constants/categories.constant';
+import { Editorial } from './editorial.interface';
+import { Volume } from './volume.interface';
 
-export interface Book {
+export interface Book extends Volume {
+  serie?: BookSerie;
+  serieVolume?: number;
+  genres: GENRE[];
+}
+
+export interface BookSerie {
+  id: number;
   title: string;
-  author: string;
-  serie: string;
-  serieVolume: number;
-  editorial: EDITORIAL;
-  language: LANGUAGE;
-  cover?: string;
+  editorial: Editorial;
 }

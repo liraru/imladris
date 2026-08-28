@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { APP_ROUTES } from '@constants';
+import { APP_ROUTES } from '@shared/constants';
 import { filter, map, startWith } from 'rxjs';
 
 @Component({
@@ -29,6 +29,7 @@ export class App {
     path: value.path,
   }));
 
+  // TODO: Use a signal to track the current URL and determine if a route is active
   protected readonly currentUrl = toSignal(
     this._router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
