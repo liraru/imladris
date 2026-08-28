@@ -1,12 +1,11 @@
-import { LANGUAGE } from '@shared/constants';
+import { GENRE } from '../constants/categories.constant';
 import { Editorial } from './editorial.interface';
-import { Author } from './author.interface';
-import { READING_STATUS } from '../constants/reading-status.constant';
-import { Volume } from './volume.interfate';
+import { Volume } from './volume.interface';
 
 export interface Book extends Volume {
   serie?: BookSerie;
   serieVolume?: number;
+  genres: GENRE[];
 }
 
 export interface BookSerie {

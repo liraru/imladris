@@ -29,6 +29,7 @@ export class App {
     path: value.path,
   }));
 
+  // TODO: Use a signal to track the current URL and determine if a route is active
   protected readonly currentUrl = toSignal(
     this._router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),

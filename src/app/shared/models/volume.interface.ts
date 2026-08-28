@@ -7,9 +7,9 @@ export interface Volume {
   id: number;
   title: string;
   authors: Author[];
-  releaseDate: Date;
-  coverImageUrl: string;
-  readingStatus: READING_STATUS;
+  readingStatus: READING_STATUS; // default: READING_STATUS.NOT_STARTED
+  releaseDate?: Date;
+  coverImageUrl?: string;
   adquisitionDate?: Date;
   startDate?: Date;
   finishDate?: Date;
