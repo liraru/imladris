@@ -1,0 +1,21 @@
+name: Supabase keep-alive
+
+on:
+  schedule:
+    # Cada 3 días a las 06:00 UTC (Supabase pausa proyectos tras ~7 días de inactividad).
+    - cron: '0 6 */3 * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          curl -sSf "${SUPABASE_URL:-https://dhbcklnbmiqympwbuohv.supabase.co}/rest/v1/authors?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_KEY:-sb_publishable_hVjyuY6JfLDPIAnAZiY2Gw_mz1siLZq}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY:-sb_publishable_hVjyuY6JfLDPIAnAZiY2Gw_mz1siLZq}" \
+            -o /dev/null -w "Status: %{http_code}\n"
