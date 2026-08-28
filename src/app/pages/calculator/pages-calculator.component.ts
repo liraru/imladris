@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { firstValueFrom } from 'rxjs';
-import { CalculatorConfirmDialogData, CalculatorConfirmDialogComponent } from '../../components/calculator-confirm-dialog/calculator-confirm-dialog.component';
+import { CalculatorConfirmDialogData, CalculatorConfirmDialogComponent } from './components/calculator-confirm-dialog/calculator-confirm-dialog.component';
 
 interface HistoryEntry {
   detail: string;

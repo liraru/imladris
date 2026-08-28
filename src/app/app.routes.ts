@@ -9,7 +9,7 @@ export const routes: Routes = [
   {
     path: ROUTES.CALCULATOR,
     loadComponent: () =>
-      import('./pages/calculator/pages/pages-calculator/pages-calculator.component').then(
+      import('./pages/calculator/pages-calculator.component').then(
         (m) => m.PagesCalculatorComponent,
       ),
   },

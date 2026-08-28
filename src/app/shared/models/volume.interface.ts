@@ -8,11 +8,11 @@ export interface Volume {
   title: string;
   authors: Author[];
   readingStatus: READING_STATUS; // default: READING_STATUS.NOT_STARTED
-  releaseDate?: Date;
+  releaseDate?: string; // yyyy-mm-dd
   coverImageUrl?: string;
-  adquisitionDate?: Date;
-  startDate?: Date;
-  finishDate?: Date;
+  adquisitionDate?: string; // yyyy-mm-dd
+  startDate?: string; // yyyy-mm-dd
+  finishDate?: string; // yyyy-mm-dd
   notes?: string;
   language: LANGUAGE;
   editorial: Editorial;
