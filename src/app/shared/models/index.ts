@@ -4,3 +4,4 @@ export * from './editorial.interface';
 export * from './book.interface';
 export * from './manga.interface';
 export * from './menu.model';
+export * from './yearly-reading.interface';

@@ -76,3 +76,14 @@ export interface MangaVolumeRow {
   editorial?: EditorialRow;
   manga_volume_authors?: { author: AuthorRow }[];
 }
+
+export interface YearlyReadingRow {
+  id: number;
+  year: number;
+  title: string;
+  authors: string[];
+  pages: number;
+  start_date: string;
+  end_date: string;
+  cover_url: string | null;
+}
