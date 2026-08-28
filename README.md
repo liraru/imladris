@@ -1,59 +1,105 @@
 # Imladris
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.5.
+**Imladris** es una aplicación personal para llevar el control de tus lecturas: calcula páginas estimadas de un libro a partir de tu progreso en Kindle, guarda un historial de cálculos y organiza tu biblioteca (libros y manga) por año de lectura.
 
-## Development server
+Construida con [Angular](https://angular.dev) y [Angular Material](https://material.angular.io), con un tema oscuro personalizado (tipografía Fraunces + Inter, paleta dorado/vino/verde) y navegación por pestañas.
 
-To start a local development server, run:
+## Secciones
+
+- **Inicio** (`/`) — página de bienvenida.
+- **Calculadora** (`/calculator`)
+  - Estima el número de páginas de un libro a partir del total de palabras y capítulos.
+  - Calcula en qué página vas según tu posición actual del Kindle.
+  - Guarda automáticamente la posición y las páginas totales en `localStorage` para no tener que reintroducirlas.
+  - Historial de cálculos realizados, con opción de vaciarlo.
+  - Diálogos de confirmación (Angular Material) para acciones de guardado y acciones destructivas.
+  - Opción de reiniciar posición y páginas totales guardadas sin afectar al historial.
+- **Biblioteca** (`/library`) — catálogo de libros y manga, con datos en `public/data/library/books.json` y `manga.json`. *(en desarrollo)*
+- **Lecturas anuales** (`/yearly-readings`) — seguimiento de lo leído por año, con datos en `public/data/yearly-readings/`. *(en desarrollo)*
+- **Gestión** (`/management`) — administración de datos de la aplicación. *(en desarrollo)*
+
+## Stack técnico
+
+- Angular 22 (standalone components, signals, `provideZonelessChangeDetection`)
+- Angular Material 22 (tema M3 personalizado con paleta propia)
+- SCSS con sistema de grid propio de 12 columnas (`src/styles/_grid.scss`)
+- Vitest para tests unitarios
+- Prettier para formateo (incluye parser Angular para plantillas HTML)
+
+## Desarrollo
+
+Para levantar un servidor de desarrollo local:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Una vez iniciado, abre `http://localhost:4200/`. La aplicación se recarga automáticamente al modificar los archivos fuente.
 
-## Code scaffolding
+## Scaffolding de código
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Angular CLI incluye herramientas de scaffolding. Para generar un nuevo componente:
 
 ```bash
 ng generate component component-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Para ver todos los esquemas disponibles (`components`, `directives`, `pipes`, etc.):
 
 ```bash
 ng generate --help
 ```
 
-## Building
+## Build
 
-To build the project run:
+Para compilar el proyecto:
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Los artefactos de compilación se guardan en `dist/`. Por defecto, el build de producción optimiza la aplicación para rendimiento y velocidad.
 
-## Running unit tests
+## Tests unitarios
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Los tests se ejecutan con [Vitest](https://vitest.dev/):
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+## Tests end-to-end
 
-For end-to-end (e2e) testing, run:
+Angular CLI no incluye un framework de e2e por defecto; puedes añadir el que prefieras.
 
 ```bash
 ng e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Estructura del proyecto
 
-## Additional Resources
+```
+src/app/
+├── app.ts / app.html / app.css      # Shell de la aplicación (toolbar + navegación por tabs)
+├── app.routes.ts                     # Definición de rutas (lazy-loaded)
+├── app.config.ts                     # Configuración de la aplicación (router, zoneless, etc.)
+├── pages/
+│   ├── home/                         # Página de inicio
+│   ├── calculator/                   # Calculadora de páginas
+│   │   ├── components/
+│   │   │   └── calculator-confirm-dialog/   # Diálogo de confirmación reutilizable           
+│   ├── library/                      # Biblioteca de libros y manga
+│   ├── yearly-readings/              # Lecturas anuales
+│   └── management/                   # Gestión de datos
+└── shared/
+    ├── constants/                    # ROUTES, LANGUAGE, COUNTRY, READING_STATUS, GENRE, DEMOGRAPHIC
+    └── models/                       # Volume, Book, Manga, Author, Editorial, CodeLabel, MenuRoute
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+public/data/
+├── library/                          # books.json, manga.json
+└── yearly-readings/                  # Lecturas por año (ej. 2026.json)
+```
+
+## Recursos adicionales
+
+Para más información sobre Angular CLI y sus comandos, consulta la [documentación oficial](https://angular.dev/tools/cli).
