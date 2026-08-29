@@ -1,32 +1,24 @@
 -- ============================================================
 
--- 03_book_series.sql
+-- 03_book_series.sql (v2 - corregido)
 
--- Inserta las series/sagas de libros únicas (columna 'Serie' de la hoja Novela).
-
--- Requiere que 02_editorials.sql se haya ejecutado antes.
+-- Requiere haber ejecutado 02_editorials.sql (v2) antes.
 
 --
 
--- NOTA: el modelo BookSerie solo admite UNA editorial por serie, pero en
+-- CAMBIOS respecto a la v1:
 
--- el Excel algunas series tienen tomos publicados por editoriales distintas
+--  - 'La Bella Salvaje' -> editorial_id ahora apunta a 'Roca Editorial'
 
--- (reediciones, ediciones especiales, cambios de editorial con el tiempo):
+--    (antes NULL, sin dato en el Excel)
 
---   Harry Potter -> Bloomsbury, Salamandra, Whizz Hard Books
+--  - 'La Librería Morisaki' -> editorial_id ahora apunta a 'Letras de Plata'
 
---   Robert Langdon -> Booket, Planeta, Umbriel
+--    (antes NULL, sin dato en el Excel)
 
---   Sherlock Holmes -> Andre Deutsch, DeBolsillo, Penguin Clásicos, ...
+-- Resto de series sin cambios respecto a la v1 (ver esa versión para el
 
---   The Lord of the Rings -> Booket, HarperCollins
-
--- En estos casos se ha asignado a la serie la editorial MÁS FRECUENTE entre
-
--- sus tomos (empate -> orden alfabético). La editorial real de cada tomo se
-
--- respeta igualmente a nivel de libro individual en 04_books_and_authors.sql.
+-- criterio de 'editorial más frecuente' en series con varias editoriales).
 
 -- ============================================================
 
@@ -113,7 +105,7 @@ SELECT 'Howl', (SELECT id FROM editorials WHERE name = 'Berenice')
 WHERE NOT EXISTS (SELECT 1 FROM book_series WHERE title = 'Howl');
 
 INSERT INTO book_series (title, editorial_id)
-SELECT 'La Bella Salvaje', NULL
+SELECT 'La Bella Salvaje', (SELECT id FROM editorials WHERE name = 'Roca Editorial')
 WHERE NOT EXISTS (SELECT 1 FROM book_series WHERE title = 'La Bella Salvaje');
 
 INSERT INTO book_series (title, editorial_id)
@@ -125,7 +117,7 @@ SELECT 'La Crónica del Asesino de Reyes', (SELECT id FROM editorials WHERE name
 WHERE NOT EXISTS (SELECT 1 FROM book_series WHERE title = 'La Crónica del Asesino de Reyes');
 
 INSERT INTO book_series (title, editorial_id)
-SELECT 'La Librería Morisaki', NULL
+SELECT 'La Librería Morisaki', (SELECT id FROM editorials WHERE name = 'Letras de Plata')
 WHERE NOT EXISTS (SELECT 1 FROM book_series WHERE title = 'La Librería Morisaki');
 
 INSERT INTO book_series (title, editorial_id)

@@ -1,15 +1,28 @@
 -- ============================================================
--- 02_editorials.sql
--- Inserta todas las editoriales únicas extraídas de Biblioteca.xlsx
--- (hojas 'Novela' y 'Manga').
+
+-- 02_editorials.sql (v2 - corregido)
+
+-- Inserta las editoriales del Excel MÁS 3 editoriales nuevas detectadas
+
+-- al resolver libros que no tenían editorial en el Excel original.
+
 -- Idempotente: usa WHERE NOT EXISTS por nombre.
+
 --
--- NOTA: 'country' es un best-effort basado en el país de la editorial
--- (no del idioma de publicación). Se deja NULL cuando el país real no
--- encaja en el enum ES/GB/US/JP (p. ej. coediciones chino-japonesas) o
--- cuando no hay certeza suficiente. 'website' y 'logo' no están en el
--- Excel, se dejan NULL.
+
+-- CAMBIOS respecto a la v1:
+
+--  - 'Lonely Planet' -> US (propiedad de Red Ventures, Nashville, desde 2020)
+
+--  - 'Tianwen Kadokawa' -> CN (joint venture con sede en Chengdu, China)
+
+--  - NUEVAS: 'Roca Editorial' (ES), 'Letras de Plata' (ES), 'Lumen' (ES)
+
+--    -- se necesitan para 03_book_series.sql y 04_books_and_authors.sql
+
 -- ============================================================
+
+
 
 INSERT INTO editorials (name, country, website, logo)
 SELECT '3A Network', 'JP', NULL, NULL
@@ -132,8 +145,16 @@ SELECT 'La Esfera de los Libros', 'ES', NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'La Esfera de los Libros');
 
 INSERT INTO editorials (name, country, website, logo)
-SELECT 'Lonely Planet', NULL, NULL, NULL
+SELECT 'Letras de Plata', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Letras de Plata');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Lonely Planet', 'US', NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Lonely Planet');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Lumen', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Lumen');
 
 INSERT INTO editorials (name, country, website, logo)
 SELECT 'Milky Way Ediciones', 'ES', NULL, NULL
@@ -172,6 +193,10 @@ SELECT 'RBA', 'ES', NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'RBA');
 
 INSERT INTO editorials (name, country, website, logo)
+SELECT 'Roca Editorial', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Roca Editorial');
+
+INSERT INTO editorials (name, country, website, logo)
 SELECT 'SM', 'ES', NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'SM');
 
@@ -196,7 +221,7 @@ SELECT 'Suma', 'ES', NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Suma');
 
 INSERT INTO editorials (name, country, website, logo)
-SELECT 'Tianwen Kadokawa', NULL, NULL, NULL
+SELECT 'Tianwen Kadokawa', 'CN', NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Tianwen Kadokawa');
 
 INSERT INTO editorials (name, country, website, logo)
@@ -234,3 +259,54 @@ WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Yen ON');
 INSERT INTO editorials (name, country, website, logo)
 SELECT 'Yen Press', 'US', NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Yen Press');
+
+-- ============================================================
+-- 02b_editorials_extra.sql
+-- Editoriales adicionales para completar el editorial_id de los 17 libros
+-- que no tenían editorial en el Excel. Ejecutar DESPUÉS de 02_editorials.sql
+-- (y antes de 07_update_book_editorials.sql). Idempotente.
+-- ============================================================
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Amazon KDP', 'US', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Amazon KDP');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Austral', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Austral');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Hermida Editores', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Hermida Editores');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Libros del Asteroide', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Libros del Asteroide');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Macmillan', 'GB', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Macmillan');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Montena', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Montena');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Plutón Ediciones', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Plutón Ediciones');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Quaterni', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Quaterni');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Sans Soleil Ediciones', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Sans Soleil Ediciones');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Susaeta', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Susaeta');
+
+INSERT INTO editorials (name, country, website, logo)
+SELECT 'Trotta Editorial', 'ES', NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM editorials WHERE name = 'Trotta Editorial');

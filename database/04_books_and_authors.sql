@@ -1,21 +1,17 @@
 -- ============================================================
--- 04_books_and_authors.sql
--- Inserta los 288 libros de la hoja 'Novela' junto con sus relaciones
--- en book_authors (tabla puente). Requiere haber ejecutado antes
--- 01_authors.sql, 02_editorials.sql y 03_book_series.sql.
+-- 04_books_and_authors.sql (v3 - corregido, editorial_id NUNCA null)
+-- Requiere: 01_authors.sql, 02_editorials.sql, 02b_editorials_extra.sql,
+-- 03_book_series.sql, todos ejecutados antes.
 --
--- Cada INSERT usa un CTE (WITH ... RETURNING id) para encadenar la creación
--- del libro con la de sus vínculos en book_authors en una sola sentencia.
--- No es idempotente por título (el catálogo puede tener títulos repetidos
--- legítimos con distinta editorial/edición), así que antes de re-ejecutar
--- este script comprueba que no lo hayas corrido ya, o hazlo dentro de una
--- transacción que puedas revertir (BEGIN; ... ROLLBACK;).
---
--- Campos sin dato en el Excel (release_date, cover_image_url,
--- adquisition_date, start_date, finish_date) se dejan en NULL.
--- reading_status se fija a 'not_started' (no hay columna de progreso en el
--- Excel; el seguimiento de lectura vive en 'yearly_readings').
--- book_genres no se rellena: el Excel no tiene columna de género.
+-- CAMBIO respecto a la v2: los 17 libros que no tenían editorial en el
+-- Excel ahora usan directamente la editorial que confirmaste (Planeta,
+-- Amazon KDP, Austral, RBA, Plutón Ediciones, Macmillan, Quaterni, Montena,
+-- Libros del Asteroide, Hermida Editores, Sans Soleil Ediciones, Trotta
+-- Editorial, Susaeta), así que editorial_id ya no puede quedar NULL en
+-- ninguna fila. El script 07_update_book_editorials.sql ya NO hace falta
+-- si partes de una base de datos limpia; consérvalo solo como referencia
+-- por si ya ejecutaste la v2 y necesitas parchear filas existentes.
+-- No es idempotente por título (títulos legítimamente repetidos).
 -- ============================================================
 
 BEGIN;
@@ -996,7 +992,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Rimas y Leyendas', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Rimas y Leyendas', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Planeta'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1092,7 +1088,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('No. 6', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'EN', NULL, NULL, NULL)
+  VALUES ('No. 6', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'EN', (SELECT id FROM editorials WHERE name = 'Amazon KDP'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1428,19 +1424,19 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Crimen y Castigo', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Crimen y Castigo', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Austral'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
 SELECT new_book.id, a.id FROM new_book, (SELECT id FROM authors WHERE name = 'Fiódor Dostoievski') AS a;
 
--- Relatos (Edgar Allan Poe)
+-- Cuentos (Edgar Allan Poe)
 WITH new_book AS (
   INSERT INTO books (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Relatos', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Cuentos', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'RBA'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1500,7 +1496,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Viaje al Centro de la Tierra', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Viaje al Centro de la Tierra', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Plutón Ediciones'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1512,7 +1508,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('De la Tierra a la Luna', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('De la Tierra a la Luna', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Plutón Ediciones'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1524,7 +1520,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('La Vuelta al Mundo en Ochenta Días', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('La Vuelta al Mundo en Ochenta Días', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Plutón Ediciones'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1548,7 +1544,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('A Christmas Carol', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'EN', NULL, NULL, NULL)
+  VALUES ('A Christmas Carol', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'EN', (SELECT id FROM editorials WHERE name = 'Macmillan'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1656,7 +1652,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('El Libro de la Oscuridad', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, (SELECT id FROM book_series WHERE title = 'La Bella Salvaje'), 1)
+  VALUES ('El Libro de la Oscuridad', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Roca Editorial'), (SELECT id FROM book_series WHERE title = 'La Bella Salvaje'), 1)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1824,7 +1820,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Genshin Impact Artbook: Mondstadt and Liyue', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, NULL, (SELECT id FROM editorials WHERE name = 'Tianwen Kadokawa'), (SELECT id FROM book_series WHERE title = 'Genshin Impact Artbook'), 1)
+  VALUES ('Genshin Impact Artbook: Mondstadt and Liyue', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'CN', (SELECT id FROM editorials WHERE name = 'Tianwen Kadokawa'), (SELECT id FROM book_series WHERE title = 'Genshin Impact Artbook'), 1)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1836,7 +1832,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Genshin Impact Artbook: Inazuma', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, NULL, (SELECT id FROM editorials WHERE name = 'Tianwen Kadokawa'), (SELECT id FROM book_series WHERE title = 'Genshin Impact Artbook'), 2)
+  VALUES ('Genshin Impact Artbook: Inazuma', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'CN', (SELECT id FROM editorials WHERE name = 'Tianwen Kadokawa'), (SELECT id FROM book_series WHERE title = 'Genshin Impact Artbook'), 2)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -1848,7 +1844,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Genshin Impact Artbook: Sumeru', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, NULL, (SELECT id FROM editorials WHERE name = 'Tianwen Kadokawa'), (SELECT id FROM book_series WHERE title = 'Genshin Impact Artbook'), 3)
+  VALUES ('Genshin Impact Artbook: Sumeru', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'CN', (SELECT id FROM editorials WHERE name = 'Tianwen Kadokawa'), (SELECT id FROM book_series WHERE title = 'Genshin Impact Artbook'), 3)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -2195,7 +2191,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('El Dragón, Rashomon y otros cuentos', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('El Dragón, Rashomon y otros cuentos', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Quaterni'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3131,7 +3127,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Crónicas del Gato Viajero', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Crónicas del Gato Viajero', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Lumen'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3167,7 +3163,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('¿Cómo vives?', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('¿Cómo vives?', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Montena'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3202,7 +3198,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Un Lugar Desconocido', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Un Lugar Desconocido', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Libros del Asteroide'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3214,7 +3210,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('El Castillo de Arena', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('El Castillo de Arena', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Libros del Asteroide'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3262,7 +3258,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Mis días en la librería Morisaki', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, (SELECT id FROM book_series WHERE title = 'La Librería Morisaki'), 1)
+  VALUES ('Mis días en la librería Morisaki', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Letras de Plata'), (SELECT id FROM book_series WHERE title = 'La Librería Morisaki'), 1)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3274,7 +3270,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Una velada en la librería Morisaki', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, (SELECT id FROM book_series WHERE title = 'La Librería Morisaki'), 2)
+  VALUES ('Una velada en la librería Morisaki', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Letras de Plata'), (SELECT id FROM book_series WHERE title = 'La Librería Morisaki'), 2)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3286,7 +3282,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Los sueños de la primavera', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Los sueños de la primavera', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Hermida Editores'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3322,7 +3318,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Folk tales of Japan', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'EN', NULL, NULL, NULL)
+  VALUES ('Folk tales of Japan', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'EN', (SELECT id FROM editorials WHERE name = 'Amazon KDP'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3346,7 +3342,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Cien aspectos de la luna', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Cien aspectos de la luna', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Sans Soleil Ediciones'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
@@ -3406,7 +3402,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('Kojiki: Crónicas de antiguos hechos de Japón', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('Kojiki: Crónicas de antiguos hechos de Japón', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Trotta Editorial'), NULL, NULL)
   RETURNING id
 )
 SELECT 1; -- sin autor conocido en el Excel: no se crea ningún vínculo en book_authors
@@ -3429,7 +3425,7 @@ WITH new_book AS (
     title, reading_status, release_date, cover_image_url, adquisition_date,
     start_date, finish_date, notes, language, editorial_id, serie_id, serie_volume
   )
-  VALUES ('El Código del Samurai', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', NULL, NULL, NULL)
+  VALUES ('El Código del Samurai', 'not_started', NULL, NULL, NULL, NULL, NULL, NULL, 'ES', (SELECT id FROM editorials WHERE name = 'Susaeta'), NULL, NULL)
   RETURNING id
 )
 INSERT INTO book_authors (book_id, author_id)
