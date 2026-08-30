@@ -34,7 +34,7 @@ export class Library implements OnInit {
   protected readonly form = this._formBUilder.group({
     mode: new FormControl<MODE>(MODE.GALLERY),
   });
-  protected readonly mode = toSignal(
+  protected readonly mode = toSignal<MODE>(
     this.form.get(FIELD.MODE)!.valueChanges.pipe(takeUntilDestroyed()),
     {
       initialValue: MODE.GALLERY,
