@@ -1,10 +1,95 @@
-<div>
-  @if(this.mode() === MODE.GALLERY) {
-    <!-- TODO: GALERIA -->
-     <span>galeria</span>
-  }
-  @else {
-    <!-- TODO: TABLA -->
-     <span>tabla</span>
-  }
-</div>
+@if (data().length === 0) {
+  <div class="library-data-display__empty">
+    <mat-icon>{{ type() === TYPE.MANGA ? 'auto_stories' : 'menu_book' }}</mat-icon>
+    <p>No hay resultados con los filtros seleccionados.</p>
+  </div>
+} @else if (mode() === MODE.GALLERY) {
+  <div class="library-gallery">
+    @for (item of data(); track item.id) {
+      <article class="library-card">
+        <div class="library-card__cover">
+          @if (item.coverImageUrl) {
+            <img [src]="item.coverImageUrl" [alt]="'Portada de ' + item.title" loading="lazy" />
+          } @else {
+            <div class="library-card__placeholder">
+              <mat-icon>{{ type() === TYPE.MANGA ? 'auto_stories' : 'menu_book' }}</mat-icon>
+            </div>
+          }
+        </div>
+        <div class="library-card__body">
+          <h3 class="library-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
+          <p class="library-card__author">{{ authorNames(item) }}</p>
+          <p class="library-card__meta">
+            {{ item.finishDate ? 'Finalizado: ' + item.finishDate : readingStatusLabels[item.readingStatus] }}
+          </p>
+        </div>
+      </article>
+    }
+  </div>
+} @else {
+  <div class="library-table-wrapper">
+    <table mat-table [dataSource]="data()" class="library-table">
+      <ng-container matColumnDef="cover">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let item">
+          @if (item.coverImageUrl) {
+            <img class="library-table__cover" [src]="item.coverImageUrl" [alt]="'Portada de ' + item.title" />
+          } @else {
+            <mat-icon>menu_book</mat-icon>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Título</th>
+        <td mat-cell *matCellDef="let item">{{ item.title }}</td>
+      </ng-container>
+      <ng-container matColumnDef="authors">
+        <th mat-header-cell *matHeaderCellDef>Autores</th>
+        <td mat-cell *matCellDef="let item">{{ authorNames(item) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="editorial">
+        <th mat-header-cell *matHeaderCellDef>Editorial</th>
+        <td mat-cell *matCellDef="let item">{{ item.editorial.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="serie">
+        <th mat-header-cell *matHeaderCellDef>{{ type() === TYPE.MANGA ? 'Tomo nº' : 'Serie / Vol.' }}</th>
+        <td mat-cell *matCellDef="let item">{{ serieLabel(item) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="genres">
+        <th mat-header-cell *matHeaderCellDef>Géneros</th>
+        <td mat-cell *matCellDef="let item">{{ genreNames(item) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="readingStatus">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let item">{{ readingStatusLabel(item) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="releaseDate">
+        <th mat-header-cell *matHeaderCellDef>Publicación</th>
+        <td mat-cell *matCellDef="let item">{{ item.releaseDate ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="adquisitionDate">
+        <th mat-header-cell *matHeaderCellDef>Adquisición</th>
+        <td mat-cell *matCellDef="let item">{{ item.adquisitionDate ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="startDate">
+        <th mat-header-cell *matHeaderCellDef>Inicio</th>
+        <td mat-cell *matCellDef="let item">{{ item.startDate ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="finishDate">
+        <th mat-header-cell *matHeaderCellDef>Fin</th>
+        <td mat-cell *matCellDef="let item">{{ item.finishDate ?? '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="language">
+        <th mat-header-cell *matHeaderCellDef>Idioma</th>
+        <td mat-cell *matCellDef="let item">{{ languageLabel(item) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="notes">
+        <th mat-header-cell *matHeaderCellDef>Notas</th>
+        <td mat-cell *matCellDef="let item" [matTooltip]="item.notes ?? ''">{{ item.notes ?? '—' }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+}
