@@ -14,9 +14,11 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { BookService } from '../../services/book.service';
 import { Book } from '@shared/models';
 import { from } from 'rxjs/internal/observable/from';
+import { map } from 'rxjs/internal/operators/map';
 
 enum FIELD {
   MODE = 'mode',
+  TYPE = 'type',
 }
 
 @Component({
@@ -34,11 +36,12 @@ export class Library implements OnInit {
   protected readonly form = this._formBUilder.group({
     mode: new FormControl<MODE>(MODE.GALLERY),
   });
-  protected readonly mode = toSignal<MODE>(
-    this.form.get(FIELD.MODE)!.valueChanges.pipe(takeUntilDestroyed()),
-    {
-      initialValue: MODE.GALLERY,
-    },
+  protected readonly mode = toSignal(
+    this.form.get(FIELD.MODE)!.valueChanges.pipe(
+      map((value) => value ?? MODE.GALLERY),
+      takeUntilDestroyed(),
+    ),
+    { initialValue: MODE.GALLERY },
   );
 
   protected data = signal<Book[]>([]);
