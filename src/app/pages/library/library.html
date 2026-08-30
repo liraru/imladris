@@ -1,3 +1,25 @@
-<app-library-search />
+<div class="library-page container">
+  <app-library-search
+    [authors]="authors()"
+    [series]="series()"
+    [editorials]="editorials()"
+    [finishYears]="finishYears()"
+    [adquisitionYears]="adquisitionYears()"
+    [resultCount]="displayItems().length"
+    (filtersChange)="onFiltersChange($event)"
+  />
 
-<app-library-data-display [mode]="mode()" [data]="data()" />
+  @if (loading()) {
+    <div class="library-page__state">
+      <mat-spinner diameter="40" />
+      <p>Cargando biblioteca…</p>
+    </div>
+  } @else if (error()) {
+    <div class="library-page__state library-page__state--error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <app-library-data-display [mode]="filters().mode" [type]="filters().type" [data]="displayItems()" />
+  }
+</div>

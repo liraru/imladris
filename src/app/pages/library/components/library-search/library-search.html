@@ -1,1 +1,143 @@
-<p>library-search works!</p>
+<mat-accordion class="library-search">
+  <mat-expansion-panel [expanded]="true" class="library-search__panel">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon>tune</mat-icon>
+        Filtros y visualización
+      </mat-panel-title>
+      <mat-panel-description>
+        @if (activeFilterCount() > 0) {
+          {{ activeFilterCount() }} filtro{{ activeFilterCount() === 1 ? '' : 's' }} activo{{ activeFilterCount() === 1 ? '' : 's' }}
+        } @else {
+          Sin filtros · {{ resultCount() }} resultados
+        }
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <form [formGroup]="form" class="library-search__form">
+      <div class="library-search__switches">
+        <div class="library-search__toggle-group">
+          <span class="library-search__toggle-label">Colección</span>
+          <mat-button-toggle-group formControlName="type" aria-label="Tipo de obra">
+            <mat-button-toggle [value]="TYPE.BOOK">
+              <mat-icon>menu_book</mat-icon>
+              <span class="library-search__toggle-text">{{ typeLabels[TYPE.BOOK] }}</span>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="TYPE.MANGA">
+              <mat-icon>auto_stories</mat-icon>
+              <span class="library-search__toggle-text">{{ typeLabels[TYPE.MANGA] }}</span>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <div class="library-search__toggle-group">
+          <span class="library-search__toggle-label">Vista</span>
+          <mat-button-toggle-group formControlName="mode" aria-label="Modo de visualización">
+            <mat-button-toggle [value]="MODE.GALLERY">
+              <mat-icon>grid_view</mat-icon>
+              <span class="library-search__toggle-text">{{ modeLabels[MODE.GALLERY] }}</span>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="MODE.TABLE">
+              <mat-icon>table_rows</mat-icon>
+              <span class="library-search__toggle-text">{{ modeLabels[MODE.TABLE] }}</span>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+
+      <div class="grid library-search__fields">
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="title" placeholder="Buscar por título" autocomplete="off" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Autor</mat-label>
+          <input matInput formControlName="author" [matAutocomplete]="authorAuto" autocomplete="off" />
+          <mat-autocomplete #authorAuto="matAutocomplete" [displayWith]="displayAuthor">
+            @for (author of filteredAuthors(); track author.id) {
+              <mat-option [value]="author">{{ author.name }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        @if (type() === TYPE.BOOK) {
+          <mat-form-field appearance="outline" class="col-12 col-md-4">
+            <mat-label>Serie</mat-label>
+            <input matInput formControlName="serie" [matAutocomplete]="serieAuto" autocomplete="off" />
+            <mat-autocomplete #serieAuto="matAutocomplete" [displayWith]="displaySerie">
+              @for (serie of filteredSeries(); track serie.id) {
+                <mat-option [value]="serie">{{ serie.title }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        }
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Editorial</mat-label>
+          <input matInput formControlName="editorial" [matAutocomplete]="editorialAuto" autocomplete="off" />
+          <mat-autocomplete #editorialAuto="matAutocomplete" [displayWith]="displayEditorial">
+            @for (editorial of filteredEditorials(); track editorial.id) {
+              <mat-option [value]="editorial">{{ editorial.name }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-2">
+          <mat-label>Año fin.</mat-label>
+          <mat-select formControlName="finishYear">
+            <mat-option [value]="null">Todos</mat-option>
+            @for (year of finishYears(); track year) {
+              <mat-option [value]="year">{{ year }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-2">
+          <mat-label>Año adq.</mat-label>
+          <mat-select formControlName="adquisitionYear">
+            <mat-option [value]="null">Todos</mat-option>
+            @for (year of adquisitionYears(); track year) {
+              <mat-option [value]="year">{{ year }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Estado de lectura</mat-label>
+          <mat-select formControlName="readingStatus">
+            <mat-option [value]="null">Todos</mat-option>
+            @for (status of readingStatuses; track status) {
+              <mat-option [value]="status">{{ readingStatusLabels[status] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-5">
+          <mat-label>Ordenar por</mat-label>
+          <mat-select formControlName="sortBy" multiple>
+            @for (field of sortFields; track field) {
+              <mat-option [value]="field">{{ sortFieldLabels[field] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <div class="col-12 col-md-3 library-search__toggle-group">
+          <span class="library-search__toggle-label">Dirección</span>
+          <mat-button-toggle-group formControlName="sortDirection" aria-label="Dirección de orden">
+            <mat-button-toggle value="asc" aria-label="Ascendente"><mat-icon>arrow_upward</mat-icon></mat-button-toggle>
+            <mat-button-toggle value="desc" aria-label="Descendente"><mat-icon>arrow_downward</mat-icon></mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+
+      <div class="library-search__footer">
+        <span class="library-search__count">{{ resultCount() }} resultados</span>
+        <button mat-stroked-button type="button" (click)="reset()">
+          <mat-icon>restart_alt</mat-icon>
+          Limpiar filtros
+        </button>
+      </div>
+    </form>
+  </mat-expansion-panel>
+</mat-accordion>
