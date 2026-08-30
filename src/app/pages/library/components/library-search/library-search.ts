@@ -145,7 +145,7 @@ function idOf<T extends { id: number }>(value: NameableRef<T> | undefined): numb
 }
 
 function filterByName<T>(items: T[], query: NameableRef<T>, nameFn: (item: T) => string): T[] {
-  const search = (typeof query === 'string' ? query : nameFn(query as T) || '').toLowerCase();
+  const search = (typeof query === 'string' ? query : query ? nameFn(query) : '').toLowerCase();
   if (!search) return items.slice(0, 30);
   return items.filter((item) => nameFn(item).toLowerCase().includes(search)).slice(0, 30);
 }
