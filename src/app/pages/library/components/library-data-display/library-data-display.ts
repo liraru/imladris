@@ -1,5 +1,6 @@
 import { Component, input, signal } from '@angular/core';
 import { MODE } from '../../constants/library.consants';
+import { Book } from '@shared/models';
 
 @Component({
   imports: [],
@@ -9,6 +10,7 @@ import { MODE } from '../../constants/library.consants';
 })
 export class LibraryDataDisplay {
   public mode = input.required<MODE>();
+  public data = input.required<Book[]>();
   
   protected readonly MODE = MODE;
 }
