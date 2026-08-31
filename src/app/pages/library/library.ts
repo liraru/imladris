@@ -1,7 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { firstValueFrom } from 'rxjs';
 import { LibraryDataDisplay } from './components/library-data-display/library-data-display';
+import { LibraryDeleteDialog, LibraryDeleteDialogData } from './components/library-delete-dialog/library-delete-dialog';
+import {
+  LibraryFormModal,
+  LibraryFormModalData,
+  LibraryFormModalResult,
+} from './components/library-form-modal/library-form-modal';
 import { LibrarySearch } from './components/library-search/library-search';
 import { AuthorService } from '../../services/author.service';
 import { BookSerieService } from '../../services/book-serie.service';
@@ -9,12 +18,13 @@ import { BookService } from '../../services/book.service';
 import { EditorialService } from '../../services/editorial.service';
 import { MangaVolumeService } from '../../services/manga-volume.service';
 import { Author, BookSerie, Editorial } from '@shared/models';
+import { FORM_MODE } from './constants/library-form.constants';
 import { SORT_FIELD, TYPE } from './constants/library.consants';
 import { DEFAULT_LIBRARY_FILTERS, LibraryFilters } from './models/library-filters.model';
 import { fromBook, fromMangaVolume, LibraryItem } from './models/library-item.model';
 
 @Component({
-  imports: [LibraryDataDisplay, LibrarySearch, MatIconModule, MatProgressSpinnerModule],
+  imports: [LibraryDataDisplay, LibrarySearch, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   selector: 'app-library',
   styleUrl: './library.css',
   templateUrl: './library.html',
@@ -26,6 +36,7 @@ export class Library implements OnInit {
   private readonly _authorSrv = inject(AuthorService);
   private readonly _editorialSrv = inject(EditorialService);
   private readonly _bookSerieSrv = inject(BookSerieService);
+  private readonly _dialog = inject(MatDialog);
 
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
@@ -37,6 +48,8 @@ export class Library implements OnInit {
   protected readonly editorials = signal<Editorial[]>([]);
 
   protected readonly filters = signal<LibraryFilters>(DEFAULT_LIBRARY_FILTERS);
+
+  protected readonly TYPE = TYPE;
 
   private readonly sourceItems = computed<LibraryItem[]>(() =>
     this.filters().type === TYPE.BOOK ? this.books() : this.mangaVolumes(),
@@ -56,6 +69,70 @@ export class Library implements OnInit {
   protected onFiltersChange(filters: LibraryFilters): void {
     this.filters.set(filters);
   }
+
+  // ---------- Alta ----------
+
+  protected openCreate(): void {
+    this.openFormModal({ mode: FORM_MODE.ALTA, type: this.filters().type });
+  }
+
+  // ---------- Ver detalle (desde el menú contextual) ----------
+
+  protected onViewDetail(item: LibraryItem): void {
+    this.openFormModal({ mode: FORM_MODE.DETALLE, type: this.filters().type, itemId: item.id });
+  }
+
+  private openFormModal(data: LibraryFormModalData): void {
+    const ref = this._dialog.open<LibraryFormModal, LibraryFormModalData, LibraryFormModalResult>(
+      LibraryFormModal,
+      {
+        data,
+        width: '760px',
+        maxWidth: '95vw',
+        autoFocus: false,
+      },
+    );
+    ref.afterClosed().subscribe((result) => {
+      if (result?.saved) this._loadItems();
+    });
+  }
+
+  // ---------- Eliminar (desde el menú contextual) ----------
+
+  protected async onDeleteItem(item: LibraryItem): Promise<void> {
+    const type = this.filters().type;
+
+    const dialogData: LibraryDeleteDialogData = {
+      type,
+      title: item.title,
+      authorNames: item.authors.length ? item.authors.map((a) => a.name).join(', ') : 'Autor desconocido',
+      editorialName: item.editorial?.name ?? '—',
+      volumeNumber: type === TYPE.MANGA ? item.serieVolume : undefined,
+      notes: type === TYPE.MANGA ? item.notes : undefined,
+    };
+
+    const ref = this._dialog.open<LibraryDeleteDialog, LibraryDeleteDialogData, boolean>(
+      LibraryDeleteDialog,
+      { data: dialogData, width: '480px', maxWidth: '95vw' },
+    );
+
+    const confirmed = await firstValueFrom(ref.afterClosed());
+    if (!confirmed) return;
+
+    try {
+      if (type === TYPE.BOOK) {
+        await this._bookSrv.remove(item.id);
+      } else {
+        await this._mangaVolumeSrv.remove(item.id);
+      }
+      await this._loadItems();
+    } catch (err) {
+      this.error.set('No se ha podido eliminar el elemento. Inténtalo de nuevo.');
+      console.error(err);
+    }
+  }
+
+  // ---------- Carga de datos ----------
 
   private async _loadReferenceData(): Promise<void> {
     try {

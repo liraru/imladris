@@ -1,1 +1,279 @@
-<p>library-form-modal works!</p>
+<h2 mat-dialog-title>
+  {{ formModeLabels[mode()] }} {{ isBook ? 'libro' : 'tomo de manga' }}
+</h2>
+
+<mat-dialog-content class="library-form-modal">
+  @if (loading()) {
+    <div class="library-form-modal__state">
+      <mat-spinner diameter="36" />
+      <p>Cargando…</p>
+    </div>
+  } @else {
+    @if (error()) {
+      <p class="library-form-modal__error">{{ error() }}</p>
+    }
+
+    <form [formGroup]="form" class="library-form-modal__form grid">
+      <mat-form-field appearance="outline" class="col-12">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="title" autocomplete="off" />
+      </mat-form-field>
+
+      <!-- Autores -->
+      <div class="col-12 library-form-modal__row-with-action">
+        <mat-form-field appearance="outline" class="library-form-modal__grow">
+          <mat-label>Autores</mat-label>
+          <mat-select formControlName="authorIds" multiple>
+            @for (author of authors(); track author.id) {
+              <mat-option [value]="author.id">{{ author.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if (!isReadOnly()) {
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Añadir autor rápido"
+            (click)="toggleQuickAuthor()"
+          >
+            <mat-icon>{{ showQuickAuthor() ? 'close' : 'person_add' }}</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (showQuickAuthor()) {
+        <div class="col-12 library-form-modal__quick-panel" [formGroup]="quickAuthorForm">
+          <mat-form-field appearance="outline" class="col-12 col-md-5">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="name" autocomplete="off" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col-8 col-md-4">
+            <mat-label>País</mat-label>
+            <mat-select formControlName="country">
+              @for (country of countries; track country) {
+                <mat-option [value]="country">{{ countryLabels[country] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <div class="col-4 col-md-3 library-form-modal__quick-panel-actions">
+            <button mat-flat-button type="button" color="tertiary" (click)="createQuickAuthor()">
+              Añadir
+            </button>
+          </div>
+          <mat-form-field appearance="outline" class="col-12">
+            <mat-label>Notas (opcional)</mat-label>
+            <input matInput formControlName="notes" autocomplete="off" />
+          </mat-form-field>
+        </div>
+      }
+
+      <!-- Editorial -->
+      <div class="col-12 col-md-6 library-form-modal__row-with-action">
+        <mat-form-field appearance="outline" class="library-form-modal__grow">
+          <mat-label>Editorial</mat-label>
+          <mat-select formControlName="editorialId">
+            @for (editorial of editorials(); track editorial.id) {
+              <mat-option [value]="editorial.id">{{ editorial.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if (!isReadOnly()) {
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Añadir editorial rápida"
+            (click)="toggleQuickEditorial()"
+          >
+            <mat-icon>{{ showQuickEditorial() ? 'close' : 'add_business' }}</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (showQuickEditorial()) {
+        <div class="col-12 library-form-modal__quick-panel" [formGroup]="quickEditorialForm">
+          <mat-form-field appearance="outline" class="col-12 col-md-5">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="name" autocomplete="off" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col-6 col-md-3">
+            <mat-label>País</mat-label>
+            <mat-select formControlName="country">
+              @for (country of countries; track country) {
+                <mat-option [value]="country">{{ countryLabels[country] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col-6 col-md-3">
+            <mat-label>Web (opcional)</mat-label>
+            <input matInput formControlName="website" autocomplete="off" />
+          </mat-form-field>
+          <div class="col-12 col-md-1 library-form-modal__quick-panel-actions">
+            <button mat-flat-button type="button" color="tertiary" (click)="createQuickEditorial()">
+              Añadir
+            </button>
+          </div>
+        </div>
+      }
+
+      <mat-form-field appearance="outline" class="col-12 col-md-6">
+        <mat-label>Idioma</mat-label>
+        <mat-select formControlName="language">
+          @for (language of languages; track language) {
+            <mat-option [value]="language">{{ languageLabels[language] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (isBook) {
+        <!-- Campos exclusivos de libro -->
+        <mat-form-field appearance="outline" class="col-12 col-md-8">
+          <mat-label>Serie (opcional)</mat-label>
+          <mat-select formControlName="serieId">
+            <mat-option [value]="null">Sin serie</mat-option>
+            @for (serie of series(); track serie.id) {
+              <mat-option [value]="serie.id">{{ serie.title }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Vol. de la serie</mat-label>
+          <input matInput type="number" formControlName="serieVolume" autocomplete="off" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12">
+          <mat-label>Géneros</mat-label>
+          <mat-select formControlName="genres" multiple>
+            @for (genre of genres; track genre) {
+              <mat-option [value]="genre">{{ genreLabels[genre] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      } @else {
+        <!-- Campos exclusivos de manga -->
+        <div class="col-12 col-md-8 library-form-modal__row-with-action">
+          <mat-form-field appearance="outline" class="library-form-modal__grow">
+            <mat-label>Manga</mat-label>
+            <mat-select formControlName="mangaId">
+              @for (manga of mangas(); track manga.id) {
+                <mat-option [value]="manga.id">{{ manga.title }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          @if (!isReadOnly()) {
+            <button
+              mat-icon-button
+              type="button"
+              matTooltip="Añadir manga rápido"
+              (click)="toggleQuickManga()"
+            >
+              <mat-icon>{{ showQuickManga() ? 'close' : 'auto_stories' }}</mat-icon>
+            </button>
+          }
+        </div>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Nº de tomo</mat-label>
+          <input matInput type="number" formControlName="volumeNumber" autocomplete="off" />
+        </mat-form-field>
+
+        @if (showQuickManga()) {
+          <div class="col-12 library-form-modal__quick-panel" [formGroup]="quickMangaForm">
+            <mat-form-field appearance="outline" class="col-12 col-md-7">
+              <mat-label>Título del manga</mat-label>
+              <input matInput formControlName="title" autocomplete="off" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col-8 col-md-4">
+              <mat-label>Demografía</mat-label>
+              <mat-select formControlName="demographic">
+                @for (demographic of demographics; track demographic) {
+                  <mat-option [value]="demographic">{{ demographicLabels[demographic] }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <div class="col-4 col-md-1 library-form-modal__quick-panel-actions">
+              <button mat-flat-button type="button" color="tertiary" (click)="createQuickManga()">
+                Añadir
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      <mat-form-field appearance="outline" class="col-12 col-md-6">
+        <mat-label>Estado de lectura</mat-label>
+        <mat-select formControlName="readingStatus">
+          @for (status of readingStatuses; track status) {
+            <mat-option [value]="status">{{ readingStatusLabels[status] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-12 col-md-6">
+        <mat-label>Portada (URL, opcional)</mat-label>
+        <input matInput formControlName="coverImageUrl" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-6 col-md-3">
+        <mat-label>Publicación</mat-label>
+        <input matInput [matDatepicker]="releasePicker" formControlName="releaseDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="releasePicker" />
+        <mat-datepicker #releasePicker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-6 col-md-3">
+        <mat-label>Adquisición</mat-label>
+        <input matInput [matDatepicker]="adqPicker" formControlName="adquisitionDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="adqPicker" />
+        <mat-datepicker #adqPicker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-6 col-md-3">
+        <mat-label>Inicio de lectura</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
+        <mat-datepicker #startPicker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-6 col-md-3">
+        <mat-label>Fin de lectura</mat-label>
+        <input matInput [matDatepicker]="finishPicker" formControlName="finishDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="finishPicker" />
+        <mat-datepicker #finishPicker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-12">
+        <mat-label>Notas</mat-label>
+        <textarea matInput formControlName="notes" rows="2"></textarea>
+      </mat-form-field>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">
+    {{ mode() === FORM_MODE.DETALLE ? 'Cerrar' : 'Cancelar' }}
+  </button>
+
+  @if (mode() === FORM_MODE.DETALLE) {
+    <button mat-flat-button type="button" color="primary" (click)="enableEdit()">
+      <mat-icon>edit</mat-icon>
+      Editar
+    </button>
+  } @else {
+    <button
+      mat-flat-button
+      type="button"
+      color="tertiary"
+      [disabled]="saving() || loading()"
+      (click)="save()"
+    >
+      @if (saving()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        <mat-icon>save</mat-icon>
+      }
+      Guardar
+    </button>
+  }
+</mat-dialog-actions>

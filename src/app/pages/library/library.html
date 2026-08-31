@@ -1,4 +1,11 @@
 <div class="library-page container">
+  <div class="library-page__header">
+    <button mat-flat-button type="button" color="primary" (click)="openCreate()">
+      <mat-icon>add</mat-icon>
+      Añadir {{ filters().type === TYPE.MANGA ? 'tomo' : 'libro' }}
+    </button>
+  </div>
+
   <app-library-search
     [authors]="authors()"
     [series]="series()"
@@ -20,6 +27,12 @@
       <p>{{ error() }}</p>
     </div>
   } @else {
-    <app-library-data-display [mode]="filters().mode" [type]="filters().type" [data]="displayItems()" />
+    <app-library-data-display
+      [mode]="filters().mode"
+      [type]="filters().type"
+      [data]="displayItems()"
+      (viewDetail)="onViewDetail($event)"
+      (deleteItem)="onDeleteItem($event)"
+    />
   }
 </div>

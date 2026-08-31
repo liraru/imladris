@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LANGUAGE_LABELS } from '@shared/constants';
@@ -9,7 +10,7 @@ import { MODE, TYPE } from '../../constants/library.consants';
 import { LibraryItem } from '../../models/library-item.model';
 
 @Component({
-  imports: [MatIconModule, MatTableModule, MatTooltipModule],
+  imports: [MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule],
   selector: 'app-library-data-display',
   styleUrl: './library-data-display.css',
   templateUrl: './library-data-display.html',
@@ -19,6 +20,11 @@ export class LibraryDataDisplay {
   public mode = input.required<MODE>();
   public type = input.required<TYPE>();
   public data = input.required<LibraryItem[]>();
+
+  /** Se emite cuando el usuario elige "Ver detalle" en el menú contextual de un elemento. */
+  public readonly viewDetail = output<LibraryItem>();
+  /** Se emite cuando el usuario elige "Eliminar" en el menú contextual de un elemento. */
+  public readonly deleteItem = output<LibraryItem>();
 
   protected readonly MODE = MODE;
   protected readonly TYPE = TYPE;
@@ -40,6 +46,7 @@ export class LibraryDataDisplay {
     'finishDate',
     'language',
     'notes',
+    'actions',
   ];
 
   protected authorNames(item: LibraryItem): string {

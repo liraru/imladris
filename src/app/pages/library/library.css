@@ -5,6 +5,11 @@
   padding-block: 1.5rem 3rem;
 }
 
+.library-page__header {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .library-page__state {
   display: flex;
   flex-direction: column;
