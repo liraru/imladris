@@ -1,16 +1,13 @@
 <mat-accordion class="library-search">
-  <mat-expansion-panel [expanded]="true" class="library-search__panel">
+  <mat-expansion-panel [expanded]="false" class="library-search__panel">
     <mat-expansion-panel-header>
       <mat-panel-title>
         <mat-icon>tune</mat-icon>
-        Filtros y visualización
+        <span class="library-search__toggle-text">Filtros y visualización</span>
       </mat-panel-title>
       <mat-panel-description>
-        @if (activeFilterCount() > 0) {
-          {{ activeFilterCount() }} filtro{{ activeFilterCount() === 1 ? '' : 's' }} activo{{ activeFilterCount() === 1 ? '' : 's' }}
-        } @else {
-          Sin filtros · {{ resultCount() }} resultados
-        }
+        {{ activeFilterCount() }} filtro{{ activeFilterCount() === 1 ? '' : 's' }} activo{{ activeFilterCount() === 1 ? '' : 's' }}
+        · {{ resultCount() }} registro{{ resultCount() === 1 ? '' : 's' }}
       </mat-panel-description>
     </mat-expansion-panel-header>
 
@@ -112,29 +109,41 @@
             }
           </mat-select>
         </mat-form-field>
+      </div>
 
-        <mat-form-field appearance="outline" class="col-12 col-md-5">
+      <div class="library-search__sort-row">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="library-search__sort-field">
           <mat-label>Ordenar por</mat-label>
           <mat-select formControlName="sortBy" multiple>
+            <mat-select-trigger>{{ sortByTriggerLabel() }}</mat-select-trigger>
             @for (field of sortFields; track field) {
-              <mat-option [value]="field">{{ sortFieldLabels[field] }}</mat-option>
+              <mat-option [value]="field" (onSelectionChange)="onSortOptionToggle(field, $event)">
+                @if (sortPosition(field); as position) {
+                  <span class="library-search__sort-position">{{ position }}</span>
+                }
+                {{ sortFieldLabels[field] }}
+              </mat-option>
             }
           </mat-select>
         </mat-form-field>
 
-        <div class="col-12 col-md-3 library-search__toggle-group">
-          <span class="library-search__toggle-label">Dirección</span>
-          <mat-button-toggle-group formControlName="sortDirection" aria-label="Dirección de orden">
-            <mat-button-toggle value="asc" aria-label="Ascendente"><mat-icon>arrow_upward</mat-icon></mat-button-toggle>
-            <mat-button-toggle value="desc" aria-label="Descendente"><mat-icon>arrow_downward</mat-icon></mat-button-toggle>
-          </mat-button-toggle-group>
-        </div>
+        <mat-button-toggle-group
+          formControlName="sortDirection"
+          class="library-search__direction"
+          aria-label="Dirección de orden"
+        >
+          <mat-button-toggle value="asc" aria-label="Ascendente"><mat-icon>arrow_upward</mat-icon></mat-button-toggle>
+          <mat-button-toggle value="desc" aria-label="Descendente"><mat-icon>arrow_downward</mat-icon></mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
 
       <div class="library-search__footer">
-        <span class="library-search__count">{{ resultCount() }} resultados</span>
-        <button mat-stroked-button type="button" (click)="reset()">
+        <button mat-stroked-button type="button" (click)="resetSort()">
           <mat-icon>restart_alt</mat-icon>
+          Restablecer orden
+        </button>
+        <button mat-stroked-button type="button" (click)="reset()">
+          <mat-icon>filter_alt_off</mat-icon>
           Limpiar filtros
         </button>
       </div>

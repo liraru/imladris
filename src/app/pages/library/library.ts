@@ -134,12 +134,18 @@ function compareByField(a: LibraryItem, b: LibraryItem, field: SORT_FIELD): numb
       return a.title.localeCompare(b.title);
     case SORT_FIELD.AUTHOR:
       return (a.authors[0]?.name ?? '').localeCompare(b.authors[0]?.name ?? '');
+    case SORT_FIELD.SERIE:
+      return (a.serieTitle ?? '').localeCompare(b.serieTitle ?? '');
+    case SORT_FIELD.VOLUME_NUMBER:
+      return (a.serieVolume ?? 0) - (b.serieVolume ?? 0);
     case SORT_FIELD.FINISH_DATE:
       return (a.finishDate ?? '').localeCompare(b.finishDate ?? '');
     case SORT_FIELD.ADQUISITION_DATE:
       return (a.adquisitionDate ?? '').localeCompare(b.adquisitionDate ?? '');
     case SORT_FIELD.RELEASE_DATE:
       return (a.releaseDate ?? '').localeCompare(b.releaseDate ?? '');
+    case SORT_FIELD.NOTES:
+      return (a.notes ?? '').localeCompare(b.notes ?? '');
     default:
       return 0;
   }

@@ -1,5 +1,11 @@
-import { READING_STATUS } from '../../../shared/constants/reading-status.constant';
-import { MODE, SORT_FIELD, TYPE } from '../constants/library.consants';
+import { READING_STATUS } from '@shared/constants';
+import {
+  DEFAULT_SORT_BY,
+  DEFAULT_SORT_DIRECTION,
+  MODE,
+  SORT_FIELD,
+  TYPE,
+} from '../constants/library.consants';
 
 export interface LibraryFilters {
   mode: MODE;
@@ -25,6 +31,6 @@ export const DEFAULT_LIBRARY_FILTERS: LibraryFilters = {
   adquisitionYear: null,
   editorialId: null,
   readingStatus: null,
-  sortBy: [SORT_FIELD.TITLE],
-  sortDirection: 'asc',
+  sortBy: DEFAULT_SORT_BY[TYPE.BOOK],
+  sortDirection: DEFAULT_SORT_DIRECTION,
 };

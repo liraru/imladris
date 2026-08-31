@@ -1,18 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { outputFromObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { outputFromObservable, toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime, map, startWith } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Author, BookSerie, Editorial } from '@shared/models';
-import { debounceTime, map, startWith } from 'rxjs';
-import { READING_STATUS, READING_STATUS_LABELS } from '../../../../shared/constants/reading-status.constant';
+import { READING_STATUS, READING_STATUS_LABELS } from '@shared/constants';
 import {
+  DEFAULT_SORT_BY,
+  DEFAULT_SORT_DIRECTION,
   MODE,
   MODE_LABELS,
   SORT_FIELD,
@@ -72,10 +75,23 @@ export class LibrarySearch {
     sortDirection: new FormControl(DEFAULT_LIBRARY_FILTERS.sortDirection, { nonNullable: true }),
   });
 
-  /** Se usa en la plantilla para ocultar "Serie" cuando el tipo activo es manga. */
+  /** Se usa en la plantilla para ocultar "Serie" y para calcular el orden por defecto. */
   protected readonly type = toSignal(this.form.controls.type.valueChanges, {
     initialValue: DEFAULT_LIBRARY_FILTERS.type,
   });
+
+  /**
+   * `mat-select[multiple]` reordena su `value` según la posición de las opciones en la lista,
+   * no según el orden de clic del usuario. Este signal lleva la cuenta real del orden de selección
+   * (se añade al hacer clic, se quita al deseleccionar) y es la fuente de verdad para `sortBy`.
+   */
+  protected readonly manualSortOrder = signal<SORT_FIELD[]>(DEFAULT_LIBRARY_FILTERS.sortBy);
+
+  protected readonly sortByTriggerLabel = computed(() =>
+    this.manualSortOrder()
+      .map((field) => this.sortFieldLabels[field])
+      .join(' → '),
+  );
 
   private readonly authorQuery = toSignal(this.form.controls.author.valueChanges, { initialValue: null });
   private readonly serieQuery = toSignal(this.form.controls.serie.valueChanges, { initialValue: null });
@@ -120,23 +136,60 @@ export class LibrarySearch {
           adquisitionYear: value.adquisitionYear ?? null,
           editorialId: idOf(value.editorial),
           readingStatus: value.readingStatus ?? null,
-          sortBy: value.sortBy ?? [],
+          sortBy: this.manualSortOrder(),
           sortDirection: value.sortDirection ?? 'asc',
         }),
       ),
     ),
   );
 
+  /** Al cambiar de colección (novelas/manga), el orden vuelve al que corresponde por defecto. */
+  private readonly _syncDefaultSortOnTypeChange = effect(() => {
+    const type = this.type();
+    const defaultSort = DEFAULT_SORT_BY[type];
+    this.form.patchValue({ sortBy: defaultSort, sortDirection: DEFAULT_SORT_DIRECTION });
+    this.manualSortOrder.set(defaultSort);
+  });
+
   protected displayAuthor = (v: NameableRef<Author>) => (typeof v === 'string' ? v : v?.name ?? '');
   protected displaySerie = (v: NameableRef<BookSerie>) => (typeof v === 'string' ? v : v?.title ?? '');
   protected displayEditorial = (v: NameableRef<Editorial>) => (typeof v === 'string' ? v : v?.name ?? '');
 
+  protected sortPosition(field: SORT_FIELD): number | null {
+    const index = this.manualSortOrder().indexOf(field);
+    return index === -1 ? null : index + 1;
+  }
+
+  protected onSortOptionToggle(field: SORT_FIELD, event: MatOptionSelectionChange): void {
+    if (!event.isUserInput) return;
+    const selected = event.source.selected;
+    this.manualSortOrder.update((current) => {
+      if (selected) {
+        return current.includes(field) ? current : [...current, field];
+      }
+      return current.filter((f) => f !== field);
+    });
+  }
+
   protected reset(): void {
+    const mode = this.form.controls.mode.value;
+    const type = this.form.controls.type.value;
+    const defaultSort = DEFAULT_SORT_BY[type];
     this.form.reset({
       ...DEFAULT_LIBRARY_FILTERS,
-      mode: this.form.controls.mode.value,
-      type: this.form.controls.type.value,
+      mode,
+      type,
+      sortBy: defaultSort,
+      sortDirection: DEFAULT_SORT_DIRECTION,
     });
+    this.manualSortOrder.set(defaultSort);
+  }
+
+  protected resetSort(): void {
+    const type = this.form.controls.type.value;
+    const defaultSort = DEFAULT_SORT_BY[type];
+    this.form.patchValue({ sortBy: defaultSort, sortDirection: DEFAULT_SORT_DIRECTION });
+    this.manualSortOrder.set(defaultSort);
   }
 }
 
