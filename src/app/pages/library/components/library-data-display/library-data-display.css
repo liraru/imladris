@@ -89,3 +89,32 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.library-menu-trigger {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.library-menu-trigger .mat-mdc-button-touch-target {
+  width: 32px !important;
+  height: 32px !important;
+}
+.library-menu-trigger:hover,
+.library-menu-trigger:focus-visible {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 14%, transparent) !important;
+}
+
+.library-card__menu-trigger {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 1;
+  border: none;
+}

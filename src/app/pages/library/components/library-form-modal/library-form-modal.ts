@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime, map, startWith } from 'rxjs';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,15 +39,24 @@ export interface LibraryFormModalResult {
   saved: boolean;
 }
 
+/** Valor de un control de autocompletado: el objeto seleccionado, texto libre en curso, o vacío. */
+type NameableRef<T> = T | string | null;
+
 function toDate(value?: string): Date | null {
   return value ? new Date(value) : null;
+}
+
+function normalize(value: string | null | undefined): string {
+  return (value ?? '').toLowerCase().trim();
 }
 
 @Component({
   selector: 'app-library-form-modal',
   imports: [
     ReactiveFormsModule,
+    MatAutocompleteModule,
     MatButtonModule,
+    MatChipsModule,
     MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -100,8 +113,12 @@ export class LibraryFormModal implements OnInit {
   protected readonly series = signal<BookSerie[]>([]);
   protected readonly mangas = signal<Manga[]>([]);
 
+  /** Autores ya añadidos al libro/tomo (se muestran como chips). */
+  protected readonly selectedAuthors = signal<Author[]>([]);
+
   protected readonly showQuickAuthor = signal(false);
   protected readonly showQuickEditorial = signal(false);
+  protected readonly showQuickSerie = signal(false);
   protected readonly showQuickManga = signal(false);
 
   protected readonly quickAuthorForm = this.fb.nonNullable.group({
@@ -114,6 +131,11 @@ export class LibraryFormModal implements OnInit {
     name: ['', Validators.required],
     country: [COUNTRY.SPAIN, Validators.required],
     website: [''],
+  });
+
+  protected readonly quickSerieForm = this.fb.nonNullable.group({
+    title: ['', Validators.required],
+    editorialId: [null as number | null, Validators.required],
   });
 
   protected readonly quickMangaForm = this.fb.nonNullable.group({
@@ -142,6 +164,72 @@ export class LibraryFormModal implements OnInit {
     volumeNumber: [null as number | null],
   });
 
+  // ---------- Controles de búsqueda para los autocompletados ----------
+
+  protected readonly authorSearchCtrl = new FormControl('', { nonNullable: true });
+  protected readonly editorialSearchCtrl = new FormControl<NameableRef<Editorial>>('');
+  protected readonly serieSearchCtrl = new FormControl<NameableRef<BookSerie>>('');
+  protected readonly mangaSearchCtrl = new FormControl<NameableRef<Manga>>('');
+
+  private readonly authorSearchValue = toSignal(
+    this.authorSearchCtrl.valueChanges.pipe(startWith(''), debounceTime(150)),
+    { initialValue: '' },
+  );
+  private readonly editorialSearchValue = toSignal(
+    this.editorialSearchCtrl.valueChanges.pipe(
+      startWith(this.editorialSearchCtrl.value),
+      debounceTime(150),
+      map((v) => (typeof v === 'string' ? v : (v?.name ?? ''))),
+    ),
+    { initialValue: '' },
+  );
+  private readonly serieSearchValue = toSignal(
+    this.serieSearchCtrl.valueChanges.pipe(
+      startWith(this.serieSearchCtrl.value),
+      debounceTime(150),
+      map((v) => (typeof v === 'string' ? v : (v?.title ?? ''))),
+    ),
+    { initialValue: '' },
+  );
+  private readonly mangaSearchValue = toSignal(
+    this.mangaSearchCtrl.valueChanges.pipe(
+      startWith(this.mangaSearchCtrl.value),
+      debounceTime(150),
+      map((v) => (typeof v === 'string' ? v : (v?.title ?? ''))),
+    ),
+    { initialValue: '' },
+  );
+
+  protected readonly filteredAuthors = computed(() => {
+    const term = normalize(this.authorSearchValue());
+    const selectedIds = new Set(this.selectedAuthors().map((a) => a.id));
+    return this.authors()
+      .filter((a) => !selectedIds.has(a.id))
+      .filter((a) => !term || a.name.toLowerCase().includes(term));
+  });
+
+  protected readonly filteredEditorials = computed(() => {
+    const term = normalize(this.editorialSearchValue());
+    return this.editorials().filter((e) => !term || e.name.toLowerCase().includes(term));
+  });
+
+  protected readonly filteredSeries = computed(() => {
+    const term = normalize(this.serieSearchValue());
+    return this.series().filter((s) => !term || s.title.toLowerCase().includes(term));
+  });
+
+  protected readonly filteredMangas = computed(() => {
+    const term = normalize(this.mangaSearchValue());
+    return this.mangas().filter((m) => !term || m.title.toLowerCase().includes(term));
+  });
+
+  protected readonly displayEditorial = (value: NameableRef<Editorial>): string =>
+    typeof value === 'string' ? value : (value?.name ?? '');
+  protected readonly displaySerie = (value: NameableRef<BookSerie>): string =>
+    typeof value === 'string' ? value : (value?.title ?? '');
+  protected readonly displayManga = (value: NameableRef<Manga>): string =>
+    typeof value === 'string' ? value : (value?.title ?? '');
+
   async ngOnInit(): Promise<void> {
     if (!this.isBook) {
       this.form.get('mangaId')!.addValidators(Validators.required);
@@ -168,6 +256,10 @@ export class LibraryFormModal implements OnInit {
 
       if (this.mode() === FORM_MODE.DETALLE) {
         this.form.disable();
+        this.authorSearchCtrl.disable();
+        this.editorialSearchCtrl.disable();
+        this.serieSearchCtrl.disable();
+        this.mangaSearchCtrl.disable();
       }
     } catch {
       this.error.set('No se ha podido cargar la información necesaria para el formulario.');
@@ -180,6 +272,11 @@ export class LibraryFormModal implements OnInit {
     if (this.isBook) {
       const book = await this.bookSrv.getById(id);
       if (!book) throw new Error('Libro no encontrado');
+
+      this.selectedAuthors.set(book.authors);
+      this.editorialSearchCtrl.setValue(book.editorial);
+      this.serieSearchCtrl.setValue(book.serie ?? null);
+
       this.form.patchValue({
         title: book.title,
         authorIds: book.authors.map((a) => a.id),
@@ -199,6 +296,11 @@ export class LibraryFormModal implements OnInit {
     } else {
       const volume = await this.mangaVolumeSrv.getById(id);
       if (!volume) throw new Error('Tomo no encontrado');
+
+      this.selectedAuthors.set(volume.authors);
+      this.editorialSearchCtrl.setValue(volume.editorial);
+      this.mangaSearchCtrl.setValue(this.mangas().find((m) => m.id === volume.mangaId) ?? null);
+
       this.form.patchValue({
         title: volume.title,
         authorIds: volume.authors.map((a) => a.id),
@@ -222,6 +324,67 @@ export class LibraryFormModal implements OnInit {
   protected enableEdit(): void {
     this.mode.set(FORM_MODE.EDICION);
     this.form.enable();
+    this.authorSearchCtrl.enable();
+    this.editorialSearchCtrl.enable();
+    this.serieSearchCtrl.enable();
+    this.mangaSearchCtrl.enable();
+  }
+
+  // ---------- Autores (autocompletado + chips) ----------
+
+  protected onAuthorSelected(event: MatAutocompleteSelectedEvent): void {
+    this.addAuthor(event.option.value as Author);
+  }
+
+  private addAuthor(author: Author): void {
+    if (this.selectedAuthors().some((a) => a.id === author.id)) {
+      this.authorSearchCtrl.setValue('');
+      return;
+    }
+    this.selectedAuthors.update((list) => [...list, author]);
+    this.form.get('authorIds')!.setValue(this.selectedAuthors().map((a) => a.id));
+    this.authorSearchCtrl.setValue('');
+  }
+
+  protected removeAuthor(authorId: number): void {
+    this.selectedAuthors.update((list) => list.filter((a) => a.id !== authorId));
+    this.form.get('authorIds')!.setValue(this.selectedAuthors().map((a) => a.id));
+  }
+
+  // ---------- Editorial (autocompletado) ----------
+
+  protected onEditorialSelected(event: MatAutocompleteSelectedEvent): void {
+    const editorial = event.option.value as Editorial;
+    this.form.get('editorialId')!.setValue(editorial.id);
+  }
+
+  protected clearEditorial(): void {
+    this.editorialSearchCtrl.setValue('');
+    this.form.get('editorialId')!.setValue(null);
+  }
+
+  // ---------- Serie (autocompletado, solo libros) ----------
+
+  protected onSerieSelected(event: MatAutocompleteSelectedEvent): void {
+    const serie = event.option.value as BookSerie;
+    this.form.get('serieId')!.setValue(serie.id);
+  }
+
+  protected clearSerie(): void {
+    this.serieSearchCtrl.setValue('');
+    this.form.get('serieId')!.setValue(null);
+  }
+
+  // ---------- Manga (autocompletado, solo manga) ----------
+
+  protected onMangaSelected(event: MatAutocompleteSelectedEvent): void {
+    const manga = event.option.value as Manga;
+    this.form.get('mangaId')!.setValue(manga.id);
+  }
+
+  protected clearManga(): void {
+    this.mangaSearchCtrl.setValue('');
+    this.form.get('mangaId')!.setValue(null);
   }
 
   // ---------- Alta rápida: autor ----------
@@ -242,8 +405,7 @@ export class LibraryFormModal implements OnInit {
       notes: value.notes || undefined,
     });
     this.authors.update((list) => [...list, created].sort((a, b) => a.name.localeCompare(b.name)));
-    const current = this.form.get('authorIds')!.value as number[];
-    this.form.get('authorIds')!.setValue([...current, created.id]);
+    this.addAuthor(created);
     this.quickAuthorForm.reset({ name: '', country: COUNTRY.SPAIN, notes: '' });
     this.showQuickAuthor.set(false);
   }
@@ -266,9 +428,33 @@ export class LibraryFormModal implements OnInit {
       website: value.website || undefined,
     });
     this.editorials.update((list) => [...list, created].sort((a, b) => a.name.localeCompare(b.name)));
+    this.editorialSearchCtrl.setValue(created);
     this.form.get('editorialId')!.setValue(created.id);
     this.quickEditorialForm.reset({ name: '', country: COUNTRY.SPAIN, website: '' });
     this.showQuickEditorial.set(false);
+  }
+
+  // ---------- Alta rápida: serie de libro ----------
+
+  protected toggleQuickSerie(): void {
+    this.showQuickSerie.update((v) => !v);
+  }
+
+  protected async createQuickSerie(): Promise<void> {
+    if (this.quickSerieForm.invalid) {
+      this.quickSerieForm.markAllAsTouched();
+      return;
+    }
+    const value = this.quickSerieForm.getRawValue();
+    const created = await this.bookSerieSrv.create({
+      title: value.title,
+      editorialId: value.editorialId!,
+    });
+    this.series.update((list) => [...list, created].sort((a, b) => a.title.localeCompare(b.title)));
+    this.serieSearchCtrl.setValue(created);
+    this.form.get('serieId')!.setValue(created.id);
+    this.quickSerieForm.reset({ title: '', editorialId: null });
+    this.showQuickSerie.set(false);
   }
 
   // ---------- Alta rápida: manga ----------
@@ -286,6 +472,7 @@ export class LibraryFormModal implements OnInit {
     const input: MangaInput = { title: value.title, demographic: value.demographic, authorIds: [], genres: [] };
     const created = await this.mangaSrv.create(input);
     this.mangas.update((list) => [...list, created].sort((a, b) => a.title.localeCompare(b.title)));
+    this.mangaSearchCtrl.setValue(created);
     this.form.get('mangaId')!.setValue(created.id);
     this.quickMangaForm.reset({ title: '', demographic: DEMOGRAPHIC.SHONEN });
     this.showQuickManga.set(false);

@@ -1,6 +1,15 @@
+/* src/app/pages/library/components/library-form-modal/library-form-modal.css */
 .library-form-modal {
   min-width: 320px;
   max-width: 100%;
+
+  /* Formularios más pequeños */
+  font-size: 0.875rem;
+  --mat-form-field-container-text-size: 0.875rem;
+  --mat-form-field-subscript-text-size: 0.7rem;
+  --mdc-outlined-text-field-label-text-size: 0.875rem;
+  --mat-select-trigger-text-size: 0.875rem;
+  --mat-autocomplete-panel-text-size: 0.875rem;
 }
 
 .library-form-modal__state {
@@ -23,7 +32,7 @@
 
 .library-form-modal__row-with-action {
   display: flex;
-  align-items: flex-start;
+  align-items: center; /* antes: flex-start */
   gap: 0.25rem;
 }
 
@@ -45,4 +54,9 @@
 .library-form-modal__quick-panel-actions {
   display: flex;
   align-items: center;
+}
+
+.library-form-modal__chips {
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }

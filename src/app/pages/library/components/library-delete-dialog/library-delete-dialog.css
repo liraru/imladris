@@ -23,3 +23,35 @@
   margin: 0;
   font-weight: 500;
 }
+
+.delete-dialog-mark {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  color: var(--mat-sys-primary);
+  margin-bottom: 0.25rem;
+}
+
+h2[mat-dialog-title] {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-optical-sizing: auto;
+}
+
+.delete-dialog__details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
+}
+
+.delete-dialog__details dt {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.8rem;
+}
+
+.delete-dialog__details dd {
+  margin: 0;
+  font-weight: 500;
+}

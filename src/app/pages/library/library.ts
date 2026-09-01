@@ -22,6 +22,7 @@ import { FORM_MODE } from './constants/library-form.constants';
 import { SORT_FIELD, TYPE } from './constants/library.consants';
 import { DEFAULT_LIBRARY_FILTERS, LibraryFilters } from './models/library-filters.model';
 import { fromBook, fromMangaVolume, LibraryItem } from './models/library-item.model';
+import { READING_STATUS } from '@shared/constants';
 
 @Component({
   imports: [LibraryDataDisplay, LibrarySearch, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
@@ -166,6 +167,54 @@ export class Library implements OnInit {
       this.loading.set(false);
     }
   }
+
+  protected async onMarkFinished(item: LibraryItem): Promise<void> {
+  const type = this.filters().type;
+  try {
+    if (type === TYPE.BOOK) {
+      const book = await this._bookSrv.getById(item.id);
+      if (!book) return;
+      await this._bookSrv.update(item.id, {
+        title: book.title,
+        authorIds: book.authors.map((a) => a.id),
+        readingStatus: READING_STATUS.FINISHED,
+        releaseDate: book.releaseDate ? new Date(book.releaseDate) : undefined,
+        coverImageUrl: book.coverImageUrl,
+        adquisitionDate: book.adquisitionDate ? new Date(book.adquisitionDate) : undefined,
+        startDate: book.startDate ? new Date(book.startDate) : undefined,
+        finishDate: book.finishDate ? new Date(book.finishDate) : new Date(),
+        notes: book.notes,
+        language: book.language,
+        editorialId: book.editorial.id,
+        serieId: book.serie?.id,
+        serieVolume: book.serieVolume,
+        genres: book.genres,
+      });
+    } else {
+      const volume = await this._mangaVolumeSrv.getById(item.id);
+      if (!volume) return;
+      await this._mangaVolumeSrv.update(item.id, {
+        title: volume.title,
+        authorIds: volume.authors.map((a) => a.id),
+        mangaId: volume.mangaId,
+        volumeNumber: volume.volumeNumber,
+        readingStatus: READING_STATUS.FINISHED,
+        releaseDate: volume.releaseDate ? new Date(volume.releaseDate) : undefined,
+        coverImageUrl: volume.coverImageUrl,
+        adquisitionDate: volume.adquisitionDate ? new Date(volume.adquisitionDate) : undefined,
+        startDate: volume.startDate ? new Date(volume.startDate) : undefined,
+        finishDate: volume.finishDate ? new Date(volume.finishDate) : new Date(),
+        notes: volume.notes,
+        language: volume.language,
+        editorialId: volume.editorial.id,
+      });
+    }
+    await this._loadItems();
+  } catch (err) {
+    this.error.set('No se ha podido marcar como leído.');
+    console.error(err);
+  }
+}
 }
 
 function extractYears(items: LibraryItem[], pick: (i: LibraryItem) => string | undefined): number[] {
@@ -226,4 +275,6 @@ function compareByField(a: LibraryItem, b: LibraryItem, field: SORT_FIELD): numb
     default:
       return 0;
   }
+
+
 }

@@ -32,6 +32,7 @@
       [type]="filters().type"
       [data]="displayItems()"
       (viewDetail)="onViewDetail($event)"
+      (markFinished)="onMarkFinished($event)"
       (deleteItem)="onDeleteItem($event)"
     />
   }
