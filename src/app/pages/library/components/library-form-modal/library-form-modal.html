@@ -23,11 +23,18 @@
       <div class="col-12 library-form-modal__row-with-action">
         <mat-form-field appearance="outline" class="library-form-modal__grow">
           <mat-label>Autores</mat-label>
-          <mat-select formControlName="authorIds" multiple>
-            @for (author of authors(); track author.id) {
-              <mat-option [value]="author.id">{{ author.name }}</mat-option>
+          <input
+            matInput
+            [formControl]="authorSearchCtrl"
+            [matAutocomplete]="authorAuto"
+            placeholder="Buscar autor…"
+            autocomplete="off"
+          />
+          <mat-autocomplete #authorAuto="matAutocomplete" (optionSelected)="onAuthorSelected($event)">
+            @for (author of filteredAuthors(); track author.id) {
+              <mat-option [value]="author">{{ author.name }}</mat-option>
             }
-          </mat-select>
+          </mat-autocomplete>
         </mat-form-field>
         @if (!isReadOnly()) {
           <button
@@ -40,6 +47,19 @@
           </button>
         }
       </div>
+
+      @if (selectedAuthors().length) {
+        <mat-chip-set class="col-12 library-form-modal__chips">
+          @for (author of selectedAuthors(); track author.id) {
+            <mat-chip [removable]="!isReadOnly()" (removed)="removeAuthor(author.id)">
+              {{ author.name }}
+              @if (!isReadOnly()) {
+                <mat-icon matChipRemove>cancel</mat-icon>
+              }
+            </mat-chip>
+          }
+        </mat-chip-set>
+      }
 
       @if (showQuickAuthor()) {
         <div class="col-12 library-form-modal__quick-panel" [formGroup]="quickAuthorForm">
@@ -71,11 +91,26 @@
       <div class="col-12 col-md-6 library-form-modal__row-with-action">
         <mat-form-field appearance="outline" class="library-form-modal__grow">
           <mat-label>Editorial</mat-label>
-          <mat-select formControlName="editorialId">
-            @for (editorial of editorials(); track editorial.id) {
-              <mat-option [value]="editorial.id">{{ editorial.name }}</mat-option>
+          <input
+            matInput
+            [formControl]="editorialSearchCtrl"
+            [matAutocomplete]="editorialAuto"
+            autocomplete="off"
+          />
+          @if (editorialSearchCtrl.value && !isReadOnly()) {
+            <button matSuffix mat-icon-button type="button" (click)="clearEditorial()" aria-label="Limpiar">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+          <mat-autocomplete
+            #editorialAuto="matAutocomplete"
+            [displayWith]="displayEditorial"
+            (optionSelected)="onEditorialSelected($event)"
+          >
+            @for (editorial of filteredEditorials(); track editorial.id) {
+              <mat-option [value]="editorial">{{ editorial.name }}</mat-option>
             }
-          </mat-select>
+          </mat-autocomplete>
         </mat-form-field>
         @if (!isReadOnly()) {
           <button
@@ -126,20 +161,68 @@
 
       @if (isBook) {
         <!-- Campos exclusivos de libro -->
-        <mat-form-field appearance="outline" class="col-12 col-md-8">
-          <mat-label>Serie (opcional)</mat-label>
-          <mat-select formControlName="serieId">
-            <mat-option [value]="null">Sin serie</mat-option>
-            @for (serie of series(); track serie.id) {
-              <mat-option [value]="serie.id">{{ serie.title }}</mat-option>
+        <div class="col-12 col-md-8 library-form-modal__row-with-action">
+          <mat-form-field appearance="outline" class="library-form-modal__grow">
+            <mat-label>Serie (opcional)</mat-label>
+            <input
+              matInput
+              [formControl]="serieSearchCtrl"
+              [matAutocomplete]="serieAuto"
+              autocomplete="off"
+            />
+            @if (serieSearchCtrl.value && !isReadOnly()) {
+              <button matSuffix mat-icon-button type="button" (click)="clearSerie()" aria-label="Limpiar">
+                <mat-icon>close</mat-icon>
+              </button>
             }
-          </mat-select>
-        </mat-form-field>
+            <mat-autocomplete
+              #serieAuto="matAutocomplete"
+              [displayWith]="displaySerie"
+              (optionSelected)="onSerieSelected($event)"
+            >
+              @for (serie of filteredSeries(); track serie.id) {
+                <mat-option [value]="serie">{{ serie.title }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          @if (!isReadOnly()) {
+            <button
+              mat-icon-button
+              type="button"
+              matTooltip="Añadir serie rápida"
+              (click)="toggleQuickSerie()"
+            >
+              <mat-icon>{{ showQuickSerie() ? 'close' : 'playlist_add' }}</mat-icon>
+            </button>
+          }
+        </div>
 
         <mat-form-field appearance="outline" class="col-12 col-md-4">
           <mat-label>Vol. de la serie</mat-label>
           <input matInput type="number" formControlName="serieVolume" autocomplete="off" />
         </mat-form-field>
+
+        @if (showQuickSerie()) {
+          <div class="col-12 library-form-modal__quick-panel" [formGroup]="quickSerieForm">
+            <mat-form-field appearance="outline" class="col-12 col-md-6">
+              <mat-label>Título de la serie</mat-label>
+              <input matInput formControlName="title" autocomplete="off" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col-8 col-md-4">
+              <mat-label>Editorial</mat-label>
+              <mat-select formControlName="editorialId">
+                @for (editorial of editorials(); track editorial.id) {
+                  <mat-option [value]="editorial.id">{{ editorial.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <div class="col-4 col-md-2 library-form-modal__quick-panel-actions">
+              <button mat-flat-button type="button" color="tertiary" (click)="createQuickSerie()">
+                Añadir
+              </button>
+            </div>
+          </div>
+        }
 
         <mat-form-field appearance="outline" class="col-12">
           <mat-label>Géneros</mat-label>
@@ -154,11 +237,26 @@
         <div class="col-12 col-md-8 library-form-modal__row-with-action">
           <mat-form-field appearance="outline" class="library-form-modal__grow">
             <mat-label>Manga</mat-label>
-            <mat-select formControlName="mangaId">
-              @for (manga of mangas(); track manga.id) {
-                <mat-option [value]="manga.id">{{ manga.title }}</mat-option>
+            <input
+              matInput
+              [formControl]="mangaSearchCtrl"
+              [matAutocomplete]="mangaAuto"
+              autocomplete="off"
+            />
+            @if (mangaSearchCtrl.value && !isReadOnly()) {
+              <button matSuffix mat-icon-button type="button" (click)="clearManga()" aria-label="Limpiar">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+            <mat-autocomplete
+              #mangaAuto="matAutocomplete"
+              [displayWith]="displayManga"
+              (optionSelected)="onMangaSelected($event)"
+            >
+              @for (manga of filteredMangas(); track manga.id) {
+                <mat-option [value]="manga">{{ manga.title }}</mat-option>
               }
-            </mat-select>
+            </mat-autocomplete>
           </mat-form-field>
           @if (!isReadOnly()) {
             <button

@@ -5,12 +5,13 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LANGUAGE_LABELS } from '@shared/constants';
 import { GENRE_LABELS } from '../../../../shared/constants/categories.constant';
-import { READING_STATUS_LABELS } from '../../../../shared/constants/reading-status.constant';
+import { READING_STATUS, READING_STATUS_LABELS } from '../../../../shared/constants/reading-status.constant';
 import { MODE, TYPE } from '../../constants/library.consants';
 import { LibraryItem } from '../../models/library-item.model';
+import { MatDivider } from "@angular/material/divider";
 
 @Component({
-  imports: [MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule],
+  imports: [MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule, MatDivider],
   selector: 'app-library-data-display',
   styleUrl: './library-data-display.css',
   templateUrl: './library-data-display.html',
@@ -25,9 +26,11 @@ export class LibraryDataDisplay {
   public readonly viewDetail = output<LibraryItem>();
   /** Se emite cuando el usuario elige "Eliminar" en el menú contextual de un elemento. */
   public readonly deleteItem = output<LibraryItem>();
+  public readonly markFinished = output<LibraryItem>();
 
   protected readonly MODE = MODE;
   protected readonly TYPE = TYPE;
+  protected readonly READING_STATUS = READING_STATUS;
   protected readonly readingStatusLabels = READING_STATUS_LABELS;
   protected readonly languageLabels = LANGUAGE_LABELS;
   protected readonly genreLabels = GENRE_LABELS;
