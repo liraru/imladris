@@ -43,7 +43,12 @@ export function fromBook(book: Book): LibraryItem {
   };
 }
 
-export function fromMangaVolume(volume: MangaVolume): LibraryItem {
+/**
+ * `mangaTitle` es el nombre del manga (la "serie" a la que pertenece el tomo), no el título del
+ * propio tomo. Se recibe aparte porque `MangaVolume` solo trae el `mangaId`; quien llama a esta
+ * función es responsable de resolverlo (ver `Library._loadItems`).
+ */
+export function fromMangaVolume(volume: MangaVolume, mangaTitle?: string): LibraryItem {
   return {
     id: volume.id,
     title: volume.title,
@@ -57,7 +62,8 @@ export function fromMangaVolume(volume: MangaVolume): LibraryItem {
     notes: volume.notes,
     language: volume.language,
     editorial: volume.editorial,
-    serieTitle: volume.title,
+    serieId: volume.mangaId,
+    serieTitle: mangaTitle,
     serieVolume: volume.volumeNumber,
   };
 }

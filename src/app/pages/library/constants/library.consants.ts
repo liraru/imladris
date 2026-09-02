@@ -32,7 +32,7 @@ export enum SORT_FIELD {
 export const SORT_FIELD_LABELS: Record<SORT_FIELD, string> = {
   [SORT_FIELD.TITLE]: 'Título',
   [SORT_FIELD.AUTHOR]: 'Autor',
-  [SORT_FIELD.SERIE]: 'Serie',
+  [SORT_FIELD.SERIE]: 'Serie / Manga',
   [SORT_FIELD.VOLUME_NUMBER]: 'Número de volumen',
   [SORT_FIELD.FINISH_DATE]: 'Fecha de finalización',
   [SORT_FIELD.ADQUISITION_DATE]: 'Fecha de adquisición',
@@ -40,10 +40,26 @@ export const SORT_FIELD_LABELS: Record<SORT_FIELD, string> = {
   [SORT_FIELD.NOTES]: 'Notas',
 };
 
-/** Orden por defecto: distinto según se esté viendo la colección de novelas o de manga. */
+/**
+ * Orden por defecto: novelas se ordenan por autor → serie → volumen de la serie → título → notas;
+ * manga se ordena por autor → nombre del manga → número de volumen → título → notas.
+ * En ambos casos el nombre de "colección" (serie/manga) vive en `SORT_FIELD.SERIE`.
+ */
 export const DEFAULT_SORT_BY: Record<TYPE, SORT_FIELD[]> = {
-  [TYPE.BOOK]: [SORT_FIELD.SERIE, SORT_FIELD.VOLUME_NUMBER, SORT_FIELD.TITLE],
-  [TYPE.MANGA]: [SORT_FIELD.TITLE, SORT_FIELD.VOLUME_NUMBER, SORT_FIELD.NOTES],
+  [TYPE.BOOK]: [
+    SORT_FIELD.AUTHOR,
+    SORT_FIELD.SERIE,
+    SORT_FIELD.VOLUME_NUMBER,
+    SORT_FIELD.TITLE,
+    SORT_FIELD.NOTES,
+  ],
+  [TYPE.MANGA]: [
+    SORT_FIELD.AUTHOR,
+    SORT_FIELD.SERIE,
+    SORT_FIELD.VOLUME_NUMBER,
+    SORT_FIELD.TITLE,
+    SORT_FIELD.NOTES,
+  ],
 };
 
 export const DEFAULT_SORT_DIRECTION: 'asc' | 'desc' = 'asc';
