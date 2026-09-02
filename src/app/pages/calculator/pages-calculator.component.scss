@@ -1,9 +1,28 @@
+.calculator-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-block: 1.5rem 3rem;
+}
+
+.calculator-page__header {
+  max-width: 640px;
+
+  p {
+    color: var(--mat-sys-on-surface-variant);
+    margin-top: 0.25rem;
+  }
+}
+
 .calculator-controllers-container {
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
+  align-items: stretch;
 }
 
 mat-card {
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
   gap: 1.5rem;
 }
@@ -16,19 +35,128 @@ mat-card-content {
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.kindle-position-form {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  justify-content: space-evenly;
-  align-items: center;
+mat-card-actions {
+  margin-top: auto;
 }
 
 .pages-form {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.kindle-position-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+
+  mat-form-field {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+}
+
+.calculator-hint {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.85rem;
+}
+
+.calculator-error {
+  color: #e08585;
+}
+
+.calculator-result {
+  padding: 0.75rem 1rem;
+  border-radius: var(--mat-sys-corner-medium, 10px);
+  background: var(--mat-sys-surface-container-high);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 25%, transparent);
+}
+
+.calculator-history {
+  mat-list-item {
+    height: auto;
+    padding-block: 0.5rem;
+    align-items: flex-start;
+
+    ::ng-deep .mdc-list-item__content {
+      align-self: center;
+    }
+  }
+
+  [matListItemTitle] {
+    white-space: normal;
+    line-height: 1.35;
+  }
+}
+
+.calculator-reset {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .calculator-hint {
+    margin: 0;
+    flex: 1 1 260px;
+  }
+}
+
+.calculator-footnote {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.75rem;
+}
+
+// -------------------------------
+// Responsive: móvil (< 576px)
+// -------------------------------
+@media (max-width: 575px) {
+  .calculator-page {
+    padding-block: 1rem 2rem;
+    gap: 1.25rem;
+  }
+
+  mat-card {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  mat-card-header {
+    margin-bottom: 1rem;
+  }
+
+  .kindle-position-form {
+    flex-direction: column;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  mat-card-actions {
+    button {
+      width: 100%;
+    }
+  }
+
+  .calculator-reset {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// -------------------------------
+// Responsive: tablet pequeña (576–767px)
+// -------------------------------
+@media (min-width: 576px) and (max-width: 767px) {
+  .kindle-position-form mat-form-field {
+    flex-basis: calc(50% - 0.5rem);
+  }
 }

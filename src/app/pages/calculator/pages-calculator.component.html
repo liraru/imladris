@@ -1,183 +1,187 @@
-<h1>Calculadora de lectura</h1>
-<p>Estima las páginas de un libro y sigue tu progreso real en el Kindle.</p>
+<div class="container calculator-page">
+  <div class="calculator-page__header">
+    <h1>Calculadora de lectura</h1>
+    <p>Estima las páginas de un libro y sigue tu progreso real en el Kindle.</p>
+  </div>
 
-<div class="calculator-controllers-container grid">
-  <!-- BLOQUE 1: PÁGINAS TOTALES -->
-  <mat-card appearance="outlined" class="col-4">
-    <mat-card-header>
-      <mat-card-title>I. Páginas totales</mat-card-title>
-    </mat-card-header>
+  <div class="calculator-controllers-container grid">
+    <!-- BLOQUE 1: PÁGINAS TOTALES -->
+    <mat-card appearance="outlined" class="col-12 col-lg-4">
+      <mat-card-header>
+        <mat-card-title>I. Páginas totales</mat-card-title>
+      </mat-card-header>
 
-    <mat-card-content>
-      <div class="pages-form">
-        <mat-form-field appearance="outline">
-          <mat-label>Palabras totales</mat-label>
-          <input
-            matInput
-            type="number"
-            min="0"
-            step="1"
-            inputmode="numeric"
-            placeholder="ej. 95000"
-            [ngModel]="palabras()"
-            (ngModelChange)="palabras.set($event)"
-          />
-        </mat-form-field>
+      <mat-card-content>
+        <div class="pages-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Palabras totales</mat-label>
+            <input
+              matInput
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              placeholder="ej. 95000"
+              [ngModel]="palabras()"
+              (ngModelChange)="palabras.set($event)"
+            />
+          </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Nº de capítulos</mat-label>
-          <input
-            matInput
-            type="number"
-            min="0"
-            step="1"
-            inputmode="numeric"
-            placeholder="ej. 24"
-            [ngModel]="capitulos()"
-            (ngModelChange)="capitulos.set($event)"
-          />
-        </mat-form-field>
-      </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Nº de capítulos</mat-label>
+            <input
+              matInput
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              placeholder="ej. 24"
+              [ngModel]="capitulos()"
+              (ngModelChange)="capitulos.set($event)"
+            />
+          </mat-form-field>
+        </div>
 
-      @if (errorPaginas()) {
-        <p>{{ errorPaginas() }}</p>
-      }
-
-      @if (resultPaginasValue() !== null) {
-        <p>
-          <strong>Páginas estimadas: {{ fmt(resultPaginasValue()!) }}</strong
-          ><br />
-          (palabras ÷ 300) + (capítulos × 0.6)
-        </p>
-      }
-    </mat-card-content>
-
-    <mat-card-actions>
-      <button mat-flat-button color="primary" type="button" (click)="calcularPaginas()">
-        Calcular páginas
-      </button>
-    </mat-card-actions>
-  </mat-card>
-
-  <!-- BLOQUE 2: PÁGINA ACTUAL -->
-  <mat-card appearance="outlined" class="col-8">
-    <mat-card-header>
-      <mat-card-title>II. Página actual</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="kindle-position-form">
-        <mat-form-field appearance="outline">
-          <mat-label>Posición actual (Kindle)</mat-label>
-          <input
-            matInput
-            type="number"
-            min="0"
-            step="1"
-            inputmode="numeric"
-            placeholder="ej. 3120"
-            [ngModel]="posicionActual()"
-            (ngModelChange)="posicionActual.set($event)"
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Posición total</mat-label>
-          <input
-            matInput
-            type="number"
-            min="0"
-            step="1"
-            inputmode="numeric"
-            placeholder="ej. 6840"
-            [ngModel]="posicionTotal()"
-            (ngModelChange)="posicionTotal.set($event)"
-            (change)="onPosicionTotalChange()"
-          />
-          <mat-hint>Guardado</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Páginas totales</mat-label>
-          <input
-            matInput
-            type="number"
-            min="0"
-            step="1"
-            inputmode="numeric"
-            placeholder="del bloque I"
-            [ngModel]="paginasTotalesStored()"
-            (ngModelChange)="paginasTotalesStored.set($event)"
-            (change)="onPaginasTotalesStoredChange()"
-          />
-          <mat-hint>Guardado</mat-hint>
-        </mat-form-field>
-      </div>
-
-      <p>
-        Estos dos valores se recuerdan entre visitas. Se rellenan solos al calcular en el bloque I,
-        pero puedes editarlos a mano en cualquier momento.
-      </p>
-
-      @if (errorPagina()) {
-        <p>{{ errorPagina() }}</p>
-      }
-
-      @if (resultPagina(); as resultado) {
-        <p>
-          <strong>Estás en la página {{ fmt(resultado.pagina) }}</strong
-          ><br />
-          {{ resultado.sub }}
-        </p>
-      }
-    </mat-card-content>
-
-    <mat-card-actions>
-      <button mat-flat-button color="primary" type="button" (click)="calcularPaginaActual()">
-        Calcular página actual
-      </button>
-    </mat-card-actions>
-  </mat-card>
-</div>
-
-<!-- HISTORIAL -->
-<mat-card appearance="outlined">
-  <mat-card-header>
-    <mat-card-title>Historial</mat-card-title>
-  </mat-card-header>
-
-  <mat-card-content>
-    @if (history().length === 0) {
-      <p>Aún no hay cálculos guardados.</p>
-    } @else {
-      <mat-list>
-        @for (entry of historyReversed(); track entry.time + entry.detail) {
-          <mat-list-item>
-            <span matListItemTitle [innerHTML]="entry.detail"></span>
-            <span matListItemLine>{{ entry.time }}</span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
+        @if (errorPaginas()) {
+          <p class="calculator-error">{{ errorPaginas() }}</p>
         }
-      </mat-list>
-    }
-  </mat-card-content>
 
-  <mat-card-actions>
-    <button mat-button color="secondary" type="button" (click)="vaciarHistorial()">
-      Vaciar historial
+        @if (resultPaginasValue() !== null) {
+          <p class="calculator-result">
+            <strong>Páginas estimadas: {{ fmt(resultPaginasValue()!) }}</strong
+            ><br />
+            (palabras ÷ 300) + (capítulos × 0.6)
+          </p>
+        }
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-flat-button color="primary" type="button" (click)="calcularPaginas()">
+          Calcular páginas
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- BLOQUE 2: PÁGINA ACTUAL -->
+    <mat-card appearance="outlined" class="col-12 col-lg-8">
+      <mat-card-header>
+        <mat-card-title>II. Página actual</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="kindle-position-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Posición actual (Kindle)</mat-label>
+            <input
+              matInput
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              placeholder="ej. 3120"
+              [ngModel]="posicionActual()"
+              (ngModelChange)="posicionActual.set($event)"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Posición total</mat-label>
+            <input
+              matInput
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              placeholder="ej. 6840"
+              [ngModel]="posicionTotal()"
+              (ngModelChange)="posicionTotal.set($event)"
+              (change)="onPosicionTotalChange()"
+            />
+            <mat-hint>Guardado</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Páginas totales</mat-label>
+            <input
+              matInput
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              placeholder="del bloque I"
+              [ngModel]="paginasTotalesStored()"
+              (ngModelChange)="paginasTotalesStored.set($event)"
+              (change)="onPaginasTotalesStoredChange()"
+            />
+            <mat-hint>Guardado</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <p class="calculator-hint">
+          Estos dos valores se recuerdan entre visitas. Se rellenan solos al calcular en el bloque
+          I, pero puedes editarlos a mano en cualquier momento.
+        </p>
+
+        @if (errorPagina()) {
+          <p class="calculator-error">{{ errorPagina() }}</p>
+        }
+
+        @if (resultPagina(); as resultado) {
+          <p class="calculator-result">
+            <strong>Estás en la página {{ fmt(resultado.pagina) }}</strong
+            ><br />
+            {{ resultado.sub }}
+          </p>
+        }
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-flat-button color="primary" type="button" (click)="calcularPaginaActual()">
+          Calcular página actual
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- HISTORIAL -->
+  <mat-card appearance="outlined" class="calculator-history">
+    <mat-card-header>
+      <mat-card-title>Historial</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (history().length === 0) {
+        <p class="calculator-hint">Aún no hay cálculos guardados.</p>
+      } @else {
+        <mat-list>
+          @for (entry of historyReversed(); track entry.time + entry.detail) {
+            <mat-list-item>
+              <span matListItemTitle [innerHTML]="entry.detail"></span>
+              <span matListItemLine>{{ entry.time }}</span>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+          }
+        </mat-list>
+      }
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-button color="secondary" type="button" (click)="vaciarHistorial()">
+        Vaciar historial
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- REINICIO -->
+  <div class="calculator-reset">
+    <button mat-stroked-button color="secondary" type="button" (click)="reiniciar()">
+      Reiniciar posición y páginas totales
     </button>
-  </mat-card-actions>
-</mat-card>
+    <p class="calculator-hint">
+      Borra únicamente la posición total y las páginas totales guardadas. El historial no se ve
+      afectado.
+    </p>
+  </div>
 
-<!-- REINICIO -->
-<p>
-  <button mat-stroked-button color="secondary" type="button" (click)="reiniciar()">
-    Reiniciar posición y páginas totales
-  </button>
-</p>
-<p>
-  Borra únicamente la posición total y las páginas totales guardadas. El historial no se ve
-  afectado.
-</p>
-
-<p>Los datos se guardan de forma persistente en este dispositivo.</p>
+  <p class="calculator-footnote">Los datos se guardan de forma persistente en este dispositivo.</p>
+</div>
