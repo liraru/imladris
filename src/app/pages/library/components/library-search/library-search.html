@@ -68,6 +68,16 @@
               }
             </mat-autocomplete>
           </mat-form-field>
+        } @else {
+          <mat-form-field appearance="outline" class="col-12 col-md-4">
+            <mat-label>Manga</mat-label>
+            <input matInput formControlName="manga" [matAutocomplete]="mangaAuto" autocomplete="off" />
+            <mat-autocomplete #mangaAuto="matAutocomplete" [displayWith]="displayManga">
+              @for (manga of filteredMangas(); track manga.id) {
+                <mat-option [value]="manga">{{ manga.title }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
         }
 
         <mat-form-field appearance="outline" class="col-12 col-md-4">
