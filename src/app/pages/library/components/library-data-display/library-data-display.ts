@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DOCUMENT, Inject, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LANGUAGE_LABELS } from '@shared/constants';
 import { GENRE_LABELS } from '../../../../shared/constants/categories.constant';
-import { READING_STATUS, READING_STATUS_LABELS } from '../../../../shared/constants/reading-status.constant';
+import {
+  READING_STATUS,
+  READING_STATUS_LABELS,
+} from '../../../../shared/constants/reading-status.constant';
 import { MODE, TYPE } from '../../constants/library.consants';
 import { LibraryItem } from '../../models/library-item.model';
-import { MatDivider } from "@angular/material/divider";
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
   imports: [MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule, MatDivider],
@@ -51,6 +54,12 @@ export class LibraryDataDisplay {
     'notes',
     'actions',
   ];
+
+  private readonly _document = Inject(DOCUMENT);
+
+  get isProduction(): boolean {
+    return this._document.location.href.includes('liraru.gitlab.io/imladris');
+  }
 
   protected authorNames(item: LibraryItem): string {
     return item.authors.length ? item.authors.map((a) => a.name).join(', ') : 'Autor desconocido';

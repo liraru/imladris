@@ -8,6 +8,7 @@
     @for (item of data(); track item.id) {
       <article class="library-card">
         <button
+          [hidden]="isProduction()"
           mat-icon-button
           class="library-card__menu-trigger library-menu-trigger"
           type="button"
@@ -31,7 +32,11 @@
           <h3 class="library-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
           <p class="library-card__author">{{ authorNames(item) }}</p>
           <p class="library-card__meta">
-            {{ item.finishDate ? 'Finalizado: ' + item.finishDate : readingStatusLabels[item.readingStatus] }}
+            {{
+              item.finishDate
+                ? 'Finalizado: ' + item.finishDate
+                : readingStatusLabels[item.readingStatus]
+            }}
           </p>
         </div>
       </article>
@@ -44,7 +49,11 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let item">
           @if (item.coverImageUrl) {
-            <img class="library-table__cover" [src]="item.coverImageUrl" [alt]="'Portada de ' + item.title" />
+            <img
+              class="library-table__cover"
+              [src]="item.coverImageUrl"
+              [alt]="'Portada de ' + item.title"
+            />
           } @else {
             <mat-icon>menu_book</mat-icon>
           }
@@ -63,7 +72,9 @@
         <td mat-cell *matCellDef="let item">{{ item.editorial.name }}</td>
       </ng-container>
       <ng-container matColumnDef="serie">
-        <th mat-header-cell *matHeaderCellDef>{{ type() === TYPE.MANGA ? 'Tomo nº' : 'Serie / Vol.' }}</th>
+        <th mat-header-cell *matHeaderCellDef>
+          {{ type() === TYPE.MANGA ? 'Tomo nº' : 'Serie / Vol.' }}
+        </th>
         <td mat-cell *matCellDef="let item">{{ serieLabel(item) }}</td>
       </ng-container>
       <ng-container matColumnDef="genres">
@@ -96,7 +107,9 @@
       </ng-container>
       <ng-container matColumnDef="notes">
         <th mat-header-cell *matHeaderCellDef>Notas</th>
-        <td mat-cell *matCellDef="let item" [matTooltip]="item.notes ?? ''">{{ item.notes ?? '—' }}</td>
+        <td mat-cell *matCellDef="let item" [matTooltip]="item.notes ?? ''">
+          {{ item.notes ?? '—' }}
+        </td>
       </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
