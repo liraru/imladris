@@ -12,7 +12,10 @@
         [matAutocomplete]="libraryAuto"
         placeholder="Copiar datos de un libro o manga ya guardado..."
       />
-      <mat-autocomplete #libraryAuto="matAutocomplete" (optionSelected)="onLibraryOptionSelected($event)">
+      <mat-autocomplete
+        #libraryAuto="matAutocomplete"
+        (optionSelected)="onLibraryOptionSelected($event)"
+      >
         @for (suggestion of filteredLibrarySuggestions(); track suggestion.title) {
           <mat-option [value]="suggestion">
             {{ suggestion.title }}
@@ -27,7 +30,7 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Título</mat-label>
-      <input matInput formControlName="title" required />
+      <input matInput formControlName="title" required cdkFocusInitial />
       @if (form.controls.title.hasError('required') && form.controls.title.touched) {
         <mat-error>El título es obligatorio.</mat-error>
       }
@@ -56,18 +59,37 @@
     <div class="field-row">
       <mat-form-field appearance="outline">
         <mat-label>Fecha de inicio</mat-label>
-        <input matInput [matDatepicker]="startPicker" formControlName="startDate" required />
+        <input
+          matInput
+          [matDatepicker]="startPicker"
+          formControlName="startDate"
+          [max]="form.controls.endDate.value"
+          required
+        />
         <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Fecha de fin</mat-label>
-        <input matInput [matDatepicker]="endPicker" formControlName="endDate" required />
+        <input
+          matInput
+          [matDatepicker]="endPicker"
+          formControlName="endDate"
+          [min]="form.controls.startDate.value"
+          required
+        />
         <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
       </mat-form-field>
     </div>
+
+    @if (
+      form.hasError('dateRangeInvalid') &&
+      (form.controls.endDate.touched || form.controls.endDate.dirty)
+    ) {
+      <p class="form-error">La fecha de fin no puede ser anterior a la fecha de inicio.</p>
+    }
 
     @if (form.controls.coverUrl.value) {
       <div class="cover-preview">

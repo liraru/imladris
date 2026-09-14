@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormControl } from '@angular/forms';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +16,7 @@ import { YearlyReading } from '@shared/models';
 import { YearlyReadingService } from '../../../../services/yearly-reading.service';
 import { BookService } from '../../../../services/book.service';
 import { MangaVolumeService } from '../../../../services/manga-volume.service';
+import { dateRangeValidator } from '../../../../shared/validators/date-range.validator';
 
 export interface YearlyReadingsFormModalData {
   year: number;
@@ -57,14 +61,17 @@ export class YearlyReadingsFormModal implements OnInit {
   private readonly _librarySuggestions = signal<LibrarySuggestion[]>([]);
   protected readonly filteredLibrarySuggestions = signal<LibrarySuggestion[]>([]);
 
-  protected readonly form = this._fb.nonNullable.group({
-    title: ['', Validators.required],
-    authors: ['', Validators.required],
-    pages: [0, [Validators.required, Validators.min(1)]],
-    startDate: [null as Date | null, Validators.required],
-    endDate: [null as Date | null, Validators.required],
-    coverUrl: [''],
-  });
+  protected readonly form = this._fb.nonNullable.group(
+    {
+      title: ['', Validators.required],
+      authors: ['', Validators.required],
+      pages: [0, [Validators.required, Validators.min(1)]],
+      startDate: [null as Date | null, Validators.required],
+      endDate: [null as Date | null, Validators.required],
+      coverUrl: [''],
+    },
+    { validators: dateRangeValidator('startDate', 'endDate') },
+  );
 
   constructor() {
     this.librarySearchControl.valueChanges.subscribe((term) => {

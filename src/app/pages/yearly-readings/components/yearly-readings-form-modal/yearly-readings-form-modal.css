@@ -20,9 +20,23 @@
   gap: 1rem;
 }
 
+.field-row mat-form-field {
+  min-width: 0;
+}
+
 .option-authors {
   color: var(--mat-sys-on-surface-variant, #9b9788);
   font-size: 0.85em;
+}
+
+.form-error {
+  margin: -0.5rem 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(209, 119, 118, 0.12);
+  color: var(--mat-sys-error, #ff5449);
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .cover-preview {
@@ -39,6 +53,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+mat-dialog-actions button[type='submit'] {
+  min-width: 96px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 575px) {
