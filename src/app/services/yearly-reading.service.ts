@@ -39,8 +39,8 @@ export class YearlyReadingService {
     const { data, error } = await this.supabase
       .from(this.table)
       .select('*')
-      .order('year', { ascending: false })
-      .order('start_date');
+      .order('end_date')
+      .order('id');
     if (error) throw error;
     return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
   }
@@ -50,7 +50,8 @@ export class YearlyReadingService {
       .from(this.table)
       .select('*')
       .eq('year', year)
-      .order('start_date');
+      .order('end_date')
+      .order('id');
     if (error) throw error;
     return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
   }
