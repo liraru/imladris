@@ -7,7 +7,7 @@
   <div class="library-gallery">
     @for (item of data(); track item.id) {
       <article class="library-card">
-        <!-- <button
+        <button
           mat-icon-button
           class="library-card__menu-trigger library-menu-trigger"
           type="button"
@@ -17,7 +17,7 @@
           aria-label="Opciones"
         >
           <mat-icon>more_vert</mat-icon>
-        </button> -->
+        </button>
         <div class="library-card__cover">
           @if (item.coverImageUrl) {
             <img [src]="item.coverImageUrl" [alt]="'Portada de ' + item.title" loading="lazy" />
