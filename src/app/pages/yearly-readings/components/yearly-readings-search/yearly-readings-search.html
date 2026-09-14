@@ -1,1 +1,17 @@
-<p>yearly-readings-search works!</p>
+<mat-form-field appearance="outline" class="year-field" subscriptSizing="dynamic">
+  <mat-label>Año</mat-label>
+  <mat-icon matPrefix>calendar_month</mat-icon>
+  <input
+    type="text"
+    matInput
+    [formControl]="control"
+    [matAutocomplete]="auto"
+    (keydown.enter)="onEnter()"
+    placeholder="Buscar año..."
+  />
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
+    @for (year of filteredYears(); track year) {
+      <mat-option [value]="year">{{ year }}</mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>

@@ -1,1 +1,65 @@
-<p>yearly-readings works!</p>
+<section class="yearly-readings">
+  <header class="page-header">
+    <div class="heading">
+      <p class="kicker">Biblioteca nocturna</p>
+      <h1>Lecturas de {{ selectedYear() }}</h1>
+    </div>
+
+    <div class="header-actions">
+      <app-yearly-readings-search
+        [years]="availableYears()"
+        [selectedYear]="selectedYear()"
+        (yearChange)="onYearChange($event)"
+      />
+
+      <button mat-flat-button color="primary" class="add-btn" (click)="openCreateModal()">
+        <mat-icon>add</mat-icon>
+        Añadir lectura
+      </button>
+    </div>
+  </header>
+
+  @if (!loading()) {
+    <p class="summary">{{ readings().length }} lecturas · {{ totalPages() }} páginas</p>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else if (readings().length === 0) {
+    <div class="empty-state">
+      <mat-icon>auto_stories</mat-icon>
+      <p>Todavía no hay lecturas registradas para {{ selectedYear() }}.</p>
+    </div>
+  } @else {
+    <div class="shelf">
+      @for (reading of readings(); track reading.id) {
+        <article class="book" (click)="openEditModal(reading)">
+          <div class="cover">
+            @if (reading.coverUrl) {
+              <img [src]="reading.coverUrl" [alt]="'Portada de ' + reading.title" loading="lazy" />
+            } @else {
+              <div class="placeholder">
+                <mat-icon>menu_book</mat-icon>
+              </div>
+            }
+            <button
+              mat-icon-button
+              class="delete-btn"
+              (click)="deleteReading(reading, $event)"
+              aria-label="Eliminar lectura"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          <div class="caption">
+            <p class="title">{{ reading.title }}</p>
+            <p class="author">{{ reading.authors.join(', ') }}</p>
+            <p class="pages">{{ reading.pages }} páginas</p>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
