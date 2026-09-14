@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "supabase:ping": "node scripts/supabase-ping.mjs"
+    "supabase:ping": "node scripts/supabase-ping.mjs",
+    "deploy": "ng build --base-href /imladris/ && cp dist/imladris/browser/index.html dist/imladris/browser/404.html && npx angular-cli-ghpages --dir=dist/imladris/browser"
   },
   "private": true,
   "packageManager": "npm@11.19.0",
@@ -28,6 +29,7 @@
     "@angular/build": "^22.1.5",
     "@angular/cli": "^22.1.5",
     "@angular/compiler-cli": "^22.1.0",
+    "angular-cli-ghpages": "^2.0.3",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
