@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.year-field {
+  width: 160px;
+}
+
+.year-field ::ng-deep .mat-mdc-text-field-wrapper {
+  background: transparent;
+}
+
+@media (max-width: 575px) {
+  .year-field {
+    width: 130px;
+  }
+}
