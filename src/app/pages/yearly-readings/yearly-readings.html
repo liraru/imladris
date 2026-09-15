@@ -1,11 +1,11 @@
-<section class="yearly-readings">
+<section class="yearly-readings container">
   <header class="page-header">
     <div class="heading">
       <p class="kicker">Biblioteca nocturna</p>
       <h1>Lecturas de {{ selectedYear() }}</h1>
     </div>
 
-    <div class="header-actions">
+    <div class="page-header__actions">
       <app-yearly-readings-search
         [years]="availableYears()"
         [selectedYear]="selectedYear()"

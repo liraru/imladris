@@ -39,6 +39,19 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--ink-raised, #17171f);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 h1,
 h2,
 h3,
@@ -62,4 +75,45 @@ mat-card-title {
 .mat-mdc-autocomplete-panel .mat-mdc-option,
 .mat-mdc-select-panel .mat-mdc-option {
   font-size: 0.875rem;
+}
+
+/* Cabecera de página compartida por todas las pantallas (patrón "Lecturas anuales") */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.page-header .kicker {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--mat-sys-primary);
+  opacity: 0.85;
+  margin: 0 0 0.5rem;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+.page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 575px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header__actions {
+    justify-content: space-between;
+  }
 }

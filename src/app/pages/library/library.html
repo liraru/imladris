@@ -1,12 +1,19 @@
 <div class="library-page container">
-  @if (authService.isAdmin()) {
-    <div class="library-page__header">
-      <button mat-flat-button type="button" color="primary" (click)="openCreate()">
-        <mat-icon>add</mat-icon>
-        Añadir {{ filters().type === TYPE.MANGA ? 'tomo' : 'libro' }}
-      </button>
+  <header class="page-header">
+    <div class="heading">
+      <p class="kicker">Biblioteca nocturna</p>
+      <h1>{{ filters().type === TYPE.MANGA ? 'Manga' : 'Novelas' }}</h1>
     </div>
-  }
+
+    @if (authService.isAdmin()) {
+      <div class="page-header__actions">
+        <button mat-flat-button type="button" color="primary" (click)="openCreate()">
+          <mat-icon>add</mat-icon>
+          Añadir {{ filters().type === TYPE.MANGA ? 'tomo' : 'libro' }}
+        </button>
+      </div>
+    }
+  </header>
 
   <app-library-search
     [authors]="authors()"

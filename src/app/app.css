@@ -1,7 +1,7 @@
 :host {
   --ink: #0d0d12;
   --ink-raised: #17171f;
-  --gold: #c9a227;
+  --gold: var(--mat-sys-primary, #c9a86a);
   --gold-soft: #e4cc7a;
   --wine: #5c1a26;
   --text-muted: #b8b3a8;
@@ -85,7 +85,16 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  gap: 0.25rem;
   color: var(--gold-soft);
+}
+
+.app-menu-toggle {
+  display: none;
+}
+
+.app-mobile-nav {
+  display: none;
 }
 
 .app-content {
@@ -105,13 +114,47 @@
     padding: 1.25rem;
   }
 
-  .app-nav ::ng-deep .mdc-tab {
-    padding-inline: 0.75rem;
+  .app-nav {
+    display: none;
   }
 
-  .app-nav ::ng-deep .mdc-tab__text-label {
-    font-size: 0.75rem;
+  .app-menu-toggle {
+    display: inline-flex;
+  }
+
+  .app-mobile-nav {
+    display: flex;
+    flex-direction: column;
+    background: var(--ink);
+    border-bottom: 1px solid rgba(201, 162, 39, 0.18);
+    padding-block: 0.5rem;
+  }
+
+  .app-mobile-nav__link {
+    padding: 0.85rem 1.25rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
     letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition:
+      color 0.2s ease,
+      background 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .app-mobile-nav__link:hover {
+    color: var(--gold-soft);
+    background: rgba(92, 26, 38, 0.25);
+  }
+
+  .app-mobile-nav__link--active {
+    color: var(--gold);
+    border-left-color: var(--gold);
+    background: rgba(92, 26, 38, 0.18);
   }
 }
 
@@ -124,16 +167,6 @@
 
   .brand {
     font-size: 1.1rem;
-  }
-
-  .app-nav ::ng-deep .mdc-tab {
-    height: 56px;
-    padding-inline: 0.5rem;
-  }
-
-  .app-nav ::ng-deep .mdc-tab__text-label {
-    font-size: 0.7rem;
-    letter-spacing: 0.04em;
   }
 
   .app-content {
