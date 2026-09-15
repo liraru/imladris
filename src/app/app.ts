@@ -6,7 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import {
+  IsActiveMatchOptions,
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 import { APP_ROUTES } from '@shared/constants';
 import { filter, map, startWith } from 'rxjs';
 import { AuthService } from './services/auth.service';
@@ -19,6 +26,7 @@ import { ROUTES } from './shared/constants/routes.constant';
   imports: [
     RouterOutlet,
     RouterLink,
+    RouterLinkActive,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
@@ -35,6 +43,17 @@ export class App {
   protected readonly authService = inject(AuthService);
   protected readonly title = 'imladris';
 
+  /**
+   * Fuera de la plantilla para que `@for` no tenga que interpretar llaves `{ }` de un
+   * objeto literal dentro de su propio bloque de control (confunde al parser de bloques).
+   */
+  protected readonly exactMatch: IsActiveMatchOptions = {
+    paths: 'exact',
+    queryParams: 'ignored',
+    fragment: 'ignored',
+    matrixParams: 'ignored',
+  };
+
   /** Oculta la pestaña "Gestión" del menú si no hay sesión de administrador activa. */
   protected readonly ROUTES = computed(() =>
     Object.entries(APP_ROUTES)
@@ -42,7 +61,12 @@ export class App {
       .map(([, value]) => ({ title: value.title, path: value.path })),
   );
 
-  protected readonly currentUrl = toSignal(
+  /**
+   * Solo se usa para cerrar el menú móvil al navegar. El resaltado de la pestaña activa
+   * ahora lo gestiona `routerLinkActive` directamente en la plantilla, más fiable en modo
+   * zoneless que compararlo manualmente en cada ciclo de detección de cambios.
+   */
+  private readonly _currentUrl = toSignal(
     this._router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       map((e) => e.urlAfterRedirects),
@@ -57,14 +81,9 @@ export class App {
   constructor() {
     // Cierra el menú móvil automáticamente al navegar a otra ruta.
     effect(() => {
-      this.currentUrl();
+      this._currentUrl();
       this.mobileMenuOpen.set(false);
     });
-  }
-
-  protected isActive(path: string): boolean {
-    const normalized = `/${path}`;
-    return this.currentUrl() === normalized;
   }
 
   protected toggleMobileMenu(): void {

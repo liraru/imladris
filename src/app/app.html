@@ -3,7 +3,14 @@
 
   <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="app-nav" mat-stretch-tabs="false">
     @for (route of ROUTES(); track $index) {
-      <a mat-tab-link routerLink="/{{ route.path }}" [active]="isActive(route.path)">
+      <a
+        mat-tab-link
+        routerLink="/{{ route.path }}"
+        routerLinkActive
+        #rla="routerLinkActive"
+        [routerLinkActiveOptions]="exactMatch"
+        [active]="rla.isActive"
+      >
         {{ route.title }}
       </a>
     }
@@ -38,7 +45,8 @@
       <a
         class="app-mobile-nav__link"
         routerLink="/{{ route.path }}"
-        [class.app-mobile-nav__link--active]="isActive(route.path)"
+        routerLinkActive="app-mobile-nav__link--active"
+        [routerLinkActiveOptions]="exactMatch"
         (click)="closeMobileMenu()"
       >
         {{ route.title }}
