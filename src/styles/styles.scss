@@ -39,6 +39,19 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--ink-raised, #17171f);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 h1,
 h2,
 h3,
