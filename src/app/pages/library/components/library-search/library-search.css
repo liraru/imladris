@@ -2,6 +2,15 @@
   margin-bottom: 1.5rem;
 }
 
+.library-search__root {
+  display: block;
+}
+
+.library-search__type-toggle {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
 .library-search__panel {
   background: var(--mat-sys-surface-container);
   border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);

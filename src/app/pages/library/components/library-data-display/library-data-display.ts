@@ -1,14 +1,18 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LANGUAGE_LABELS } from '@shared/constants';
 import { GENRE_LABELS } from '../../../../shared/constants/categories.constant';
-import { READING_STATUS, READING_STATUS_LABELS } from '../../../../shared/constants/reading-status.constant';
+import {
+  READING_STATUS,
+  READING_STATUS_LABELS,
+} from '../../../../shared/constants/reading-status.constant';
+import { AuthService } from '../../../../services/auth.service';
 import { MODE, TYPE } from '../../constants/library.consants';
 import { LibraryItem } from '../../models/library-item.model';
-import { MatDivider } from "@angular/material/divider";
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
   imports: [MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule, MatDivider],
@@ -18,6 +22,8 @@ import { MatDivider } from "@angular/material/divider";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LibraryDataDisplay {
+  protected readonly authService = inject(AuthService);
+
   public mode = input.required<MODE>();
   public type = input.required<TYPE>();
   public data = input.required<LibraryItem[]>();

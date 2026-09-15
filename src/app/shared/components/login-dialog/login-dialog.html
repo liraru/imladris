@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>
+  <mat-icon class="login-dialog__mark">lock</mat-icon>
+  Iniciar sesión
+</h2>
+
+<mat-dialog-content class="login-dialog">
+  <form [formGroup]="form" class="login-dialog__form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline" class="login-dialog__field">
+      <mat-label>Usuario</mat-label>
+      <input matInput formControlName="email" type="email" autocomplete="username" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="login-dialog__field">
+      <mat-label>Contraseña</mat-label>
+      <input
+        matInput
+        formControlName="password"
+        [type]="hidePassword() ? 'password' : 'text'"
+        autocomplete="current-password"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="togglePasswordVisibility()"
+        [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+      >
+        <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+      </button>
+    </mat-form-field>
+
+    @if (error()) {
+      <p class="login-dialog__error">{{ error() }}</p>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    [disabled]="form.invalid || loading()"
+    (click)="submit()"
+  >
+    @if (loading()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      Entrar
+    }
+  </button>
+</mat-dialog-actions>

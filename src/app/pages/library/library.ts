@@ -24,6 +24,7 @@ import { SORT_FIELD, TYPE } from './constants/library.consants';
 import { DEFAULT_LIBRARY_FILTERS, LibraryFilters } from './models/library-filters.model';
 import { fromBook, fromMangaVolume, LibraryItem } from './models/library-item.model';
 import { READING_STATUS } from '@shared/constants';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   imports: [LibraryDataDisplay, LibrarySearch, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
@@ -43,6 +44,7 @@ export class Library implements OnInit {
 
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly authService = inject(AuthService);
 
   private readonly books = signal<LibraryItem[]>([]);
   private readonly mangaVolumes = signal<LibraryItem[]>([]);

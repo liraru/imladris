@@ -11,7 +11,9 @@ import { environment } from '../../environments/environment';
 export class SupabaseService {
   readonly client: SupabaseClient = createClient(environment.supabaseUrl, environment.supabaseKey, {
     auth: {
-      persistSession: false,
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
     },
   });
 }

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +16,7 @@ import {
   YearlyReadingsFormModal,
   YearlyReadingsFormModalData,
 } from './components/yearly-readings-form-modal/yearly-readings-form-modal';
+import { AuthService } from '../../services/auth.service';
 import { YearlyReadingService } from '../../services/yearly-reading.service';
 import { YearlyReading } from '@shared/models';
 
@@ -22,6 +30,8 @@ import { YearlyReading } from '@shared/models';
 export class YearlyReadings implements OnInit {
   private readonly _service = inject(YearlyReadingService);
   private readonly _dialog = inject(MatDialog);
+
+  protected readonly authService = inject(AuthService);
 
   protected readonly selectedYear = signal<number>(new Date().getFullYear());
   protected readonly readings = signal<YearlyReading[]>([]);
@@ -44,6 +54,8 @@ export class YearlyReadings implements OnInit {
   }
 
   protected async openCreateModal(): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
     const ref = this._dialog.open(YearlyReadingsFormModal, {
       width: '560px',
       data: { year: this.selectedYear() } satisfies YearlyReadingsFormModalData,
@@ -56,6 +68,8 @@ export class YearlyReadings implements OnInit {
   }
 
   protected async openEditModal(reading: YearlyReading): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
     const ref = this._dialog.open(YearlyReadingsFormModal, {
       width: '560px',
       data: { year: this.selectedYear(), reading } satisfies YearlyReadingsFormModalData,
@@ -66,6 +80,7 @@ export class YearlyReadings implements OnInit {
 
   protected async deleteReading(reading: YearlyReading, event: Event): Promise<void> {
     event.stopPropagation();
+    if (!this.authService.isAdmin()) return;
     if (!confirm(`¿Eliminar "${reading.title}" del historial?`)) return;
     await this._service.remove(reading.id);
     await this.loadReadings(this.selectedYear());

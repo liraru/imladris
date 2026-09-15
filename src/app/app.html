@@ -2,12 +2,24 @@
   <span class="brand">Imladris</span>
 
   <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="app-nav" mat-stretch-tabs="false">
-    @for (route of ROUTES; track $index) {
+    @for (route of ROUTES(); track $index) {
       <a mat-tab-link routerLink="/{{ route.path }}" [active]="isActive(route.path)">
         {{ route.title }}
       </a>
     }
   </nav>
+
+  <div class="app-auth">
+    @if (authService.isAdmin()) {
+      <button mat-icon-button type="button" matTooltip="Cerrar sesión" (click)="logout()">
+        <mat-icon>lock_open</mat-icon>
+      </button>
+    } @else {
+      <button mat-icon-button type="button" matTooltip="Iniciar sesión" (click)="openLogin()">
+        <mat-icon>lock</mat-icon>
+      </button>
+    }
+  </div>
 </mat-toolbar>
 
 <mat-tab-nav-panel #tabPanel class="app-content">
