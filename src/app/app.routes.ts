@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { ROUTES } from './shared/constants/routes.constant';
+import { adminGuard } from './shared/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: ROUTES.MANAGEMENT,
+    canActivate: [adminGuard],
     loadComponent: () => import('./pages/management/management').then((m) => m.Management),
   },
   {

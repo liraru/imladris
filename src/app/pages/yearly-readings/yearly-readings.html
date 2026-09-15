@@ -12,10 +12,12 @@
         (yearChange)="onYearChange($event)"
       />
 
-      <button mat-flat-button color="primary" class="add-btn" (click)="openCreateModal()">
-        <mat-icon>add</mat-icon>
-        Añadir lectura
-      </button>
+      @if (authService.isAdmin()) {
+        <button mat-flat-button color="primary" class="add-btn" (click)="openCreateModal()">
+          <mat-icon>add</mat-icon>
+          Añadir lectura
+        </button>
+      }
     </div>
   </header>
 
@@ -35,7 +37,11 @@
   } @else {
     <div class="shelf">
       @for (reading of readings(); track reading.id) {
-        <article class="book" (click)="openEditModal(reading)">
+        <article
+          class="book"
+          [class.book--readonly]="!authService.isAdmin()"
+          (click)="authService.isAdmin() && openEditModal(reading)"
+        >
           <div class="cover">
             @if (reading.coverUrl) {
               <img [src]="reading.coverUrl" [alt]="'Portada de ' + reading.title" loading="lazy" />
@@ -44,14 +50,16 @@
                 <mat-icon>menu_book</mat-icon>
               </div>
             }
-            <button
-              mat-icon-button
-              class="delete-btn"
-              (click)="deleteReading(reading, $event)"
-              aria-label="Eliminar lectura"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
+            @if (authService.isAdmin()) {
+              <button
+                mat-icon-button
+                class="delete-btn"
+                (click)="deleteReading(reading, $event)"
+                aria-label="Eliminar lectura"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
           </div>
           <div class="caption">
             <p class="title">{{ reading.title }}</p>
