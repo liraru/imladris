@@ -52,28 +52,30 @@
       @if (lastReadings().length === 0) {
         <p class="home__empty">Todavía no has marcado ninguna lectura como finalizada.</p>
       } @else {
-        <div class="shelf">
-          @for (item of lastReadings(); track item.id) {
-            <article class="book book--readonly">
-              <div class="cover">
-                @if (item.coverImageUrl) {
+        <div class="home__card-grid">
+          @for (reading of lastReadings(); track reading.id) {
+            <article class="home__card">
+              <div class="home__card-cover">
+                @if (reading.coverUrl) {
                   <img
-                    [src]="item.coverImageUrl"
-                    [alt]="'Portada de ' + item.title"
+                    [src]="reading.coverUrl"
+                    [alt]="'Portada de ' + reading.title"
                     loading="lazy"
                   />
                 } @else {
-                  <div class="placeholder">
-                    <mat-icon>{{
-                      item.type === HOME_ITEM_TYPE.MANGA ? 'auto_stories' : 'menu_book'
-                    }}</mat-icon>
+                  <div class="home__card-placeholder">
+                    <mat-icon>menu_book</mat-icon>
                   </div>
                 }
               </div>
-              <div class="caption">
-                <p class="title" [matTooltip]="item.title">{{ item.title }}</p>
-                <p class="author">{{ authorNames(item) }}</p>
-                <p class="pages">Finalizado: {{ item.finishDate }}</p>
+              <div class="home__card-body">
+                <h3 class="home__card-title" [matTooltip]="reading.title">{{ reading.title }}</h3>
+                <p class="home__card-author">
+                  {{ reading.authors.join(', ') || 'Autor desconocido' }}
+                </p>
+                <p class="home__card-meta">
+                  Finalizado: {{ reading.endDate | date: 'dd/MM/yyyy' }}
+                </p>
               </div>
             </article>
           }
@@ -90,10 +92,10 @@
       @if (lastAdditions().length === 0) {
         <p class="home__empty">Todavía no hay incorporaciones registradas.</p>
       } @else {
-        <div class="home__additions">
+        <div class="home__card-grid">
           @for (item of lastAdditions(); track item.id) {
-            <article class="addition-card">
-              <div class="addition-card__cover">
+            <article class="home__card">
+              <div class="home__card-cover">
                 @if (item.coverImageUrl) {
                   <img
                     [src]="item.coverImageUrl"
@@ -101,17 +103,19 @@
                     loading="lazy"
                   />
                 } @else {
-                  <div class="addition-card__placeholder">
+                  <div class="home__card-placeholder">
                     <mat-icon>{{
                       item.type === HOME_ITEM_TYPE.MANGA ? 'auto_stories' : 'menu_book'
                     }}</mat-icon>
                   </div>
                 }
               </div>
-              <div class="addition-card__body">
-                <h3 class="addition-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
-                <p class="addition-card__author">{{ authorNames(item) }}</p>
-                <p class="addition-card__meta">Adquirido: {{ item.adquisitionDate }}</p>
+              <div class="home__card-body">
+                <h3 class="home__card-title" [matTooltip]="item.title">{{ item.title }}</h3>
+                <p class="home__card-author">{{ authorNames(item) }}</p>
+                <p class="home__card-meta">
+                  Adquirido: {{ item.adquisitionDate | date: 'dd/MM/yyyy' }}
+                </p>
               </div>
             </article>
           }

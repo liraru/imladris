@@ -1,4 +1,3 @@
-import { LANGUAGE } from '@shared/constants';
 import { Author, Book, MangaVolume } from '@shared/models';
 
 export enum HOME_ITEM_TYPE {
@@ -7,7 +6,7 @@ export enum HOME_ITEM_TYPE {
 }
 
 /**
- * Representación mínima y común de un libro o tomo de manga para la pantalla de inicio.
+ * Representación mínima de un libro o tomo de manga para "Últimas incorporaciones".
  * No reutiliza `LibraryItem` (propio de la sección Biblioteca) para no acoplar features entre sí.
  */
 export interface HomeItem {
@@ -17,10 +16,6 @@ export interface HomeItem {
   authors: Author[];
   coverImageUrl?: string;
   adquisitionDate?: string;
-  finishDate?: string;
-  serieTitle?: string;
-  serieVolume?: number;
-  language: LANGUAGE;
 }
 
 export function fromBook(book: Book): HomeItem {
@@ -31,18 +26,10 @@ export function fromBook(book: Book): HomeItem {
     authors: book.authors,
     coverImageUrl: book.coverImageUrl,
     adquisitionDate: book.adquisitionDate,
-    finishDate: book.finishDate,
-    serieTitle: book.serie?.title,
-    serieVolume: book.serieVolume,
-    language: book.language,
   };
 }
 
-/**
- * `mangaTitle` es el nombre del manga (la serie a la que pertenece el tomo); `MangaVolume` solo
- * trae el `mangaId`, así que quien llama a esta función es responsable de resolverlo.
- */
-export function fromMangaVolume(volume: MangaVolume, mangaTitle?: string): HomeItem {
+export function fromMangaVolume(volume: MangaVolume): HomeItem {
   return {
     id: volume.id,
     type: HOME_ITEM_TYPE.MANGA,
@@ -50,9 +37,5 @@ export function fromMangaVolume(volume: MangaVolume, mangaTitle?: string): HomeI
     authors: volume.authors,
     coverImageUrl: volume.coverImageUrl,
     adquisitionDate: volume.adquisitionDate,
-    finishDate: volume.finishDate,
-    serieTitle: mangaTitle,
-    serieVolume: volume.volumeNumber,
-    language: volume.language,
   };
 }

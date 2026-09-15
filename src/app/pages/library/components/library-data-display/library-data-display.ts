@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
@@ -15,7 +16,7 @@ import { LibraryItem } from '../../models/library-item.model';
 import { MatDivider } from '@angular/material/divider';
 
 @Component({
-  imports: [MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule, MatDivider],
+  imports: [DatePipe, MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule, MatDivider],
   selector: 'app-library-data-display',
   styleUrl: './library-data-display.css',
   templateUrl: './library-data-display.html',

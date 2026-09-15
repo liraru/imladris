@@ -6,20 +6,31 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ROUTES } from '@shared/constants';
+import { YearlyReading } from '@shared/models';
 import { BookService } from '../../services/book.service';
-import { MangaService } from '../../services/manga.service';
 import { MangaVolumeService } from '../../services/manga-volume.service';
+import { YearlyReadingService } from '../../services/yearly-reading.service';
 import { fromBook, fromMangaVolume, HOME_ITEM_TYPE, HomeItem } from './models/home-item.model';
+
+const RECENT_COUNT = 5;
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule],
+  imports: [
+    RouterLink,
+    DatePipe,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +38,7 @@ import { fromBook, fromMangaVolume, HOME_ITEM_TYPE, HomeItem } from './models/ho
 export class Home implements OnInit {
   private readonly _bookSrv = inject(BookService);
   private readonly _mangaVolumeSrv = inject(MangaVolumeService);
-  private readonly _mangaSrv = inject(MangaService);
+  private readonly _yearlyReadingSrv = inject(YearlyReadingService);
 
   protected readonly ROUTES = ROUTES;
   protected readonly HOME_ITEM_TYPE = HOME_ITEM_TYPE;
@@ -35,53 +46,38 @@ export class Home implements OnInit {
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
-  private readonly items = signal<HomeItem[]>([]);
+  /** Últimas lecturas finalizadas, provienen de Lecturas anuales, ya ordenadas por el servicio. */
+  protected readonly lastReadings = signal<YearlyReading[]>([]);
 
-  /** Las 3 últimas lecturas finalizadas, más reciente primero. */
-  protected readonly lastReadings = computed(() =>
-    [...this.items()]
-      .filter((item) => !!item.finishDate)
-      .sort((a, b) => (b.finishDate ?? '').localeCompare(a.finishDate ?? ''))
-      .slice(0, 3),
-  );
+  private readonly _additions = signal<HomeItem[]>([]);
 
-  /** Las 6 últimas incorporaciones a la biblioteca (libros y tomos de manga), más reciente primero. */
+  /** Las últimas incorporaciones a la biblioteca (libros y tomos de manga), más reciente primero. */
   protected readonly lastAdditions = computed(() =>
-    [...this.items()]
+    [...this._additions()]
       .filter((item) => !!item.adquisitionDate)
       .sort((a, b) => (b.adquisitionDate ?? '').localeCompare(a.adquisitionDate ?? ''))
-      .slice(0, 6),
+      .slice(0, RECENT_COUNT),
   );
 
   ngOnInit(): void {
-    this._loadItems();
+    this._loadData();
   }
 
   protected authorNames(item: HomeItem): string {
     return item.authors.length ? item.authors.map((a) => a.name).join(', ') : 'Autor desconocido';
   }
 
-  protected serieLabel(item: HomeItem): string {
-    if (!item.serieTitle) return '';
-    return item.serieVolume ? `${item.serieTitle} #${item.serieVolume}` : item.serieTitle;
-  }
-
-  private async _loadItems(): Promise<void> {
+  private async _loadData(): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const [books, mangaVolumes, mangas] = await Promise.all([
+      const [readings, books, mangaVolumes] = await Promise.all([
+        this._yearlyReadingSrv.getRecent(RECENT_COUNT),
         this._bookSrv.getAll(),
         this._mangaVolumeSrv.getAll(),
-        this._mangaSrv.getAll(),
       ]);
-      const mangaTitleById = new Map(mangas.map((manga) => [manga.id, manga.title]));
-      this.items.set([
-        ...books.map(fromBook),
-        ...mangaVolumes.map((volume) =>
-          fromMangaVolume(volume, mangaTitleById.get(volume.mangaId)),
-        ),
-      ]);
+      this.lastReadings.set(readings);
+      this._additions.set([...books.map(fromBook), ...mangaVolumes.map(fromMangaVolume)]);
     } catch (err) {
       this.error.set('No se pudo cargar la información de la biblioteca. Inténtalo de nuevo.');
       console.error(err);

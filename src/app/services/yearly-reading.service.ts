@@ -35,12 +35,13 @@ export class YearlyReadingService {
   private readonly supabase = inject(SupabaseService).client;
   private readonly table = 'yearly_readings';
 
+  /** Ordenado por fecha de finalización de lectura (más reciente primero), no por `id`. */
   async getAll(): Promise<YearlyReading[]> {
     const { data, error } = await this.supabase
       .from(this.table)
       .select('*')
-      .order('end_date')
-      .order('id');
+      .order('end_date', { ascending: false })
+      .order('id', { ascending: false });
     if (error) throw error;
     return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
   }
@@ -50,8 +51,20 @@ export class YearlyReadingService {
       .from(this.table)
       .select('*')
       .eq('year', year)
-      .order('end_date')
-      .order('id');
+      .order('end_date', { ascending: true })
+      .order('id', { ascending: true });
+    if (error) throw error;
+    return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
+  }
+
+  /** Las últimas `limit` lecturas finalizadas, en cualquier año, más reciente primero. */
+  async getRecent(limit: number): Promise<YearlyReading[]> {
+    const { data, error } = await this.supabase
+      .from(this.table)
+      .select('*')
+      .order('end_date', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(limit);
     if (error) throw error;
     return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
   }
