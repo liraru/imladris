@@ -1,1 +1,122 @@
-<p>home works!</p>
+<section class="home">
+  <header class="page-header home__hero">
+    <div class="heading">
+      <p class="kicker">Biblioteca nocturna</p>
+      <h1>Bienvenida a Imladris</h1>
+      <p class="home__tagline">
+        Un rincón para llevar la cuenta de cada libro y cada tomo que pasa por tus manos.
+      </p>
+    </div>
+
+    <div class="page-header__actions">
+      <a mat-flat-button color="primary" routerLink="/{{ ROUTES.LIBRARY }}">
+        <mat-icon>menu_book</mat-icon>
+        Ir a la biblioteca
+      </a>
+    </div>
+  </header>
+
+  <nav class="home__quick-links">
+    <a class="home__quick-link" routerLink="/{{ ROUTES.LIBRARY }}">
+      <mat-icon>auto_stories</mat-icon>
+      <span>Biblioteca</span>
+    </a>
+    <a class="home__quick-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}">
+      <mat-icon>calendar_month</mat-icon>
+      <span>Lecturas anuales</span>
+    </a>
+    <a class="home__quick-link" routerLink="/{{ ROUTES.CALCULATOR }}">
+      <mat-icon>calculate</mat-icon>
+      <span>Calculadora</span>
+    </a>
+  </nav>
+
+  @if (loading()) {
+    <div class="home__state">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else if (error()) {
+    <div class="home__state home__state--error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <section class="home__section">
+      <div class="home__section-header">
+        <h2>Últimas lecturas</h2>
+        <a class="home__section-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}"
+          >Ver lecturas anuales</a
+        >
+      </div>
+
+      @if (lastReadings().length === 0) {
+        <p class="home__empty">Todavía no has marcado ninguna lectura como finalizada.</p>
+      } @else {
+        <div class="shelf">
+          @for (item of lastReadings(); track item.id) {
+            <article class="book book--readonly">
+              <div class="cover">
+                @if (item.coverImageUrl) {
+                  <img
+                    [src]="item.coverImageUrl"
+                    [alt]="'Portada de ' + item.title"
+                    loading="lazy"
+                  />
+                } @else {
+                  <div class="placeholder">
+                    <mat-icon>{{
+                      item.type === HOME_ITEM_TYPE.MANGA ? 'auto_stories' : 'menu_book'
+                    }}</mat-icon>
+                  </div>
+                }
+              </div>
+              <div class="caption">
+                <p class="title" [matTooltip]="item.title">{{ item.title }}</p>
+                <p class="author">{{ authorNames(item) }}</p>
+                <p class="pages">Finalizado: {{ item.finishDate }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="home__section">
+      <div class="home__section-header">
+        <h2>Últimas incorporaciones</h2>
+        <a class="home__section-link" routerLink="/{{ ROUTES.LIBRARY }}">Ver biblioteca completa</a>
+      </div>
+
+      @if (lastAdditions().length === 0) {
+        <p class="home__empty">Todavía no hay incorporaciones registradas.</p>
+      } @else {
+        <div class="home__additions">
+          @for (item of lastAdditions(); track item.id) {
+            <article class="addition-card">
+              <div class="addition-card__cover">
+                @if (item.coverImageUrl) {
+                  <img
+                    [src]="item.coverImageUrl"
+                    [alt]="'Portada de ' + item.title"
+                    loading="lazy"
+                  />
+                } @else {
+                  <div class="addition-card__placeholder">
+                    <mat-icon>{{
+                      item.type === HOME_ITEM_TYPE.MANGA ? 'auto_stories' : 'menu_book'
+                    }}</mat-icon>
+                  </div>
+                }
+              </div>
+              <div class="addition-card__body">
+                <h3 class="addition-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
+                <p class="addition-card__author">{{ authorNames(item) }}</p>
+                <p class="addition-card__meta">Adquirido: {{ item.adquisitionDate }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+</section>
