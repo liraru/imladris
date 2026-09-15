@@ -1,40 +1,11 @@
 :host {
-  --gold: #c9a668;
-  --gold-dim: #8a7550;
-  --gold-glow: rgba(201, 166, 104, 0.28);
-  --text-muted: #9b9788;
+  --gold: var(--mat-sys-primary);
+  --gold-dim: color-mix(in srgb, var(--mat-sys-primary) 60%, black);
+  --gold-glow: color-mix(in srgb, var(--mat-sys-primary) 28%, transparent);
+  --text-muted: var(--mat-sys-on-surface-variant);
   --shadow: rgba(0, 0, 0, 0.55);
 
   display: block;
-}
-
-.page-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.kicker {
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  color: var(--gold);
-  opacity: 0.85;
-  margin: 0 0 0.5rem;
-}
-
-.heading h1 {
-  margin: 0;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .add-btn mat-icon {

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -51,9 +51,28 @@ export class App {
     { initialValue: this._router.url },
   );
 
+  /** Controla la visibilidad del menú de navegación en vista móvil (botón "hamburguesa"). */
+  protected readonly mobileMenuOpen = signal(false);
+
+  constructor() {
+    // Cierra el menú móvil automáticamente al navegar a otra ruta.
+    effect(() => {
+      this.currentUrl();
+      this.mobileMenuOpen.set(false);
+    });
+  }
+
   protected isActive(path: string): boolean {
     const normalized = `/${path}`;
     return this.currentUrl() === normalized;
+  }
+
+  protected toggleMobileMenu(): void {
+    this.mobileMenuOpen.update((open) => !open);
+  }
+
+  protected closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
   }
 
   protected openLogin(): void {

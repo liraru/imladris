@@ -5,13 +5,10 @@
   padding-block: 1.5rem 3rem;
 }
 
-.calculator-page__header {
+.calculator-page__subtitle {
   max-width: 640px;
-
-  p {
-    color: var(--mat-sys-on-surface-variant);
-    margin-top: 0.25rem;
-  }
+  color: var(--mat-sys-on-surface-variant);
+  margin: -0.75rem 0 0;
 }
 
 .calculator-controllers-container {
