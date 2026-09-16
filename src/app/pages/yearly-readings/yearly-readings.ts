@@ -2,14 +2,17 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
 import { YearlyReadingsSearch } from './components/yearly-readings-search/yearly-readings-search';
 import {
@@ -21,7 +24,13 @@ import { YearlyReadingService } from '../../services/yearly-reading.service';
 import { YearlyReading } from '@shared/models';
 
 @Component({
-  imports: [YearlyReadingsSearch, MatIconModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [
+    YearlyReadingsSearch,
+    MatIconModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+  ],
   selector: 'app-yearly-readings',
   styleUrl: './yearly-readings.css',
   templateUrl: './yearly-readings.html',
@@ -37,6 +46,20 @@ export class YearlyReadings implements OnInit {
   protected readonly readings = signal<YearlyReading[]>([]);
   protected readonly availableYears = signal<number[]>([]);
   protected readonly loading = signal<boolean>(true);
+
+  /** Referencia al bloque (título + estantería) que se captura como imagen. */
+  protected readonly captureArea = viewChild<ElementRef<HTMLElement>>('captureArea');
+
+  /** Evita clics repetidos mientras se genera la imagen. */
+  protected readonly capturing = signal<boolean>(false);
+
+  /**
+   * Controla si la cabecera de texto (título + resumen) dentro del área de captura
+   * está visible. Permanece oculta en la página normal (display:none) y solo se
+   * muestra durante la ventana de tiempo en la que se genera el canvas, porque
+   * html2canvas no captura elementos con display:none.
+   */
+  protected readonly showCaptureHeader = signal<boolean>(false);
 
   protected readonly totalPages = computed(() =>
     this.readings().reduce((sum, r) => sum + (r.pages ?? 0), 0),
@@ -84,6 +107,52 @@ export class YearlyReadings implements OnInit {
     if (!confirm(`¿Eliminar "${reading.title}" del historial?`)) return;
     await this._service.remove(reading.id);
     await this.loadReadings(this.selectedYear());
+  }
+
+  /**
+   * Genera una imagen PNG del año seleccionado (título + portadas) y la descarga.
+   * Solo disponible para el usuario administrador logeado. La captura se fuerza
+   * siempre a ancho de escritorio (windowWidth) para que el resultado sea idéntico
+   * se ejecute desde móvil o desde escritorio.
+   */
+  protected async downloadYearImage(): Promise<void> {
+    if (!this.authService.isAdmin() || this.capturing()) return;
+
+    const element = this.captureArea()?.nativeElement;
+    if (!element) return;
+
+    this.capturing.set(true);
+    this.showCaptureHeader.set(true);
+
+    try {
+      // Espera a que Angular pinte la cabecera de captura antes de fotografiarla.
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const { default: html2canvas } = await import('html2canvas');
+
+      const canvas = await html2canvas(element, {
+        backgroundColor: '#17171f',
+        scale: 2,
+        useCORS: true,
+        windowWidth: 1440,
+        windowHeight: Math.max(element.scrollHeight + 200, 900),
+      });
+
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) return;
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `imladris-lecturas-${this.selectedYear()}.png`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error generando la imagen del año', err);
+    } finally {
+      this.showCaptureHeader.set(false);
+      this.capturing.set(false);
+    }
   }
 
   private async loadReadings(year: number): Promise<void> {

@@ -9,13 +9,36 @@
 /* ---------- Hero ---------- */
 
 .home__hero {
-  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.home__hero .heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .home__tagline {
-  margin: 0.5rem 0 0;
-  max-width: 46ch;
+  margin: 0.5rem auto 0;
+  max-width: 42rem;
   color: var(--text-muted);
+}
+
+.home__logo {
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+@media (max-width: 575px) {
+  .home__logo {
+    max-width: 160px;
+  }
 }
 
 .page-header__actions mat-icon {
@@ -27,6 +50,7 @@
 .home__quick-links {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 1rem;
   margin: 1.75rem 0 2.75rem;
 }

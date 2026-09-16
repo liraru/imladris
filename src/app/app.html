@@ -1,5 +1,8 @@
 <mat-toolbar class="app-toolbar">
-  <span class="brand">Imladris</span>
+  <a class="brand-link" routerLink="/" (click)="closeMobileMenu()">
+    <img src="/imladris-favicon-192.png" alt="Imladris" class="brand-icon" />
+    <span class="brand">Imladris</span>
+  </a>
 
   <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="app-nav" mat-stretch-tabs="false">
     @for (route of ROUTES(); track $index) {

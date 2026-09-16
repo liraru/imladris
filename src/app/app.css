@@ -15,6 +15,19 @@
   gap: 2rem;
 }
 
+.brand-link,
+.brand-link:link,
+.brand-link:visited,
+.brand-link:hover,
+.brand-link:active {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
 .brand {
   font-family: 'Fraunces', serif;
   font-style: italic;
@@ -26,6 +39,12 @@
   em {
     color: var(--gold);
   }
+}
+
+.brand-icon {
+  height: 28px;
+  width: auto;
+  display: block;
 }
 
 .app-nav {
@@ -167,6 +186,10 @@
 
   .brand {
     font-size: 1.1rem;
+  }
+
+  .brand-icon {
+    height: 22px;
   }
 
   .app-content {
