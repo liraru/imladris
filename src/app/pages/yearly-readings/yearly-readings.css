@@ -46,17 +46,20 @@
 }
 
 /*
- * Solo activa mientras se genera la imagen (downloadYearImage). Fuerza un margen
- * generoso alrededor de la estantería y una rejilla fija de 7 carátulas por fila,
- * independientemente del ancho real de pantalla, ya que la captura siempre se
- * renderiza a windowWidth: 1440 (ver yearly-readings.ts).
+ * Solo activa mientras se genera la imagen (downloadYearImage). El contenedor
+ * crece a lo ancho (width: max-content) para alojar 7 columnas fijas del mismo
+ * ancho que en la vista normal (220px), en vez de encoger las carátulas para
+ * que quepan en el ancho disponible del contenedor (limitado por .container).
+ * windowWidth en downloadYearImage() se calcula a partir de este ancho ya
+ * renderizado para que html2canvas no recorte el resultado.
  */
 .capture-area--capturing {
+  width: max-content;
   padding: 3rem;
 }
 
 .capture-area--capturing .shelf {
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, 220px);
 }
 
 .capture-area__header {

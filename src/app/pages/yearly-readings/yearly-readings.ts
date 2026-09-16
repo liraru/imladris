@@ -113,9 +113,11 @@ export class YearlyReadings implements OnInit {
 
   /**
    * Genera una imagen PNG del año seleccionado (título + portadas) y la descarga.
-   * Solo disponible para el usuario administrador logeado. La captura se fuerza
-   * siempre a ancho de escritorio (windowWidth) para que el resultado sea idéntico
-   * se ejecute desde móvil o desde escritorio.
+   * Solo disponible para el usuario administrador logeado. Durante la captura, el
+   * contenedor crece a lo ancho (ver `.capture-area--capturing` en el CSS) para
+   * alojar 7 carátulas al mismo tamaño que en la vista normal, en vez de encogerlas
+   * para caber en el ancho de pantalla. `windowWidth` se calcula a partir del ancho
+   * ya renderizado para que html2canvas no recorte el resultado.
    */
   protected async downloadYearImage(): Promise<void> {
     if (!this.authService.isAdmin() || this.capturing()) return;
@@ -127,7 +129,7 @@ export class YearlyReadings implements OnInit {
     this.showCaptureHeader.set(true);
 
     try {
-      // Espera a que Angular pinte la cabecera de captura y el grid de 7 columnas antes de fotografiarlos.
+      // Espera a que Angular pinte la cabecera de captura y el ancho ampliado antes de fotografiarlos.
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       const { default: html2canvas } = await import('html2canvas');
@@ -136,7 +138,7 @@ export class YearlyReadings implements OnInit {
         backgroundColor: '#17171f',
         scale: 2,
         useCORS: true,
-        windowWidth: 1440,
+        windowWidth: Math.max(element.scrollWidth + 100, 1440),
         windowHeight: Math.max(element.scrollHeight + 200, 900),
       });
 
