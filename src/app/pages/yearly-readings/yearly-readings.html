@@ -50,9 +50,8 @@
       <p>Todavía no hay lecturas registradas para {{ selectedYear() }}.</p>
     </div>
   } @else {
-    <div #captureArea class="capture-area">
+    <div #captureArea class="capture-area" [class.capture-area--capturing]="capturing()">
       <div class="capture-area__header" [class.capture-area__header--visible]="showCaptureHeader()">
-        <p class="kicker">Biblioteca nocturna</p>
         <h2>Lecturas de {{ selectedYear() }}</h2>
         <p class="capture-area__summary">
           {{ readings().length }} lecturas · {{ totalPages() }} páginas
@@ -91,9 +90,14 @@
               }
             </div>
             <div class="caption">
+              <div class="pages-row">
+                <p class="pages">{{ reading.endDate | date: "d 'de' MMMM" }}</p>
+                <p class="pages">
+                  {{ reading.pages }} pág.
+                </p>
+              </div>
               <p class="title">{{ reading.title }}</p>
               <p class="author">{{ reading.authors.join(', ') }}</p>
-              <p class="pages">{{ reading.pages }} páginas</p>
             </div>
           </article>
         }

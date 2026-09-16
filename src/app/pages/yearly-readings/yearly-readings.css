@@ -45,6 +45,20 @@
   padding: 1rem 0;
 }
 
+/*
+ * Solo activa mientras se genera la imagen (downloadYearImage). Fuerza un margen
+ * generoso alrededor de la estantería y una rejilla fija de 7 carátulas por fila,
+ * independientemente del ancho real de pantalla, ya que la captura siempre se
+ * renderiza a windowWidth: 1440 (ver yearly-readings.ts).
+ */
+.capture-area--capturing {
+  padding: 3rem;
+}
+
+.capture-area--capturing .shelf {
+  grid-template-columns: repeat(7, 1fr);
+}
+
 .capture-area__header {
   display: none;
   text-align: center;
@@ -167,9 +181,15 @@
 
 .book .pages {
   font-size: 0.85rem;
-  font-style: italic;
+  /* font-style: italic; */
   color: var(--text-muted);
   margin: 0;
+}
+
+.book .end-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.15rem 0 0;
 }
 
 @media (max-width: 767px) {
@@ -197,4 +217,10 @@
 
 .book--readonly {
   cursor: default;
+}
+
+.pages-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
