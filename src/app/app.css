@@ -137,6 +137,10 @@
     display: none;
   }
 
+  .app-auth {
+    margin-left: auto;
+  }
+
   .app-menu-toggle {
     display: inline-flex;
   }
