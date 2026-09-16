@@ -12,6 +12,10 @@
   margin-right: 0.25rem;
 }
 
+.download-btn {
+  color: var(--gold);
+}
+
 .summary {
   color: var(--text-muted);
   font-size: 0.9rem;
@@ -34,6 +38,33 @@
   width: 2.5rem;
   height: 2.5rem;
   opacity: 0.6;
+}
+
+.capture-area {
+  background: var(--ink-raised, #17171f);
+  padding: 1rem 0;
+}
+
+.capture-area__header {
+  display: none;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.capture-area__header--visible {
+  display: block;
+}
+
+.capture-area__header h2 {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  margin: 0.35rem 0;
+}
+
+.capture-area__summary {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 .shelf {

@@ -6,18 +6,33 @@
     </div>
 
     <div class="page-header__actions">
-      <app-yearly-readings-search
-        [years]="availableYears()"
-        [selectedYear]="selectedYear()"
-        (yearChange)="onYearChange($event)"
-      />
-
       @if (authService.isAdmin()) {
+        <button
+          mat-icon-button
+          type="button"
+          class="download-btn"
+          [disabled]="capturing() || readings().length === 0"
+          matTooltip="Descargar imagen del año"
+          (click)="downloadYearImage()"
+        >
+          @if (capturing()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            <mat-icon>download</mat-icon>
+          }
+        </button>
+
         <button mat-flat-button color="primary" class="add-btn" (click)="openCreateModal()">
           <mat-icon>add</mat-icon>
           Añadir lectura
         </button>
       }
+
+      <app-yearly-readings-search
+        [years]="availableYears()"
+        [selectedYear]="selectedYear()"
+        (yearChange)="onYearChange($event)"
+      />
     </div>
   </header>
 
@@ -35,39 +50,54 @@
       <p>Todavía no hay lecturas registradas para {{ selectedYear() }}.</p>
     </div>
   } @else {
-    <div class="shelf">
-      @for (reading of readings(); track reading.id) {
-        <article
-          class="book"
-          [class.book--readonly]="!authService.isAdmin()"
-          (click)="authService.isAdmin() && openEditModal(reading)"
-        >
-          <div class="cover">
-            @if (reading.coverUrl) {
-              <img [src]="reading.coverUrl" [alt]="'Portada de ' + reading.title" loading="lazy" />
-            } @else {
-              <div class="placeholder">
-                <mat-icon>menu_book</mat-icon>
-              </div>
-            }
-            @if (authService.isAdmin()) {
-              <button
-                mat-icon-button
-                class="delete-btn"
-                (click)="deleteReading(reading, $event)"
-                aria-label="Eliminar lectura"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
-            }
-          </div>
-          <div class="caption">
-            <p class="title">{{ reading.title }}</p>
-            <p class="author">{{ reading.authors.join(', ') }}</p>
-            <p class="pages">{{ reading.pages }} páginas</p>
-          </div>
-        </article>
-      }
+    <div #captureArea class="capture-area">
+      <div class="capture-area__header" [class.capture-area__header--visible]="showCaptureHeader()">
+        <p class="kicker">Biblioteca nocturna</p>
+        <h2>Lecturas de {{ selectedYear() }}</h2>
+        <p class="capture-area__summary">
+          {{ readings().length }} lecturas · {{ totalPages() }} páginas
+        </p>
+      </div>
+
+      <div class="shelf">
+        @for (reading of readings(); track reading.id) {
+          <article
+            class="book"
+            [class.book--readonly]="!authService.isAdmin()"
+            (click)="authService.isAdmin() && openEditModal(reading)"
+          >
+            <div class="cover">
+              @if (reading.coverUrl) {
+                <img
+                  [src]="reading.coverUrl"
+                  [alt]="'Portada de ' + reading.title"
+                  loading="lazy"
+                  crossorigin="anonymous"
+                />
+              } @else {
+                <div class="placeholder">
+                  <mat-icon>menu_book</mat-icon>
+                </div>
+              }
+              @if (authService.isAdmin()) {
+                <button
+                  mat-icon-button
+                  class="delete-btn"
+                  (click)="deleteReading(reading, $event)"
+                  aria-label="Eliminar lectura"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </div>
+            <div class="caption">
+              <p class="title">{{ reading.title }}</p>
+              <p class="author">{{ reading.authors.join(', ') }}</p>
+              <p class="pages">{{ reading.pages }} páginas</p>
+            </div>
+          </article>
+        }
+      </div>
     </div>
   }
 </section>

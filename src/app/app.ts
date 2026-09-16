@@ -43,10 +43,6 @@ export class App {
   protected readonly authService = inject(AuthService);
   protected readonly title = 'imladris';
 
-  /**
-   * Fuera de la plantilla para que `@for` no tenga que interpretar llaves `{ }` de un
-   * objeto literal dentro de su propio bloque de control (confunde al parser de bloques).
-   */
   protected readonly exactMatch: IsActiveMatchOptions = {
     paths: 'exact',
     queryParams: 'ignored',
@@ -54,18 +50,16 @@ export class App {
     matrixParams: 'ignored',
   };
 
-  /** Oculta la pestaña "Gestión" del menú si no hay sesión de administrador activa. */
+  /**
+   * Pestañas del menú superior. Se excluye "Inicio": el acceso a home ahora se hace
+   * desde el nombre/icono de la marca en el toolbar, no desde una pestaña más.
+   */
   protected readonly ROUTES = computed(() =>
     Object.entries(APP_ROUTES)
-      .filter(([key]) => key !== 'MANAGEMENT' || this.authService.isAdmin())
+      .filter(([key]) => key !== 'HOME' && (key !== 'MANAGEMENT' || this.authService.isAdmin()))
       .map(([, value]) => ({ title: value.title, path: value.path })),
   );
 
-  /**
-   * Solo se usa para cerrar el menú móvil al navegar. El resaltado de la pestaña activa
-   * ahora lo gestiona `routerLinkActive` directamente en la plantilla, más fiable en modo
-   * zoneless que compararlo manualmente en cada ciclo de detección de cambios.
-   */
   private readonly _currentUrl = toSignal(
     this._router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -75,11 +69,9 @@ export class App {
     { initialValue: this._router.url },
   );
 
-  /** Controla la visibilidad del menú de navegación en vista móvil (botón "hamburguesa"). */
   protected readonly mobileMenuOpen = signal(false);
 
   constructor() {
-    // Cierra el menú móvil automáticamente al navegar a otra ruta.
     effect(() => {
       this._currentUrl();
       this.mobileMenuOpen.set(false);
