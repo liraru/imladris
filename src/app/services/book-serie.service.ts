@@ -73,4 +73,14 @@ export class BookSerieService {
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
     if (error) throw error;
   }
+
+  /** Ids de series referenciadas desde libros. */
+  async getUsedIds(): Promise<Set<number>> {
+    const { data, error } = await this.supabase
+      .from('books')
+      .select('serie_id')
+      .not('serie_id', 'is', null);
+    if (error) throw error;
+    return new Set((data ?? []).map((row) => (row as { serie_id: number }).serie_id));
+  }
 }

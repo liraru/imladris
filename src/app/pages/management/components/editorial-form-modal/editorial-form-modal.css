@@ -1,0 +1,13 @@
+.editorial-form-modal {
+  min-width: 280px;
+  max-width: 100%;
+}
+
+.editorial-form-modal__error {
+  color: #e08585;
+  margin-bottom: 0.5rem;
+}
+
+.editorial-form-modal__form {
+  padding-top: 0.5rem;
+}

@@ -1,1 +1,16 @@
-<p>authors works!</p>
+@if (error()) {
+  <p class="authors__error">{{ error() }}</p>
+}
+
+<app-master-data-table
+  [columns]="columns"
+  [items]="items()"
+  [loading]="loading()"
+  [isDeletable]="isDeletable"
+  addLabel="Añadir autor"
+  searchPlaceholder="Buscar autor…"
+  emptyMessage="Todavía no hay autores registrados."
+  (add)="openAdd()"
+  (edit)="openEdit($event)"
+  (delete)="remove($event)"
+/>
