@@ -2,37 +2,38 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 
-import { AuthorService } from '../../../../services/author.service';
-import { Author } from '@shared/models';
-import { COUNTRY_LABELS } from '../../../../shared/constants/countries.constant';
+import { BookSerieService } from '../../../../services/book-serie.service';
+import { BookSerie } from '@shared/models';
 import { MasterDataTable } from '../master-data-table/master-data-table';
 import { MasterColumn } from '../../models/master-column.model';
-import { AuthorFormModal, AuthorFormModalData } from '../author-form-modal/author-form-modal';
+import {
+  BookSerieFormModal,
+  BookSerieFormModalData,
+} from '../book-serie-form-modal/book-serie-form-modal';
 import { FORM_MODE } from '../../constants/management-form.constants';
 
 @Component({
-  selector: 'app-authors',
+  selector: 'app-book-series',
   imports: [MasterDataTable],
-  templateUrl: './authors.html',
-  styleUrl: './authors.css',
+  templateUrl: './book-series.html',
+  styleUrl: './book-series.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Authors implements OnInit {
-  private readonly _service = inject(AuthorService);
+export class BookSeries implements OnInit {
+  private readonly _service = inject(BookSerieService);
   private readonly _dialog = inject(MatDialog);
 
-  protected readonly items = signal<Author[]>([]);
+  protected readonly items = signal<BookSerie[]>([]);
   protected readonly usedIds = signal<Set<number>>(new Set());
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
-  protected readonly columns: MasterColumn<Author>[] = [
-    { key: 'name', header: 'Nombre', value: (a) => a.name },
-    { key: 'country', header: 'País', value: (a) => COUNTRY_LABELS[a.country] },
-    { key: 'notes', header: 'Notas', value: (a) => a.notes ?? '—' },
+  protected readonly columns: MasterColumn<BookSerie>[] = [
+    { key: 'title', header: 'Título', value: (s) => s.title },
+    { key: 'editorial', header: 'Editorial', value: (s) => s.editorial.name },
   ];
 
-  protected readonly isDeletable = (item: Author) => !this.usedIds().has(item.id);
+  protected readonly isDeletable = (item: BookSerie) => !this.usedIds().has(item.id);
 
   async ngOnInit(): Promise<void> {
     await this.load();
@@ -49,7 +50,7 @@ export class Authors implements OnInit {
       this.items.set(items);
       this.usedIds.set(usedIds);
     } catch (err) {
-      this.error.set('No se pudieron cargar los autores. Inténtalo de nuevo.');
+      this.error.set('No se pudieron cargar las series. Inténtalo de nuevo.');
       console.error(err);
     } finally {
       this.loading.set(false);
@@ -57,40 +58,40 @@ export class Authors implements OnInit {
   }
 
   protected async openAdd(): Promise<void> {
-    const ref = this._dialog.open(AuthorFormModal, {
+    const ref = this._dialog.open(BookSerieFormModal, {
       width: '480px',
       maxWidth: '95vw',
-      data: { mode: FORM_MODE.ALTA } satisfies AuthorFormModalData,
+      data: { mode: FORM_MODE.ALTA } satisfies BookSerieFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
     if (saved) await this.load();
   }
 
-  protected async openEdit(author: Author): Promise<void> {
-    const ref = this._dialog.open(AuthorFormModal, {
+  protected async openEdit(serie: BookSerie): Promise<void> {
+    const ref = this._dialog.open(BookSerieFormModal, {
       width: '480px',
       maxWidth: '95vw',
-      data: { mode: FORM_MODE.EDICION, author } satisfies AuthorFormModalData,
+      data: { mode: FORM_MODE.EDICION, serie } satisfies BookSerieFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
     if (saved) await this.load();
   }
 
-  protected async remove(author: Author): Promise<void> {
-    if (this.usedIds().has(author.id)) return;
-    if (!confirm(`¿Eliminar a "${author.name}"? Esta acción no se puede deshacer.`)) return;
+  protected async remove(serie: BookSerie): Promise<void> {
+    if (this.usedIds().has(serie.id)) return;
+    if (!confirm(`¿Eliminar la serie "${serie.title}"? Esta acción no se puede deshacer.`)) return;
 
     try {
       const usedIds = await this._service.getUsedIds();
-      if (usedIds.has(author.id)) {
+      if (usedIds.has(serie.id)) {
         this.usedIds.set(usedIds);
-        alert('Este autor se ha empezado a usar en otro registro y ya no se puede eliminar.');
+        alert('Esta serie se ha empezado a usar en otro registro y ya no se puede eliminar.');
         return;
       }
-      await this._service.remove(author.id);
+      await this._service.remove(serie.id);
       await this.load();
     } catch (err) {
-      this.error.set('No se ha podido eliminar el autor. Inténtalo de nuevo.');
+      this.error.set('No se ha podido eliminar la serie. Inténtalo de nuevo.');
       console.error(err);
     }
   }

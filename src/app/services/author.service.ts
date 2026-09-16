@@ -71,4 +71,23 @@ export class AuthorService {
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
     if (error) throw error;
   }
+
+  /** Ids de autores referenciados desde libros, mangas o tomos de manga. */
+  async getUsedIds(): Promise<Set<number>> {
+    const [bookAuthors, mangaAuthors, mangaVolumeAuthors] = await Promise.all([
+      this.supabase.from('book_authors').select('author_id'),
+      this.supabase.from('manga_authors').select('author_id'),
+      this.supabase.from('manga_volume_authors').select('author_id'),
+    ]);
+    if (bookAuthors.error) throw bookAuthors.error;
+    if (mangaAuthors.error) throw mangaAuthors.error;
+    if (mangaVolumeAuthors.error) throw mangaVolumeAuthors.error;
+
+    const ids = new Set<number>();
+    for (const row of bookAuthors.data ?? []) ids.add((row as { author_id: number }).author_id);
+    for (const row of mangaAuthors.data ?? []) ids.add((row as { author_id: number }).author_id);
+    for (const row of mangaVolumeAuthors.data ?? [])
+      ids.add((row as { author_id: number }).author_id);
+    return ids;
+  }
 }

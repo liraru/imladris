@@ -1,1 +1,68 @@
-<p>management works!</p>
+<div class="management">
+  <header class="page-header">
+    <div class="heading">
+      <p class="kicker">Biblioteca nocturna</p>
+      <h1>Gestión</h1>
+    </div>
+  </header>
+
+  <mat-sidenav-container
+    class="management__container"
+    [class.management__container--collapsed]="collapsed() && !isMobile()"
+  >
+    <mat-sidenav
+      class="management__sidenav"
+      [mode]="isMobile() ? 'over' : 'side'"
+      [opened]="isMobile() ? mobileMenuOpen() : true"
+      (openedChange)="onSidenavOpenedChange($event)"
+    >
+      <nav class="management__menu">
+        @for (entry of menuEntries; track entry.master) {
+          <button
+            type="button"
+            class="management__menu-item"
+            [class.management__menu-item--active]="selectedMaster() === entry.master"
+            [matTooltip]="collapsed() && !isMobile() ? entry.label : ''"
+            matTooltipPosition="right"
+            (click)="selectMaster(entry.master)"
+          >
+            <mat-icon>{{ entry.icon }}</mat-icon>
+            <span class="management__menu-item-label">{{ entry.label }}</span>
+          </button>
+        }
+      </nav>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="management__content">
+      <div class="management__content-header">
+        <button
+          mat-icon-button
+          type="button"
+          class="management__toggle"
+          [matTooltip]="isMobile() ? 'Abrir menú' : collapsed() ? 'Expandir menú' : 'Colapsar menú'"
+          (click)="toggleMenu()"
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
+        <h2 class="management__content-title">{{ selectedLabel() }}</h2>
+      </div>
+
+      <div class="management__content-body">
+        @switch (selectedMaster()) {
+          @case (MANAGEMENT_MASTER.AUTHORS) {
+            <app-authors />
+          }
+          @case (MANAGEMENT_MASTER.EDITORIALS) {
+            <app-editorials />
+          }
+          @case (MANAGEMENT_MASTER.BOOK_SERIES) {
+            <app-book-series />
+          }
+          @case (MANAGEMENT_MASTER.MANGAS) {
+            <app-mangas />
+          }
+        }
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

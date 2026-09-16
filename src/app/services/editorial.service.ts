@@ -70,4 +70,24 @@ export class EditorialService {
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
     if (error) throw error;
   }
+
+  /** Ids de editoriales referenciadas desde libros, tomos de manga o series. */
+  async getUsedIds(): Promise<Set<number>> {
+    const [books, mangaVolumes, bookSeries] = await Promise.all([
+      this.supabase.from('books').select('editorial_id'),
+      this.supabase.from('manga_volumes').select('editorial_id'),
+      this.supabase.from('book_series').select('editorial_id'),
+    ]);
+    if (books.error) throw books.error;
+    if (mangaVolumes.error) throw mangaVolumes.error;
+    if (bookSeries.error) throw bookSeries.error;
+
+    const ids = new Set<number>();
+    for (const row of books.data ?? []) ids.add((row as { editorial_id: number }).editorial_id);
+    for (const row of mangaVolumes.data ?? [])
+      ids.add((row as { editorial_id: number }).editorial_id);
+    for (const row of bookSeries.data ?? [])
+      ids.add((row as { editorial_id: number }).editorial_id);
+    return ids;
+  }
 }

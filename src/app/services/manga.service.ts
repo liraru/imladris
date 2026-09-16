@@ -38,10 +38,7 @@ export class MangaService {
   private readonly table = 'mangas';
 
   async getAll(): Promise<Manga[]> {
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select(SELECT_FULL)
-      .order('title');
+    const { data, error } = await this.supabase.from(this.table).select(SELECT_FULL).order('title');
     if (error) throw error;
     return (data ?? []).map((row) => toManga(row as unknown as MangaRow));
   }
@@ -95,6 +92,13 @@ export class MangaService {
     // manga_authors, manga_genres y manga_volumes se borran en cascada.
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
     if (error) throw error;
+  }
+
+  /** Ids de mangas referenciados desde tomos de manga. */
+  async getUsedIds(): Promise<Set<number>> {
+    const { data, error } = await this.supabase.from('manga_volumes').select('manga_id');
+    if (error) throw error;
+    return new Set((data ?? []).map((row) => (row as { manga_id: number }).manga_id));
   }
 
   private async syncAuthors(mangaId: number, authorIds: number[]): Promise<void> {

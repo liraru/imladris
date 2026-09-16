@@ -1,0 +1,13 @@
+.author-form-modal {
+  min-width: 280px;
+  max-width: 100%;
+}
+
+.author-form-modal__error {
+  color: #e08585;
+  margin-bottom: 0.5rem;
+}
+
+.author-form-modal__form {
+  padding-top: 0.5rem;
+}

@@ -1,5 +1,5 @@
 @if (error()) {
-  <p class="editorials__error">{{ error() }}</p>
+  <p class="book-series__error">{{ error() }}</p>
 }
 
 <app-master-data-table
@@ -7,9 +7,9 @@
   [items]="items()"
   [loading]="loading()"
   [isDeletable]="isDeletable"
-  addLabel="Añadir editorial"
-  searchPlaceholder="Buscar editorial…"
-  emptyMessage="Todavía no hay editoriales registradas."
+  addLabel="Añadir serie"
+  searchPlaceholder="Buscar serie…"
+  emptyMessage="Todavía no hay series registradas."
   (add)="openAdd()"
   (edit)="openEdit($event)"
   (delete)="remove($event)"
