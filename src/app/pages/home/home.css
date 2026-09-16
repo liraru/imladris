@@ -134,9 +134,11 @@
 }
 
 /* ---------- Tarjetas: mismo tamaño/estilo para lecturas e incorporaciones ----------
-   Se usa flex en lugar de grid para que, cuando la última fila no se llene (p. ej. 5
-   tarjetas en una rejilla de 6 columnas), el hueco quede centrado en vez de pegado
-   a la izquierda. */
+   Se usa flex en lugar de grid para que, cuando la última fila no se llene (p. ej. menos
+   de 5 tarjetas), el hueco quede centrado en vez de pegado a la izquierda.
+   El breakpoint de escritorio calcula 5 columnas (no 6) porque RECENT_COUNT = 5 en
+   home.ts: así, cuando hay 5 elementos, la fila ocupa el mismo ancho que la cabecera
+   de la sección y título/enlace quedan alineados con las esquinas de las portadas. */
 
 .home__card-grid {
   display: flex;
@@ -173,7 +175,7 @@
 }
 @media (min-width: 1024px) {
   .home__card {
-    flex-basis: calc(16.667% - 1.0417rem);
+    flex-basis: calc(20% - 1rem);
   }
 }
 
@@ -248,19 +250,12 @@
 
 @media (max-width: 575px) {
   .home__quick-links {
+    flex-direction: column;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 0.25rem;
-    margin: 1.5rem -1rem 2.25rem;
-    padding-inline: 1rem;
-    scrollbar-width: none;
-  }
-
-  .home__quick-links::-webkit-scrollbar {
-    display: none;
+    margin: 1.5rem 0 2.25rem;
   }
 
   .home__quick-link {
-    flex: 0 0 auto;
+    justify-content: center;
   }
 }

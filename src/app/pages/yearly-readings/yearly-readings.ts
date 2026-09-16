@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,6 +27,7 @@ import { YearlyReading } from '@shared/models';
 @Component({
   imports: [
     YearlyReadingsSearch,
+    DatePipe,
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
@@ -125,7 +127,7 @@ export class YearlyReadings implements OnInit {
     this.showCaptureHeader.set(true);
 
     try {
-      // Espera a que Angular pinte la cabecera de captura antes de fotografiarla.
+      // Espera a que Angular pinte la cabecera de captura y el grid de 7 columnas antes de fotografiarlos.
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       const { default: html2canvas } = await import('html2canvas');
