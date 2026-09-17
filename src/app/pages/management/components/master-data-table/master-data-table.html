@@ -21,7 +21,13 @@
       }
     </mat-form-field>
 
-    <button mat-flat-button type="button" color="primary" (click)="add.emit()">
+    <button
+      mat-flat-button
+      type="button"
+      color="primary"
+      class="master-data-table__add-btn"
+      (click)="add.emit()"
+    >
       <mat-icon>add</mat-icon>
       {{ addLabel() }}
     </button>
