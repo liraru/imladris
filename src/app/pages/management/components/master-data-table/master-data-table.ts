@@ -63,7 +63,7 @@ export class MasterDataTable<T extends { id: number }> {
     if (!query) return items;
     const cols = this.columns();
     return items.filter((item) =>
-      cols.some((col) => col.value(item).toLowerCase().includes(query)),
+      cols.some((col) => (col.value(item) ?? '').toLowerCase().includes(query)),
     );
   });
 
