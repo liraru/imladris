@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Enviar a Lecturas anuales</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="modal-content">
+    <p class="modal-intro">
+      «{{ data.item.title }}» se moverá del plan de lectura a Lecturas anuales.
+    </p>
+
+    <div class="field-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de inicio</mat-label>
+        <input
+          matInput
+          [matDatepicker]="startPicker"
+          formControlName="startDate"
+          [max]="form.controls.endDate.value"
+          required
+          cdkFocusInitial
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de fin</mat-label>
+        <input
+          matInput
+          [matDatepicker]="endPicker"
+          formControlName="endDate"
+          [min]="form.controls.startDate.value"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+        <mat-hint>Vacío = todavía en lectura</mat-hint>
+      </mat-form-field>
+    </div>
+
+    @if (
+      form.hasError('dateRangeInvalid') &&
+      (form.controls.endDate.touched || form.controls.endDate.dirty)
+    ) {
+      <p class="form-error">La fecha de fin no puede ser anterior a la fecha de inicio.</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()" [disabled]="saving()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+      @if (saving()) {
+        <mat-spinner diameter="18"></mat-spinner>
+      } @else {
+        Enviar
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -65,6 +65,9 @@
             (click)="authService.isAdmin() && openEditModal(reading)"
           >
             <div class="cover">
+              @if (!reading.endDate) {
+                <span class="reading-badge">Leyendo</span>
+              }
               @if (reading.coverUrl) {
                 <img
                   [src]="reading.coverUrl"
@@ -90,7 +93,13 @@
             </div>
             <div class="caption">
               <div class="pages-row">
-                <p class="pages">{{ reading.endDate | date: "d 'de' MMMM" }}</p>
+                <p class="pages">
+                  @if (reading.endDate) {
+                    {{ reading.endDate | date: "d 'de' MMMM" }}
+                  } @else {
+                    Leyendo
+                  }
+                </p>
                 <p class="pages">{{ reading.pages }} pág.</p>
               </div>
               <p class="title">{{ reading.title }}</p>

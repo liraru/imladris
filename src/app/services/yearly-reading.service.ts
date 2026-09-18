@@ -35,13 +35,17 @@ export class YearlyReadingService {
   private readonly supabase = inject(SupabaseService).client;
   private readonly table = 'yearly_readings';
 
-  /** Ordenado por fecha de finalización de lectura (más reciente primero), no por `id`. */
+  /**
+   * Orden base: primero por fecha de fin (las que no la tienen, es decir "en lectura",
+   * quedan al final); a igualdad de fecha de fin, por id. Es el orden de la página
+   * de Lecturas anuales.
+   */
   async getAll(): Promise<YearlyReading[]> {
     const { data, error } = await this.supabase
       .from(this.table)
       .select('*')
-      .order('end_date', { ascending: false })
-      .order('id', { ascending: false });
+      .order('end_date', { ascending: true, nullsFirst: false })
+      .order('id', { ascending: true });
     if (error) throw error;
     return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
   }
@@ -51,20 +55,37 @@ export class YearlyReadingService {
       .from(this.table)
       .select('*')
       .eq('year', year)
-      .order('end_date', { ascending: true })
+      .order('end_date', { ascending: true, nullsFirst: false })
       .order('id', { ascending: true });
     if (error) throw error;
     return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
   }
 
-  /** Las últimas `limit` lecturas finalizadas, en cualquier año, más reciente primero. */
+  /**
+   * Las últimas `limit` lecturas finalizadas (con fecha de fin), en cualquier año,
+   * en orden inverso al de Lecturas anuales: más reciente primero.
+   */
   async getRecent(limit: number): Promise<YearlyReading[]> {
     const { data, error } = await this.supabase
       .from(this.table)
       .select('*')
+      .not('end_date', 'is', null)
       .order('end_date', { ascending: false })
       .order('id', { ascending: false })
       .limit(limit);
+    if (error) throw error;
+    return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
+  }
+
+  /** Lecturas todavía en curso (sin fecha de fin), más recientes primero. */
+  async getInProgress(limit?: number): Promise<YearlyReading[]> {
+    const query = this.supabase
+      .from(this.table)
+      .select('*')
+      .is('end_date', null)
+      .order('id', { ascending: false });
+
+    const { data, error } = await (limit !== undefined ? query.limit(limit) : query);
     if (error) throw error;
     return (data ?? []).map((row) => toYearlyReading(row as YearlyReadingRow));
   }

@@ -5,3 +5,4 @@ export * from './book.interface';
 export * from './manga.interface';
 export * from './menu.model';
 export * from './yearly-reading.interface';
+export * from './reading-plan.interface';

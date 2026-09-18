@@ -26,6 +26,7 @@ export class Editorials implements OnInit {
 
   protected readonly items = signal<Editorial[]>([]);
   protected readonly usedIds = signal<Set<number>>(new Set());
+  protected readonly usageCounts = signal<Map<number, number>>(new Map());
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
@@ -33,6 +34,11 @@ export class Editorials implements OnInit {
     { key: 'name', header: 'Nombre', value: (e) => e.name },
     { key: 'country', header: 'País', value: (e) => COUNTRY_LABELS[e.country] },
     { key: 'website', header: 'Web', value: (e) => e.website ?? '—' },
+    {
+      key: 'usageCount',
+      header: 'Registros',
+      value: (e) => String(this.usageCounts().get(e.id) ?? 0),
+    },
   ];
 
   protected readonly isDeletable = (item: Editorial) => !this.usedIds().has(item.id);
@@ -45,12 +51,14 @@ export class Editorials implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const [items, usedIds] = await Promise.all([
+      const [items, usedIds, usageCounts] = await Promise.all([
         this._service.getAll(),
         this._service.getUsedIds(),
+        this._service.getUsageCounts(),
       ]);
       this.items.set(items);
       this.usedIds.set(usedIds);
+      this.usageCounts.set(usageCounts);
     } catch (err) {
       this.error.set('No se pudieron cargar las editoriales. Inténtalo de nuevo.');
       console.error(err);

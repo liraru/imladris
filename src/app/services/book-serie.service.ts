@@ -83,4 +83,20 @@ export class BookSerieService {
     if (error) throw error;
     return new Set((data ?? []).map((row) => (row as { serie_id: number }).serie_id));
   }
+
+  /** Nº de libros asociados a cada serie. */
+  async getUsageCounts(): Promise<Map<number, number>> {
+    const { data, error } = await this.supabase
+      .from('books')
+      .select('serie_id')
+      .not('serie_id', 'is', null);
+    if (error) throw error;
+
+    const counts = new Map<number, number>();
+    for (const row of data ?? []) {
+      const id = (row as { serie_id: number }).serie_id;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
+  }
 }

@@ -23,6 +23,7 @@ export class Authors implements OnInit {
 
   protected readonly items = signal<Author[]>([]);
   protected readonly usedIds = signal<Set<number>>(new Set());
+  protected readonly usageCounts = signal<Map<number, number>>(new Map());
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
@@ -30,6 +31,11 @@ export class Authors implements OnInit {
     { key: 'name', header: 'Nombre', value: (a) => a.name },
     { key: 'country', header: 'País', value: (a) => COUNTRY_LABELS[a.country] },
     { key: 'notes', header: 'Notas', value: (a) => a.notes ?? '—' },
+    {
+      key: 'usageCount',
+      header: 'Registros',
+      value: (a) => String(this.usageCounts().get(a.id) ?? 0),
+    },
   ];
 
   protected readonly isDeletable = (item: Author) => !this.usedIds().has(item.id);
@@ -42,12 +48,14 @@ export class Authors implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const [items, usedIds] = await Promise.all([
+      const [items, usedIds, usageCounts] = await Promise.all([
         this._service.getAll(),
         this._service.getUsedIds(),
+        this._service.getUsageCounts(),
       ]);
       this.items.set(items);
       this.usedIds.set(usedIds);
+      this.usageCounts.set(usageCounts);
     } catch (err) {
       this.error.set('No se pudieron cargar los autores. Inténtalo de nuevo.');
       console.error(err);
