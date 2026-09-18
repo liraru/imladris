@@ -30,91 +30,119 @@
       <p>Todavía no has añadido ninguna lectura al plan.</p>
     </div>
   } @else {
-    <div class="reading-plan-table__wrapper">
-      <table class="reading-plan-table">
-        <thead>
-          <tr>
-            <th class="reading-plan-table__drag-col"></th>
-            <th class="reading-plan-table__cover-col"></th>
-            <th>Título</th>
-            <th class="reading-plan-table__hide-mobile">Autores</th>
-            <th class="reading-plan-table__pages-col">Páginas</th>
-            <th class="reading-plan-table__actions-col"></th>
-          </tr>
-        </thead>
-        <tbody
-          cdkDropList
-          class="reading-plan-table__body"
-          (cdkDropListDropped)="drop($event)"
+    <div class="reading-plan-table">
+      <div class="reading-plan-table__row reading-plan-table__row--header">
+        <span class="reading-plan-table__drag-col"></span>
+        <span class="reading-plan-table__cover-col reading-plan-table__desktop-only"></span>
+        <span class="reading-plan-table__title-col">Título</span>
+        <span class="reading-plan-table__authors-col reading-plan-table__desktop-only"
+          >Autores</span
         >
-          @for (item of items(); track item.id) {
-            <tr cdkDrag [cdkDragDisabled]="reordering()" class="reading-plan-table__row">
-              <td class="reading-plan-table__drag-col">
-                <mat-icon
-                  class="reading-plan-table__drag-handle"
-                  cdkDragHandle
-                  matTooltip="Arrastrar para reordenar"
-                >
-                  drag_indicator
-                </mat-icon>
-              </td>
-              <td class="reading-plan-table__cover-col">
-                @if (item.coverUrl) {
-                  <img
-                    [src]="item.coverUrl"
-                    [alt]="'Portada de ' + item.title"
-                    class="reading-plan-table__cover"
-                    loading="lazy"
-                  />
-                } @else {
-                  <div class="reading-plan-table__cover reading-plan-table__cover--placeholder">
-                    <mat-icon>menu_book</mat-icon>
-                  </div>
-                }
-              </td>
-              <td>
-                <span class="reading-plan-table__title">{{ item.title }}</span>
-                <span class="reading-plan-table__authors reading-plan-table__hide-desktop">
-                  {{ item.authors.join(', ') || 'Autor desconocido' }}
+        <span class="reading-plan-table__pages-col reading-plan-table__desktop-only">Páginas</span>
+        <span class="reading-plan-table__actions-col"></span>
+      </div>
+
+      <div class="reading-plan-table__body" cdkDropList (cdkDropListDropped)="drop($event)">
+        @for (item of items(); track item.id) {
+          <div cdkDrag [cdkDragDisabled]="reordering()" class="reading-plan-table__row">
+            <span class="reading-plan-table__drag-col">
+              <mat-icon
+                class="reading-plan-table__drag-handle"
+                cdkDragHandle
+                matTooltip="Arrastrar para reordenar"
+              >
+                drag_indicator
+              </mat-icon>
+            </span>
+
+            <span class="reading-plan-table__cover-col reading-plan-table__desktop-only">
+              @if (item.coverUrl) {
+                <img
+                  [src]="item.coverUrl"
+                  [alt]="'Portada de ' + item.title"
+                  class="reading-plan-table__cover"
+                  loading="lazy"
+                />
+              } @else {
+                <span class="reading-plan-table__cover reading-plan-table__cover--placeholder">
+                  <mat-icon>menu_book</mat-icon>
                 </span>
-              </td>
-              <td class="reading-plan-table__hide-mobile">{{ item.authors.join(', ') || '—' }}</td>
-              <td class="reading-plan-table__pages-col">{{ item.pages }}</td>
-              <td class="reading-plan-table__actions-col">
-                <div class="reading-plan-table__actions">
-                  <button
-                    mat-icon-button
-                    type="button"
-                    class="reading-plan-table__action-btn reading-plan-table__action-btn--send"
-                    matTooltip="Enviar a Lecturas anuales"
-                    (click)="openSendModal(item)"
-                  >
-                    <mat-icon>send</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    type="button"
-                    class="reading-plan-table__action-btn"
-                    matTooltip="Editar"
-                    (click)="openEditModal(item)"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    type="button"
-                    class="reading-plan-table__action-btn"
-                    matTooltip="Eliminar"
-                    (click)="remove(item)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+              }
+            </span>
+
+            <span class="reading-plan-table__title-col">
+              <span class="reading-plan-table__title">{{ item.title }}</span>
+              <span class="reading-plan-table__pages-mobile reading-plan-table__mobile-only">
+                {{ item.pages }} pág.
+              </span>
+            </span>
+
+            <span class="reading-plan-table__authors-col reading-plan-table__desktop-only">
+              {{ item.authors.join(', ') || '—' }}
+            </span>
+
+            <span class="reading-plan-table__pages-col reading-plan-table__desktop-only">
+              {{ item.pages }}
+            </span>
+
+            <span class="reading-plan-table__actions-col">
+              <span class="reading-plan-table__actions reading-plan-table__desktop-only">
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="reading-plan-table__action-btn reading-plan-table__action-btn--send"
+                  matTooltip="Enviar a Lecturas anuales"
+                  (click)="openSendModal(item)"
+                >
+                  <mat-icon>send</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="reading-plan-table__action-btn"
+                  matTooltip="Editar"
+                  (click)="openEditModal(item)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="reading-plan-table__action-btn"
+                  matTooltip="Eliminar"
+                  (click)="remove(item)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </span>
+
+              <button
+                mat-icon-button
+                type="button"
+                class="reading-plan-table__menu-btn reading-plan-table__mobile-only"
+                aria-label="Acciones"
+                [matMenuTriggerFor]="menu"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="openSendModal(item)">
+                  <mat-icon>send</mat-icon>
+                  <span>Enviar a Lecturas anuales</span>
+                </button>
+                <button mat-menu-item (click)="openEditModal(item)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </button>
+                <button mat-menu-item (click)="remove(item)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Eliminar</span>
+                </button>
+              </mat-menu>
+            </span>
+          </div>
+        }
+      </div>
     </div>
   }
 </section>
