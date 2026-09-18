@@ -20,6 +20,9 @@ import { AuthService } from './services/auth.service';
 import { LoginDialog } from './shared/components/login-dialog/login-dialog';
 import { ROUTES } from './shared/constants/routes.constant';
 
+/** Pestañas del menú superior que solo deben verse si hay sesión de administrador. */
+const ADMIN_ONLY_ROUTE_KEYS = new Set(['MANAGEMENT', 'YEARLY_READING_PLAN']);
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -56,7 +59,10 @@ export class App {
    */
   protected readonly ROUTES = computed(() =>
     Object.entries(APP_ROUTES)
-      .filter(([key]) => key !== 'HOME' && (key !== 'MANAGEMENT' || this.authService.isAdmin()))
+      .filter(
+        ([key]) =>
+          key !== 'HOME' && (!ADMIN_ONLY_ROUTE_KEYS.has(key) || this.authService.isAdmin()),
+      )
       .map(([, value]) => ({ title: value.title, path: value.path })),
   );
 
@@ -92,7 +98,10 @@ export class App {
 
   protected async logout(): Promise<void> {
     await this.authService.signOut();
-    if (this._router.url === `/${ROUTES.MANAGEMENT}`) {
+    if (
+      this._router.url === `/${ROUTES.MANAGEMENT}` ||
+      this._router.url === `/${ROUTES.READING_PLAN}`
+    ) {
       this._router.navigateByUrl(`/${ROUTES.LIBRARY}`);
     }
   }

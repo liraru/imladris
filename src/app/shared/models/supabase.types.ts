@@ -87,3 +87,12 @@ export interface YearlyReadingRow {
   end_date: string;
   cover_url: string | null;
 }
+
+export interface ReadingPlanRow {
+  id: number;
+  title: string;
+  authors: string[];
+  pages: number;
+  cover_url: string | null;
+  order: number;
+}

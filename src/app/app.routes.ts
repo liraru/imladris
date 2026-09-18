@@ -24,6 +24,11 @@ export const routes: Routes = [
       import('./pages/yearly-readings/yearly-readings').then((m) => m.YearlyReadings),
   },
   {
+    path: ROUTES.READING_PLAN,
+    canActivate: [adminGuard],
+    loadComponent: () => import('./pages/reading-plan/reading-plan').then((m) => m.ReadingPlan),
+  },
+  {
     path: ROUTES.MANAGEMENT,
     canActivate: [adminGuard],
     loadComponent: () => import('./pages/management/management').then((m) => m.Management),

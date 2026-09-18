@@ -5,6 +5,7 @@ export enum ROUTES {
   CALCULATOR = 'calculator',
   LIBRARY = 'library',
   YEARLY_READINGS = 'yearly-readings',
+  READING_PLAN = 'reading-plan',
   MANAGEMENT = 'management',
 }
 
@@ -13,5 +14,6 @@ export const APP_ROUTES: { [key: string]: MenuRoute } = {
   CALCULATOR: { title: 'Calculadora', path: ROUTES.CALCULATOR },
   LIBRARY: { title: 'Biblioteca', path: ROUTES.LIBRARY },
   YEARLY_READINGS: { title: 'Lecturas Anuales', path: ROUTES.YEARLY_READINGS },
+  READING_PLAN: { title: 'Plan de lectura', path: ROUTES.READING_PLAN },
   MANAGEMENT: { title: 'Gestión', path: ROUTES.MANAGEMENT },
 };
