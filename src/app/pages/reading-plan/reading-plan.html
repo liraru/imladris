@@ -30,58 +30,71 @@
       <p>Todavía no has añadido ninguna lectura al plan.</p>
     </div>
   } @else {
-    <div class="plan-table__wrapper">
-      <table class="plan-table">
+    <div class="reading-plan-table__wrapper">
+      <table class="reading-plan-table">
         <thead>
           <tr>
-            <th class="plan-table__drag-col"></th>
-            <th class="plan-table__cover-col"></th>
+            <th class="reading-plan-table__drag-col"></th>
+            <th class="reading-plan-table__cover-col"></th>
             <th>Título</th>
-            <th class="plan-table__hide-mobile">Autores</th>
-            <th class="plan-table__pages-col">Páginas</th>
-            <th class="plan-table__actions-col"></th>
+            <th class="reading-plan-table__hide-mobile">Autores</th>
+            <th class="reading-plan-table__pages-col">Páginas</th>
+            <th class="reading-plan-table__actions-col"></th>
           </tr>
         </thead>
-        <tbody cdkDropList class="plan-table__body" (cdkDropListDropped)="drop($event)">
+        <tbody
+          cdkDropList
+          class="reading-plan-table__body"
+          (cdkDropListDropped)="drop($event)"
+        >
           @for (item of items(); track item.id) {
-            <tr cdkDrag [cdkDragDisabled]="reordering()" class="plan-table__row">
-              <td class="plan-table__drag-col">
+            <tr cdkDrag [cdkDragDisabled]="reordering()" class="reading-plan-table__row">
+              <td class="reading-plan-table__drag-col">
                 <mat-icon
-                  class="plan-table__drag-handle"
+                  class="reading-plan-table__drag-handle"
                   cdkDragHandle
                   matTooltip="Arrastrar para reordenar"
                 >
                   drag_indicator
                 </mat-icon>
               </td>
-              <td class="plan-table__cover-col">
+              <td class="reading-plan-table__cover-col">
                 @if (item.coverUrl) {
                   <img
                     [src]="item.coverUrl"
                     [alt]="'Portada de ' + item.title"
-                    class="plan-table__cover"
+                    class="reading-plan-table__cover"
                     loading="lazy"
                   />
                 } @else {
-                  <div class="plan-table__cover plan-table__cover--placeholder">
+                  <div class="reading-plan-table__cover reading-plan-table__cover--placeholder">
                     <mat-icon>menu_book</mat-icon>
                   </div>
                 }
               </td>
               <td>
-                <span class="plan-table__title">{{ item.title }}</span>
-                <span class="plan-table__authors plan-table__hide-desktop">
+                <span class="reading-plan-table__title">{{ item.title }}</span>
+                <span class="reading-plan-table__authors reading-plan-table__hide-desktop">
                   {{ item.authors.join(', ') || 'Autor desconocido' }}
                 </span>
               </td>
-              <td class="plan-table__hide-mobile">{{ item.authors.join(', ') || '—' }}</td>
-              <td class="plan-table__pages-col">{{ item.pages }}</td>
-              <td class="plan-table__actions-col">
-                <div class="plan-table__actions">
+              <td class="reading-plan-table__hide-mobile">{{ item.authors.join(', ') || '—' }}</td>
+              <td class="reading-plan-table__pages-col">{{ item.pages }}</td>
+              <td class="reading-plan-table__actions-col">
+                <div class="reading-plan-table__actions">
                   <button
                     mat-icon-button
                     type="button"
-                    class="plan-table__action-btn"
+                    class="reading-plan-table__action-btn reading-plan-table__action-btn--send"
+                    matTooltip="Enviar a Lecturas anuales"
+                    (click)="openSendModal(item)"
+                  >
+                    <mat-icon>send</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="reading-plan-table__action-btn"
                     matTooltip="Editar"
                     (click)="openEditModal(item)"
                   >
@@ -90,7 +103,7 @@
                   <button
                     mat-icon-button
                     type="button"
-                    class="plan-table__action-btn"
+                    class="reading-plan-table__action-btn"
                     matTooltip="Eliminar"
                     (click)="remove(item)"
                   >

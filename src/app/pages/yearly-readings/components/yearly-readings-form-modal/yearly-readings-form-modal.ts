@@ -67,7 +67,7 @@ export class YearlyReadingsFormModal implements OnInit {
       authors: ['', Validators.required],
       pages: [0, [Validators.required, Validators.min(1)]],
       startDate: [null as Date | null, Validators.required],
-      endDate: [null as Date | null, Validators.required],
+      endDate: [null as Date | null],
       coverUrl: [''],
     },
     { validators: dateRangeValidator('startDate', 'endDate') },
@@ -87,7 +87,7 @@ export class YearlyReadingsFormModal implements OnInit {
         authors: reading.authors.join(', '),
         pages: reading.pages,
         startDate: new Date(`${reading.startDate}T00:00:00`),
-        endDate: new Date(`${reading.endDate}T00:00:00`),
+        endDate: reading.endDate ? new Date(`${reading.endDate}T00:00:00`) : null,
         coverUrl: reading.coverUrl,
       });
     }
@@ -121,7 +121,7 @@ export class YearlyReadingsFormModal implements OnInit {
         .filter(Boolean),
       pages: raw.pages,
       startDate: this._toDateString(raw.startDate)!,
-      endDate: this._toDateString(raw.endDate)!,
+      endDate: this._toDateString(raw.endDate),
       coverUrl: raw.coverUrl?.trim() ?? '',
     };
 

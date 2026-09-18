@@ -49,6 +49,9 @@ export class Home implements OnInit {
   /** Últimas lecturas finalizadas, provienen de Lecturas anuales, ya ordenadas por el servicio. */
   protected readonly lastReadings = signal<YearlyReading[]>([]);
 
+  /** Lecturas actualmente en curso (sin fecha de fin), más recientes primero. */
+  protected readonly readingNow = signal<YearlyReading[]>([]);
+
   private readonly _additions = signal<HomeItem[]>([]);
 
   /** Las últimas incorporaciones a la biblioteca (libros y tomos de manga), más reciente primero. */
@@ -71,12 +74,14 @@ export class Home implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const [readings, books, mangaVolumes] = await Promise.all([
+      const [readings, readingNow, books, mangaVolumes] = await Promise.all([
         this._yearlyReadingSrv.getRecent(RECENT_COUNT),
+        this._yearlyReadingSrv.getInProgress(),
         this._bookSrv.getAll(),
         this._mangaVolumeSrv.getAll(),
       ]);
       this.lastReadings.set(readings);
+      this.readingNow.set(readingNow);
       this._additions.set([...books.map(fromBook), ...mangaVolumes.map(fromMangaVolume)]);
     } catch (err) {
       this.error.set('No se pudo cargar la información de la biblioteca. Inténtalo de nuevo.');

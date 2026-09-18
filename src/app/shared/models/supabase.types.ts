@@ -84,7 +84,7 @@ export interface YearlyReadingRow {
   authors: string[];
   pages: number;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   cover_url: string | null;
 }
 

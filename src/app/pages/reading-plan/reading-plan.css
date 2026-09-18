@@ -38,20 +38,20 @@
   opacity: 0.6;
 }
 
-.plan-table__wrapper {
+.reading-plan-table__wrapper {
   overflow-x: auto;
   border-radius: var(--mat-sys-corner-medium, 10px);
   background: var(--mat-sys-surface-container);
   border: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
 }
 
-.plan-table {
+.reading-plan-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 }
 
-.plan-table thead th {
+.reading-plan-table thead th {
   text-align: left;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
@@ -61,38 +61,38 @@
   border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
 }
 
-.plan-table__row td {
+.reading-plan-table__row td {
   padding: 0.6rem 1rem;
   border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 6%, transparent);
   vertical-align: middle;
 }
 
-.plan-table__row:last-child td {
+.reading-plan-table__row:last-child td {
   border-bottom: none;
 }
 
-.plan-table__row {
+.reading-plan-table__row {
   background: var(--mat-sys-surface-container);
 }
 
-.plan-table__drag-col {
+.reading-plan-table__drag-col {
   width: 2.5rem;
 }
 
-.plan-table__drag-handle {
+.reading-plan-table__drag-handle {
   cursor: grab;
   color: var(--text-muted);
 }
 
-.plan-table__drag-handle:active {
+.reading-plan-table__drag-handle:active {
   cursor: grabbing;
 }
 
-.plan-table__cover-col {
+.reading-plan-table__cover-col {
   width: 48px;
 }
 
-.plan-table__cover {
+.reading-plan-table__cover {
   width: 40px;
   height: 60px;
   border-radius: 3px;
@@ -101,7 +101,7 @@
   display: block;
 }
 
-.plan-table__cover--placeholder {
+.reading-plan-table__cover--placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -109,42 +109,42 @@
   color: var(--gold);
 }
 
-.plan-table__cover--placeholder mat-icon {
+.reading-plan-table__cover--placeholder mat-icon {
   font-size: 1.2rem;
   width: 1.2rem;
   height: 1.2rem;
 }
 
-.plan-table__title {
+.reading-plan-table__title {
   font-family: 'Fraunces', serif;
   font-style: italic;
   color: var(--mat-sys-on-surface);
   display: block;
 }
 
-.plan-table__authors {
+.reading-plan-table__authors {
   font-size: 0.78rem;
   color: var(--text-muted);
 }
 
-.plan-table__pages-col {
+.reading-plan-table__pages-col {
   width: 90px;
   color: var(--text-muted);
   font-size: 0.85rem;
 }
 
-.plan-table__actions-col {
-  width: 88px;
+.reading-plan-table__actions-col {
+  width: 124px;
 }
 
-.plan-table__actions {
+.reading-plan-table__actions {
   display: flex;
   align-items: center;
   gap: 0.25rem;
   justify-content: flex-end;
 }
 
-.plan-table__action-btn {
+.reading-plan-table__action-btn {
   width: 36px !important;
   height: 36px !important;
   padding: 0 !important;
@@ -152,11 +152,19 @@
   box-shadow: none !important;
 }
 
-.plan-table__action-btn:hover {
+.reading-plan-table__action-btn:hover {
   background: color-mix(in srgb, var(--mat-sys-on-surface) 12%, transparent) !important;
 }
 
-.plan-table__hide-desktop {
+/*
+ * El glifo del icono "send" no está centrado en su caja (a diferencia de "edit"/"delete"),
+ * por lo que necesita un pequeño ajuste manual para quedar centrado en el botón circular.
+ */
+.reading-plan-table__action-btn--send mat-icon {
+  transform: translate(1px, 1px);
+}
+
+.reading-plan-table__hide-desktop {
   display: none;
 }
 
@@ -174,26 +182,27 @@
   opacity: 0.35;
 }
 
-.plan-table__body.cdk-drop-list-dragging .plan-table__row:not(.cdk-drag-placeholder) {
+.reading-plan-table__body.cdk-drop-list-dragging
+  .reading-plan-table__row:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 @media (max-width: 767px) {
-  .plan-table__hide-mobile {
+  .reading-plan-table__hide-mobile {
     display: none;
   }
 
-  .plan-table__hide-desktop {
+  .reading-plan-table__hide-desktop {
     display: block;
   }
 
-  .plan-table__cover {
+  .reading-plan-table__cover {
     width: 34px;
     height: 51px;
   }
 
-  .plan-table thead th,
-  .plan-table__row td {
+  .reading-plan-table thead th,
+  .reading-plan-table__row td {
     padding: 0.5rem 0.6rem;
   }
 }

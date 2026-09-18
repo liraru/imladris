@@ -21,7 +21,7 @@ import { LoginDialog } from './shared/components/login-dialog/login-dialog';
 import { ROUTES } from './shared/constants/routes.constant';
 
 /** Pestañas del menú superior que solo deben verse si hay sesión de administrador. */
-const ADMIN_ONLY_ROUTE_KEYS = new Set(['MANAGEMENT', 'YEARLY_READING_PLAN']);
+const ADMIN_ONLY_ROUTE_KEYS = new Set(['MANAGEMENT', 'READING_PLAN']);
 
 @Component({
   selector: 'app-root',

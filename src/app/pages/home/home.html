@@ -86,6 +86,48 @@
 
     <section class="home__section">
       <div class="home__section-header">
+        <h2>Leyendo</h2>
+        <a class="home__section-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}"
+          >Ver lecturas anuales</a
+        >
+      </div>
+
+      @if (readingNow().length === 0) {
+        <p class="home__empty">No estás leyendo nada ahora mismo.</p>
+      } @else {
+        <div class="home__card-grid">
+          @for (reading of readingNow(); track reading.id) {
+            <article class="home__card">
+              <div class="home__card-cover">
+                @if (reading.coverUrl) {
+                  <img
+                    [src]="reading.coverUrl"
+                    [alt]="'Portada de ' + reading.title"
+                    loading="lazy"
+                  />
+                } @else {
+                  <div class="home__card-placeholder">
+                    <mat-icon>menu_book</mat-icon>
+                  </div>
+                }
+              </div>
+              <div class="home__card-body">
+                <h3 class="home__card-title" [matTooltip]="reading.title">{{ reading.title }}</h3>
+                <p class="home__card-author">
+                  {{ reading.authors.join(', ') || 'Autor desconocido' }}
+                </p>
+                <p class="home__card-meta">
+                  Empezado: {{ reading.startDate | date: 'dd/MM/yyyy' }}
+                </p>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="home__section">
+      <div class="home__section-header">
         <h2>Últimas incorporaciones</h2>
         <a class="home__section-link" routerLink="/{{ ROUTES.LIBRARY }}">Ver biblioteca completa</a>
       </div>

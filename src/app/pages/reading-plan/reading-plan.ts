@@ -16,6 +16,10 @@ import {
   ReadingPlanFormModal,
   ReadingPlanFormModalData,
 } from './components/reading-plan-form-modal/reading-plan-form-modal';
+import {
+  SendToYearlyReadingModal,
+  SendToYearlyReadingModalData,
+} from './components/send-to-yearly-reading-modal/send-to-yearly-reading-modal';
 import { ReadingPlanService } from '../../services/reading-plan.service';
 import { ReadingPlanItem } from '@shared/models';
 
@@ -107,6 +111,17 @@ export class ReadingPlan implements OnInit {
     });
     const saved = await firstValueFrom(ref.afterClosed());
     if (saved) await this.load();
+  }
+
+  /** Envía la lectura al historial de Lecturas anuales y la retira del plan. */
+  protected async openSendModal(item: ReadingPlanItem): Promise<void> {
+    const ref = this._dialog.open(SendToYearlyReadingModal, {
+      width: '420px',
+      maxWidth: '95vw',
+      data: { item } satisfies SendToYearlyReadingModalData,
+    });
+    const sent = await firstValueFrom(ref.afterClosed());
+    if (sent) await this.load();
   }
 
   protected async remove(item: ReadingPlanItem): Promise<void> {
