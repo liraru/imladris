@@ -90,4 +90,20 @@ export class EditorialService {
       ids.add((row as { editorial_id: number }).editorial_id);
     return ids;
   }
+
+  /** Nº de registros (libros + tomos de manga) asociados a cada editorial. */
+  async getUsageCounts(): Promise<Map<number, number>> {
+    const [books, mangaVolumes] = await Promise.all([
+      this.supabase.from('books').select('editorial_id'),
+      this.supabase.from('manga_volumes').select('editorial_id'),
+    ]);
+    if (books.error) throw books.error;
+    if (mangaVolumes.error) throw mangaVolumes.error;
+
+    const counts = new Map<number, number>();
+    const add = (id: number) => counts.set(id, (counts.get(id) ?? 0) + 1);
+    for (const row of books.data ?? []) add((row as { editorial_id: number }).editorial_id);
+    for (const row of mangaVolumes.data ?? []) add((row as { editorial_id: number }).editorial_id);
+    return counts;
+  }
 }

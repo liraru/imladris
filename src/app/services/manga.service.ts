@@ -101,6 +101,19 @@ export class MangaService {
     return new Set((data ?? []).map((row) => (row as { manga_id: number }).manga_id));
   }
 
+  /** Nº de tomos asociados a cada manga. */
+  async getUsageCounts(): Promise<Map<number, number>> {
+    const { data, error } = await this.supabase.from('manga_volumes').select('manga_id');
+    if (error) throw error;
+
+    const counts = new Map<number, number>();
+    for (const row of data ?? []) {
+      const id = (row as { manga_id: number }).manga_id;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
+  }
+
   private async syncAuthors(mangaId: number, authorIds: number[]): Promise<void> {
     const { error: deleteError } = await this.supabase
       .from('manga_authors')

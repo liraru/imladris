@@ -90,4 +90,20 @@ export class AuthorService {
       ids.add((row as { author_id: number }).author_id);
     return ids;
   }
+
+  /** Nº de registros (libros + tomos de manga) en los que participa cada autor. */
+  async getUsageCounts(): Promise<Map<number, number>> {
+    const [bookAuthors, mangaVolumeAuthors] = await Promise.all([
+      this.supabase.from('book_authors').select('author_id'),
+      this.supabase.from('manga_volume_authors').select('author_id'),
+    ]);
+    if (bookAuthors.error) throw bookAuthors.error;
+    if (mangaVolumeAuthors.error) throw mangaVolumeAuthors.error;
+
+    const counts = new Map<number, number>();
+    const add = (id: number) => counts.set(id, (counts.get(id) ?? 0) + 1);
+    for (const row of bookAuthors.data ?? []) add((row as { author_id: number }).author_id);
+    for (const row of mangaVolumeAuthors.data ?? []) add((row as { author_id: number }).author_id);
+    return counts;
+  }
 }

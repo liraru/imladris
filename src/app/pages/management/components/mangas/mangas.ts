@@ -23,6 +23,7 @@ export class Mangas implements OnInit {
 
   protected readonly items = signal<Manga[]>([]);
   protected readonly usedIds = signal<Set<number>>(new Set());
+  protected readonly usageCounts = signal<Map<number, number>>(new Map());
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
@@ -39,6 +40,11 @@ export class Mangas implements OnInit {
       header: 'Géneros',
       value: (m) => (m.genres.length ? m.genres.map((g) => GENRE_LABELS[g]).join(', ') : '—'),
     },
+    {
+      key: 'usageCount',
+      header: 'Registros',
+      value: (m) => String(this.usageCounts().get(m.id) ?? 0),
+    },
   ];
 
   protected readonly isDeletable = (item: Manga) => !this.usedIds().has(item.id);
@@ -51,12 +57,14 @@ export class Mangas implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const [items, usedIds] = await Promise.all([
+      const [items, usedIds, usageCounts] = await Promise.all([
         this._service.getAll(),
         this._service.getUsedIds(),
+        this._service.getUsageCounts(),
       ]);
       this.items.set(items);
       this.usedIds.set(usedIds);
+      this.usageCounts.set(usageCounts);
     } catch (err) {
       this.error.set('No se pudieron cargar los mangas. Inténtalo de nuevo.');
       console.error(err);
