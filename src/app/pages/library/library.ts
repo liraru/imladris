@@ -207,7 +207,7 @@ export class Library implements OnInit {
           title: volume.title,
           authorIds: volume.authors.map((a) => a.id),
           mangaId: volume.mangaId,
-          volumeNumber: volume.volumeNumber,
+          volumeNumber: volume.volumeNumber ?? null,
           readingStatus: READING_STATUS.FINISHED,
           releaseDate: volume.releaseDate ? new Date(volume.releaseDate) : undefined,
           coverImageUrl: volume.coverImageUrl,

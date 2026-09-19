@@ -1,32 +1,52 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { debounceTime, map, startWith } from 'rxjs';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { debounceTime, map, startWith } from 'rxjs';
 
 import { AuthorService } from '../../../../services/author.service';
 import { BookSerieService } from '../../../../services/book-serie.service';
-import { BookService, BookInput } from '../../../../services/book.service';
+import { BookInput, BookService } from '../../../../services/book.service';
 import { EditorialService } from '../../../../services/editorial.service';
-import { MangaService, MangaInput } from '../../../../services/manga.service';
-import { MangaVolumeService, MangaVolumeInput } from '../../../../services/manga-volume.service';
+import { MangaVolumeInput, MangaVolumeService } from '../../../../services/manga-volume.service';
+import { MangaInput, MangaService } from '../../../../services/manga.service';
 
+import {
+  LANGUAGE,
+  LANGUAGE_LABELS,
+  READING_STATUS,
+  READING_STATUS_LABELS,
+} from '@shared/constants';
 import { Author, BookSerie, Editorial, Manga } from '@shared/models';
+import {
+  DEMOGRAPHIC,
+  DEMOGRAPHIC_LABELS,
+  GENRE,
+  GENRE_LABELS,
+} from '../../../../shared/constants/categories.constant';
 import { COUNTRY, COUNTRY_LABELS } from '../../../../shared/constants/countries.constant';
-import { DEMOGRAPHIC, DEMOGRAPHIC_LABELS, GENRE, GENRE_LABELS } from '../../../../shared/constants/categories.constant';
-import { LANGUAGE, LANGUAGE_LABELS, READING_STATUS, READING_STATUS_LABELS } from '@shared/constants';
-import { TYPE, TYPE_LABELS } from '../../constants/library.consants';
 import { FORM_MODE, FORM_MODE_LABELS } from '../../constants/library-form.constants';
+import { TYPE, TYPE_LABELS } from '../../constants/library.consants';
 
 export interface LibraryFormModalData {
   mode: FORM_MODE;
@@ -65,6 +85,9 @@ function normalize(value: string | null | undefined): string {
     MatProgressSpinnerModule,
     MatSelectModule,
     MatTooltipModule,
+  ],
+  providers: [
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { subscriptSizing: 'dynamic' } },
   ],
   templateUrl: './library-form-modal.html',
   styleUrl: './library-form-modal.css',
@@ -233,7 +256,6 @@ export class LibraryFormModal implements OnInit {
   async ngOnInit(): Promise<void> {
     if (!this.isBook) {
       this.form.get('mangaId')!.addValidators(Validators.required);
-      this.form.get('volumeNumber')!.addValidators(Validators.required);
     }
 
     try {
@@ -314,7 +336,7 @@ export class LibraryFormModal implements OnInit {
         coverImageUrl: volume.coverImageUrl ?? '',
         notes: volume.notes ?? '',
         mangaId: volume.mangaId,
-        volumeNumber: volume.volumeNumber,
+        volumeNumber: volume.volumeNumber ?? null,
       });
     }
   }
@@ -427,7 +449,9 @@ export class LibraryFormModal implements OnInit {
       country: value.country,
       website: value.website || undefined,
     });
-    this.editorials.update((list) => [...list, created].sort((a, b) => a.name.localeCompare(b.name)));
+    this.editorials.update((list) =>
+      [...list, created].sort((a, b) => a.name.localeCompare(b.name)),
+    );
     this.editorialSearchCtrl.setValue(created);
     this.form.get('editorialId')!.setValue(created.id);
     this.quickEditorialForm.reset({ name: '', country: COUNTRY.SPAIN, website: '' });
@@ -469,7 +493,12 @@ export class LibraryFormModal implements OnInit {
       return;
     }
     const value = this.quickMangaForm.getRawValue();
-    const input: MangaInput = { title: value.title, demographic: value.demographic, authorIds: [], genres: [] };
+    const input: MangaInput = {
+      title: value.title,
+      demographic: value.demographic,
+      authorIds: [],
+      genres: [],
+    };
     const created = await this.mangaSrv.create(input);
     this.mangas.update((list) => [...list, created].sort((a, b) => a.title.localeCompare(b.title)));
     this.mangaSearchCtrl.setValue(created);
@@ -518,7 +547,7 @@ export class LibraryFormModal implements OnInit {
           title: value.title!,
           authorIds: value.authorIds!,
           mangaId: value.mangaId!,
-          volumeNumber: value.volumeNumber!,
+          volumeNumber: value.volumeNumber,
           readingStatus: value.readingStatus!,
           releaseDate: value.releaseDate ?? undefined,
           coverImageUrl: value.coverImageUrl || undefined,

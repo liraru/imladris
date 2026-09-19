@@ -33,7 +33,12 @@ export function fromMangaVolume(volume: MangaVolume): HomeItem {
   return {
     id: volume.id,
     type: HOME_ITEM_TYPE.MANGA,
-    title: volume.title,
+    title:
+      volume.volumeNumber != null
+        ? `${volume.title} vol.${volume.volumeNumber}`
+        : volume.notes
+          ? `${volume.title} - ${volume.notes}`
+          : volume.title,
     authors: volume.authors,
     coverImageUrl: volume.coverImageUrl,
     adquisitionDate: volume.adquisitionDate,

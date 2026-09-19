@@ -51,7 +51,12 @@ export function fromBook(book: Book): LibraryItem {
 export function fromMangaVolume(volume: MangaVolume, mangaTitle?: string): LibraryItem {
   return {
     id: volume.id,
-    title: volume.title,
+    title:
+      volume.volumeNumber != null
+        ? `${volume.title} vol.${volume.volumeNumber}`
+        : volume.notes
+          ? `${volume.title} - ${volume.notes}`
+          : volume.title,
     authors: volume.authors,
     readingStatus: volume.readingStatus,
     releaseDate: volume.releaseDate,
