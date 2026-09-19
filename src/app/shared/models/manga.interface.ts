@@ -12,5 +12,5 @@ export interface Manga {
 
 export interface MangaVolume extends Volume {
   mangaId: number;
-  volumeNumber: number;
+  volumeNumber?: number;
 }

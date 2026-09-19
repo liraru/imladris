@@ -22,7 +22,7 @@ function toMangaVolume(row: MangaVolumeRow): MangaVolume {
       notes: author.notes ?? undefined,
     })),
     mangaId: row.manga_id,
-    volumeNumber: row.volume_number,
+    volumeNumber: row.volume_number ?? undefined,
     readingStatus: row.reading_status,
     releaseDate: row.release_date ? row.release_date : undefined,
     coverImageUrl: row.cover_image_url ?? undefined,
@@ -45,7 +45,7 @@ export interface MangaVolumeInput {
   title: string;
   authorIds: number[];
   mangaId: number;
-  volumeNumber: number;
+  volumeNumber: number | null;
   readingStatus: MangaVolume['readingStatus'];
   releaseDate?: Date;
   coverImageUrl?: string;

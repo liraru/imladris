@@ -63,7 +63,7 @@ export interface MangaVolumeRow {
   id: number;
   title: string;
   manga_id: number;
-  volume_number: number;
+  volume_number: number | null;
   reading_status: READING_STATUS;
   release_date: string | null;
   cover_image_url: string | null;
