@@ -1,18 +1,5 @@
 <div class="library-search">
   <form [formGroup]="form" class="library-search__root">
-    <div class="library-search__type-toggle">
-      <mat-button-toggle-group formControlName="type" aria-label="Tipo de obra">
-        <mat-button-toggle [value]="TYPE.BOOK">
-          <mat-icon>menu_book</mat-icon>
-          <span class="library-search__toggle-text">{{ typeLabels[TYPE.BOOK] }}</span>
-        </mat-button-toggle>
-        <mat-button-toggle [value]="TYPE.MANGA">
-          <mat-icon>auto_stories</mat-icon>
-          <span class="library-search__toggle-text">{{ typeLabels[TYPE.MANGA] }}</span>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
-    </div>
-
     <mat-accordion>
       <mat-expansion-panel [expanded]="false" class="library-search__panel">
         <mat-expansion-panel-header>

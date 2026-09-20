@@ -14,6 +14,7 @@ import { ReadingPlanItem } from '@shared/models';
 import { ReadingPlanService } from '../../../../services/reading-plan.service';
 import { BookService } from '../../../../services/book.service';
 import { MangaVolumeService } from '../../../../services/manga-volume.service';
+import { FanficService } from '../../../../services/fanfic.service';
 
 export interface ReadingPlanFormModalData {
   /** Posición que ocupará el nuevo elemento (último de la cola). Ignorado en edición. */
@@ -49,6 +50,7 @@ export class ReadingPlanFormModal implements OnInit {
   private readonly _service = inject(ReadingPlanService);
   private readonly _bookService = inject(BookService);
   private readonly _mangaVolumeService = inject(MangaVolumeService);
+  private readonly _fanficService = inject(FanficService);
   protected readonly data = inject<ReadingPlanFormModalData>(MAT_DIALOG_DATA);
 
   protected readonly isEdit = !!this.data.item;
@@ -130,9 +132,10 @@ export class ReadingPlanFormModal implements OnInit {
   }
 
   private async loadLibrarySuggestions(): Promise<void> {
-    const [books, volumes] = await Promise.all([
+    const [books, volumes, fanfics] = await Promise.all([
       this._bookService.getAll(),
       this._mangaVolumeService.getAll(),
+      this._fanficService.getAll(),
     ]);
 
     const fromBooks: LibrarySuggestion[] = books.map((b) => ({
@@ -147,7 +150,13 @@ export class ReadingPlanFormModal implements OnInit {
       coverUrl: v.coverImageUrl,
     }));
 
-    const all = [...fromBooks, ...fromVolumes];
+    const fromFanfics: LibrarySuggestion[] = fanfics.map((f) => ({
+      title: f.title,
+      authors: f.authors.map((a) => a),
+      coverUrl: f.coverUrl,
+    }));
+
+    const all = [...fromBooks, ...fromVolumes, ...fromFanfics];
     this._librarySuggestions.set(all);
     this.filteredLibrarySuggestions.set(all);
   }

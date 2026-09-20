@@ -22,7 +22,7 @@ import {
   SORT_FIELD_LABELS,
   TYPE,
   TYPE_LABELS,
-} from '../../constants/library.consants';
+} from '../../constants/library.constants';
 import { DEFAULT_LIBRARY_FILTERS, LibraryFilters } from '../../models/library-filters.model';
 
 type NameableRef<T> = T | string | null;
@@ -112,7 +112,7 @@ function saveStoredFilters(filters: LibraryFilters): void {
 export class LibrarySearch {
   /** Filtros restaurados de `localStorage` al construir el componente (o `null` si no había nada). */
   private readonly _stored = loadStoredFilters();
-
+  readonly type = input<TYPE>(DEFAULT_LIBRARY_FILTERS.type);
   readonly authors = input<Author[]>([]);
   readonly series = input<BookSerie[]>([]);
   readonly editorials = input<Editorial[]>([]);
@@ -132,7 +132,6 @@ export class LibrarySearch {
 
   protected readonly form = new FormGroup({
     mode: new FormControl(this._stored?.mode ?? DEFAULT_LIBRARY_FILTERS.mode, { nonNullable: true }),
-    type: new FormControl(this._stored?.type ?? DEFAULT_LIBRARY_FILTERS.type, { nonNullable: true }),
     title: new FormControl(this._stored?.title ?? '', { nonNullable: true }),
     author: new FormControl<NameableRef<Author>>(null),
     serie: new FormControl<NameableRef<BookSerie>>(null),
@@ -145,11 +144,6 @@ export class LibrarySearch {
     sortDirection: new FormControl(this._stored?.sortDirection ?? DEFAULT_LIBRARY_FILTERS.sortDirection, {
       nonNullable: true,
     }),
-  });
-
-  /** Se usa en la plantilla para ocultar "Serie" (libros) / "Manga" y para calcular el orden por defecto. */
-  protected readonly type = toSignal(this.form.controls.type.valueChanges, {
-    initialValue: this._stored?.type ?? DEFAULT_LIBRARY_FILTERS.type,
   });
 
   /**
@@ -222,10 +216,10 @@ export class LibrarySearch {
       map(
         (value): LibraryFilters => ({
           mode: value.mode ?? DEFAULT_LIBRARY_FILTERS.mode,
-          type: value.type ?? DEFAULT_LIBRARY_FILTERS.type,
+          type: this.type(),
           title: value.title ?? '',
           authorId: idOf(value.author),
-          serieId: value.type === TYPE.MANGA ? idOf(value.manga) : idOf(value.serie),
+          serieId: this.type() === TYPE.MANGA ? idOf(value.manga) : idOf(value.serie),
           finishYear: value.finishYear ?? null,
           adquisitionYear: value.adquisitionYear ?? null,
           editorialId: idOf(value.editorial),
@@ -321,12 +315,11 @@ export class LibrarySearch {
 
   protected reset(): void {
     const mode = this.form.controls.mode.value;
-    const type = this.form.controls.type.value;
+    const type = this.type();
     const defaultSort = DEFAULT_SORT_BY[type];
     this.form.reset({
       ...DEFAULT_LIBRARY_FILTERS,
       mode,
-      type,
       sortBy: defaultSort,
       sortDirection: DEFAULT_SORT_DIRECTION,
     });
@@ -334,7 +327,7 @@ export class LibrarySearch {
   }
 
   protected resetSort(): void {
-    const type = this.form.controls.type.value;
+    const type = this.type();
     const defaultSort = DEFAULT_SORT_BY[type];
     this.form.patchValue({ sortBy: defaultSort, sortDirection: DEFAULT_SORT_DIRECTION });
     this.manualSortOrder.set(defaultSort);

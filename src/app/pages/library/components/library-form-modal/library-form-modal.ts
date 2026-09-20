@@ -46,7 +46,7 @@ import {
 } from '../../../../shared/constants/categories.constant';
 import { COUNTRY, COUNTRY_LABELS } from '../../../../shared/constants/countries.constant';
 import { FORM_MODE, FORM_MODE_LABELS } from '../../constants/library-form.constants';
-import { TYPE, TYPE_LABELS } from '../../constants/library.consants';
+import { TYPE, TYPE_LABELS } from '../../constants/library.constants';
 
 export interface LibraryFormModalData {
   mode: FORM_MODE;

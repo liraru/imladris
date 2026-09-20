@@ -1,48 +1,62 @@
 <div class="library-page container">
   <header class="page-header">
-    <div class="heading">
-      <h1>{{ filters().type === TYPE.MANGA ? 'Manga' : 'Novelas' }}</h1>
-    </div>
+    <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="library-page__tabs">
+      @for (entry of tabs; track entry.tab) {
+        <a
+          mat-tab-link
+          [active]="activeTab() === entry.tab"
+          (click)="onTabChange(entry.tab)"
+        >
+          <mat-icon>{{ entry.icon }}</mat-icon>
+          {{ entry.label }}
+        </a>
+      }
+    </nav>
+    <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 
-    @if (authService.isAdmin()) {
+    @if (activeTab() !== LIBRARY_TAB.FANFIC && authService.isAdmin()) {
       <div class="page-header__actions">
         <button mat-flat-button type="button" color="primary" (click)="openCreate()">
           <mat-icon>add</mat-icon>
-          Añadir {{ filters().type === TYPE.MANGA ? 'tomo' : 'libro' }}
+          Añadir {{ activeTab() === LIBRARY_TAB.MANGA ? 'tomo' : 'libro' }}
         </button>
       </div>
     }
   </header>
 
-  <app-library-search
-    [authors]="authors()"
-    [series]="series()"
-    [editorials]="editorials()"
-    [mangas]="mangas()"
-    [finishYears]="finishYears()"
-    [adquisitionYears]="adquisitionYears()"
-    [resultCount]="displayItems().length"
-    (filtersChange)="onFiltersChange($event)"
-  />
-
-  @if (loading()) {
-    <div class="library-page__state">
-      <mat-spinner diameter="40" />
-      <p>Cargando biblioteca…</p>
-    </div>
-  } @else if (error()) {
-    <div class="library-page__state library-page__state--error">
-      <mat-icon>error_outline</mat-icon>
-      <p>{{ error() }}</p>
-    </div>
+  @if (activeTab() === LIBRARY_TAB.FANFIC) {
+    <app-fanfic-section />
   } @else {
-    <app-library-data-display
-      [mode]="filters().mode"
-      [type]="filters().type"
-      [data]="displayItems()"
-      (viewDetail)="onViewDetail($event)"
-      (markFinished)="onMarkFinished($event)"
-      (deleteItem)="onDeleteItem($event)"
+    <app-library-search
+      [authors]="authors()"
+      [series]="series()"
+      [editorials]="editorials()"
+      [mangas]="mangas()"
+      [finishYears]="finishYears()"
+      [adquisitionYears]="adquisitionYears()"
+      [resultCount]="displayItems().length"
+      (filtersChange)="onFiltersChange($event)"
     />
+
+    @if (loading()) {
+      <div class="library-page__state">
+        <mat-spinner diameter="40" />
+        <p>Cargando biblioteca…</p>
+      </div>
+    } @else if (error()) {
+      <div class="library-page__state library-page__state--error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error() }}</p>
+      </div>
+    } @else {
+      <app-library-data-display
+        [mode]="filters().mode"
+        [type]="filters().type"
+        [data]="displayItems()"
+        (viewDetail)="onViewDetail($event)"
+        (markFinished)="onMarkFinished($event)"
+        (deleteItem)="onDeleteItem($event)"
+      />
+    }
   }
 </div>

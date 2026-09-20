@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+.fanfic-search__toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.fanfic-search__toggle-label {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.85rem;
+}
+
+.fanfic-search__fields {
+  align-items: flex-end;
+}
+
+.fanfic-search__direction {
+  align-self: center;
+}
+
+.fanfic-search__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}

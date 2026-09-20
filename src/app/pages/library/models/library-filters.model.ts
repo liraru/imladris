@@ -5,7 +5,7 @@ import {
   MODE,
   SORT_FIELD,
   TYPE,
-} from '../constants/library.consants';
+} from '../constants/library.constants';
 
 export interface LibraryFilters {
   mode: MODE;
