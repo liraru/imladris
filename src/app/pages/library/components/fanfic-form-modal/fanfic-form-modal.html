@@ -1,0 +1,295 @@
+<h2 mat-dialog-title>{{ formModeLabels[mode()] }} fanfic</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="modal-content">
+    @if (loading()) {
+      <div class="fanfic-form-modal__state">
+        <mat-spinner diameter="32" />
+      </div>
+    } @else {
+      @if (error()) {
+        <p class="fanfic-form-modal__error">{{ error() }}</p>
+      }
+
+      <div class="grid">
+        <mat-form-field appearance="outline" class="col-12">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="title" required cdkFocusInitial autocomplete="off" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12">
+          <mat-label>Autores</mat-label>
+          <input
+            matInput
+            formControlName="authors"
+            placeholder="Separados por comas"
+            required
+            autocomplete="off"
+          />
+        </mat-form-field>
+
+        <!-- Fandom -->
+        <div class="col-12 col-md-6 fanfic-form-modal__row-with-action">
+          <mat-form-field appearance="outline" class="fanfic-form-modal__grow">
+            <mat-label>Fandom</mat-label>
+            <input
+              matInput
+              [formControl]="fandomSearchCtrl"
+              [matAutocomplete]="fandomAuto"
+              autocomplete="off"
+            />
+            @if (fandomSearchCtrl.value && !isReadOnly()) {
+              <button
+                matSuffix
+                mat-icon-button
+                type="button"
+                (click)="clearFandom()"
+                aria-label="Limpiar"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+            <mat-autocomplete
+              #fandomAuto="matAutocomplete"
+              [displayWith]="displayFandom"
+              (optionSelected)="onFandomSelected($event)"
+            >
+              @for (fandom of filteredFandoms(); track fandom.id) {
+                <mat-option [value]="fandom">{{ fandom.name }} ({{ fandom.origin }})</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          @if (!isReadOnly()) {
+            <button
+              mat-icon-button
+              type="button"
+              matTooltip="Añadir fandom rápido"
+              (click)="toggleQuickFandom()"
+            >
+              <mat-icon>{{ showQuickFandom() ? 'close' : 'playlist_add' }}</mat-icon>
+            </button>
+          }
+        </div>
+
+        @if (showQuickFandom()) {
+          <div class="col-12 fanfic-form-modal__quick-panel" [formGroup]="quickFandomForm">
+            <mat-form-field appearance="outline" class="col-12 col-md-6">
+              <mat-label>Nombre del fandom</mat-label>
+              <input matInput formControlName="name" autocomplete="off" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col-8 col-md-4">
+              <mat-label>Origen (serie, libro, película...)</mat-label>
+              <input matInput formControlName="origin" autocomplete="off" />
+            </mat-form-field>
+            <div class="col-4 col-md-2 fanfic-form-modal__quick-panel-actions">
+              <button mat-flat-button type="button" color="tertiary" (click)="createQuickFandom()">
+                Añadir
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Ship -->
+        <div class="col-12 col-md-6 fanfic-form-modal__row-with-action">
+          <mat-form-field appearance="outline" class="fanfic-form-modal__grow">
+            <mat-label>Ship</mat-label>
+            <input
+              matInput
+              [formControl]="shipSearchCtrl"
+              [matAutocomplete]="shipAuto"
+              [disabled]="!form.controls.fandomId.value"
+              autocomplete="off"
+            />
+            @if (shipSearchCtrl.value && !isReadOnly()) {
+              <button
+                matSuffix
+                mat-icon-button
+                type="button"
+                (click)="clearShip()"
+                aria-label="Limpiar"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+            <mat-autocomplete
+              #shipAuto="matAutocomplete"
+              [displayWith]="displayShip"
+              (optionSelected)="onShipSelected($event)"
+            >
+              @for (ship of filteredShips(); track ship.id) {
+                <mat-option [value]="ship">{{ ship.characters.join(' / ') }}</mat-option>
+              }
+            </mat-autocomplete>
+            @if (!form.controls.fandomId.value) {
+              <mat-hint>Elige antes un fandom.</mat-hint>
+            }
+          </mat-form-field>
+          @if (!isReadOnly()) {
+            <button
+              mat-icon-button
+              type="button"
+              matTooltip="Añadir ship rápido"
+              [disabled]="!form.controls.fandomId.value"
+              (click)="toggleQuickShip()"
+            >
+              <mat-icon>{{ showQuickShip() ? 'close' : 'playlist_add' }}</mat-icon>
+            </button>
+          }
+        </div>
+
+        @if (showQuickShip()) {
+          <div class="col-12 fanfic-form-modal__quick-panel" [formGroup]="quickShipForm">
+            <mat-form-field appearance="outline" class="col-12 col-md-10">
+              <mat-label>Personajes (separados por comas)</mat-label>
+              <input matInput formControlName="characters" autocomplete="off" />
+            </mat-form-field>
+            <div class="col-12 col-md-2 fanfic-form-modal__quick-panel-actions">
+              <button mat-flat-button type="button" color="tertiary" (click)="createQuickShip()">
+                Añadir
+              </button>
+            </div>
+          </div>
+        }
+
+        <mat-form-field appearance="outline" class="col-6 col-md-4">
+          <mat-label>Rating</mat-label>
+          <mat-select formControlName="rating">
+            @for (rating of ratings; track rating) {
+              <mat-option [value]="rating">{{ ratingLabels[rating] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-4">
+          <mat-label>Palabras</mat-label>
+          <input matInput type="number" formControlName="words" min="0" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-2">
+          <mat-label>Capítulos</mat-label>
+          <input matInput type="number" formControlName="chapters" min="1" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-2">
+          <mat-label>Páginas (opcional)</mat-label>
+          <input matInput type="number" formControlName="pages" min="0" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-6">
+          <mat-label>Estado de lectura</mat-label>
+          <mat-select formControlName="readingStatus">
+            @for (status of readingStatuses; track status) {
+              <mat-option [value]="status">{{ readingStatusLabels[status] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-6">
+          <mat-label>Idioma</mat-label>
+          <mat-select formControlName="language">
+            @for (language of languages; track language) {
+              <mat-option [value]="language">{{ languageLabels[language] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-6">
+          <mat-label>Trigger warnings (opcional)</mat-label>
+          <input
+            matInput
+            formControlName="triggerWarnings"
+            placeholder="Separados por comas"
+            autocomplete="off"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-6">
+          <mat-label>Tags (opcional)</mat-label>
+          <input
+            matInput
+            formControlName="tags"
+            placeholder="Separados por comas"
+            autocomplete="off"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12">
+          <mat-label>Resumen (opcional)</mat-label>
+          <textarea matInput formControlName="summary" rows="3"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Portada (URL, opcional)</mat-label>
+          <input matInput formControlName="coverUrl" autocomplete="off" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Enlace original (URL, opcional)</mat-label>
+          <input matInput formControlName="originalUrl" autocomplete="off" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12 col-md-4">
+          <mat-label>Archivo descargado (URL, opcional)</mat-label>
+          <input matInput formControlName="fileUrl" autocomplete="off" />
+        </mat-form-field>
+
+        @if (form.controls.coverUrl.value) {
+          <div class="col-12 fanfic-form-modal__cover-preview">
+            <img [src]="form.controls.coverUrl.value" alt="Vista previa de portada" />
+          </div>
+        }
+
+        <mat-form-field appearance="outline" class="col-6 col-md-3">
+          <mat-label>Publicación</mat-label>
+          <input matInput [matDatepicker]="releasePicker" formControlName="releaseDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="releasePicker" />
+          <mat-datepicker #releasePicker />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-3">
+          <mat-label>Adquisición</mat-label>
+          <input matInput [matDatepicker]="adquisitionPicker" formControlName="adquisitionDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="adquisitionPicker" />
+          <mat-datepicker #adquisitionPicker />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-3">
+          <mat-label>Inicio de lectura</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
+          <mat-datepicker #startPicker />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-6 col-md-3">
+          <mat-label>Fin de lectura</mat-label>
+          <input matInput [matDatepicker]="finishPicker" formControlName="finishDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="finishPicker" />
+          <mat-datepicker #finishPicker />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-12">
+          <mat-label>Notas (opcional)</mat-label>
+          <textarea matInput formControlName="notes" rows="2"></textarea>
+        </mat-form-field>
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()" [disabled]="saving()">Cerrar</button>
+    @if (mode() === FORM_MODE.DETALLE) {
+      <button mat-flat-button type="button" color="primary" (click)="switchToEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    } @else {
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving() || loading()">
+        @if (saving()) {
+          <mat-spinner diameter="18"></mat-spinner>
+        } @else {
+          {{ mode() === FORM_MODE.EDICION ? 'Guardar cambios' : 'Añadir' }}
+        }
+      </button>
+    }
+  </mat-dialog-actions>
+</form>

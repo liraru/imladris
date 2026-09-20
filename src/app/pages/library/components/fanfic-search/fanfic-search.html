@@ -1,0 +1,112 @@
+<div class="fanfic-search">
+  <form [formGroup]="form" class="fanfic-search__root">
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false" class="fanfic-search__panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>tune</mat-icon>
+            <span class="fanfic-search__toggle-text">Filtros y visualización</span>
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ activeFilterCount() }} filtro{{ activeFilterCount() === 1 ? '' : 's' }} activo{{
+              activeFilterCount() === 1 ? '' : 's'
+            }}
+            · {{ resultCount() }} registro{{ resultCount() === 1 ? '' : 's' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="fanfic-search__switches">
+          <div class="fanfic-search__toggle-group">
+            <span class="fanfic-search__toggle-label">Vista</span>
+            <mat-button-toggle-group formControlName="mode" aria-label="Modo de visualización">
+              <mat-button-toggle [value]="MODE.GALLERY">
+                <mat-icon>grid_view</mat-icon>
+                <span class="fanfic-search__toggle-text">{{ modeLabels[MODE.GALLERY] }}</span>
+              </mat-button-toggle>
+              <mat-button-toggle [value]="MODE.TABLE">
+                <mat-icon>table_rows</mat-icon>
+                <span class="fanfic-search__toggle-text">{{ modeLabels[MODE.TABLE] }}</span>
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+        </div>
+
+        <div class="grid fanfic-search__fields">
+          <mat-form-field appearance="outline" class="col-12 col-md-4">
+            <mat-label>Título</mat-label>
+            <input
+              matInput
+              formControlName="title"
+              placeholder="Buscar por título"
+              autocomplete="off"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-12 col-md-4">
+            <mat-label>Fandom</mat-label>
+            <input
+              matInput
+              formControlName="fandom"
+              [matAutocomplete]="fandomAuto"
+              autocomplete="off"
+            />
+            <mat-autocomplete #fandomAuto="matAutocomplete" [displayWith]="displayFandom">
+              @for (fandom of filteredFandoms(); track fandom.id) {
+                <mat-option [value]="fandom">{{ fandom.name }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-12 col-md-4">
+            <mat-label>Rating</mat-label>
+            <mat-select formControlName="rating">
+              <mat-option [value]="null">Todos</mat-option>
+              @for (rating of ratings; track rating) {
+                <mat-option [value]="rating">{{ ratingLabels[rating] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-12 col-md-6">
+            <mat-label>Estado de lectura</mat-label>
+            <mat-select formControlName="readingStatus">
+              <mat-option [value]="null">Todos</mat-option>
+              @for (status of readingStatuses; track status) {
+                <mat-option [value]="status">{{ readingStatusLabels[status] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-6 col-md-4">
+            <mat-label>Ordenar por</mat-label>
+            <mat-select formControlName="sortBy">
+              @for (field of sortFields; track field) {
+                <mat-option [value]="field">{{ sortFieldLabels[field] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-button-toggle-group
+            formControlName="sortDirection"
+            class="fanfic-search__direction"
+            aria-label="Dirección de orden"
+          >
+            <mat-button-toggle value="asc" aria-label="Ascendente"
+              ><mat-icon>arrow_upward</mat-icon></mat-button-toggle
+            >
+            <mat-button-toggle value="desc" aria-label="Descendente"
+              ><mat-icon>arrow_downward</mat-icon></mat-button-toggle
+            >
+          </mat-button-toggle-group>
+        </div>
+
+        <div class="fanfic-search__footer">
+          <button mat-stroked-button type="button" (click)="reset()">
+            <mat-icon>filter_alt_off</mat-icon>
+            Limpiar filtros
+          </button>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
+</div>

@@ -6,3 +6,6 @@ export * from './manga.interface';
 export * from './menu.model';
 export * from './yearly-reading.interface';
 export * from './reading-plan.interface';
+export * from './fandom.interface';
+export * from './ship.interface';
+export * from './fanfic.interface';

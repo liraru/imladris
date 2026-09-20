@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+/* Botones in-form alineados horizontalmente con su input, como en library-form-modal */
+.fanfic-form-modal__row-with-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fanfic-form-modal__grow {
+  flex: 1 1 auto;
+}
+
+.fanfic-form-modal__quick-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  margin: -0.25rem 0 0.5rem;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-high);
+}
+
+.fanfic-form-modal__quick-panel-actions {
+  display: flex;
+  align-items: center;
+  height: 56px;
+}
+
+.fanfic-form-modal__cover-preview img {
+  max-height: 160px;
+  border-radius: 8px;
+}
+
+.fanfic-form-modal__state {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.fanfic-form-modal__error {
+  color: var(--mat-sys-error);
+}

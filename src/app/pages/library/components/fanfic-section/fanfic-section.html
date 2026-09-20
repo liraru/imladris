@@ -1,0 +1,42 @@
+<div class="fanfic-section">
+  <header class="page-header">
+    <div class="heading">
+      <h1>Fanfic</h1>
+    </div>
+
+    @if (authService.isAdmin()) {
+      <div class="page-header__actions">
+        <button mat-flat-button type="button" color="primary" (click)="openCreate()">
+          <mat-icon>add</mat-icon>
+          Añadir fanfic
+        </button>
+      </div>
+    }
+  </header>
+
+  <app-fanfic-search
+    [fandoms]="fandoms()"
+    [resultCount]="displayItems().length"
+    (filtersChange)="onFiltersChange($event)"
+  />
+
+  @if (loading()) {
+    <div class="library-page__state">
+      <mat-spinner diameter="40" />
+      <p>Cargando fanfics…</p>
+    </div>
+  } @else if (error()) {
+    <div class="library-page__state library-page__state--error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <app-fanfic-data-display
+      [mode]="filters().mode"
+      [data]="displayItems()"
+      (viewDetail)="onViewDetail($event)"
+      (markFinished)="onMarkFinished($event)"
+      (deleteItem)="onDeleteItem($event)"
+    />
+  }
+</div>

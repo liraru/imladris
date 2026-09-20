@@ -63,3 +63,31 @@ export const DEFAULT_SORT_BY: Record<TYPE, SORT_FIELD[]> = {
 };
 
 export const DEFAULT_SORT_DIRECTION: 'asc' | 'desc' = 'asc';
+
+/**
+ * Pestañas de nivel superior de la página de Biblioteca. Sustituye al antiguo
+ * selector "Novelas / Manga" que vivía dentro de `library-search`. `FANFIC`
+ * es una sección independiente (ver `fanfic-section`), no reutiliza `TYPE`.
+ */
+export enum LIBRARY_TAB {
+  BOOK = 1,
+  MANGA,
+  FANFIC,
+}
+
+export interface LibraryTabEntry {
+  tab: LIBRARY_TAB;
+  label: string;
+  icon: string;
+}
+
+export const LIBRARY_TABS: LibraryTabEntry[] = [
+  { tab: LIBRARY_TAB.BOOK, label: 'Novelas', icon: 'menu_book' },
+  { tab: LIBRARY_TAB.MANGA, label: 'Manga', icon: 'auto_stories' },
+  { tab: LIBRARY_TAB.FANFIC, label: 'Fanfic', icon: 'favorite' },
+];
+
+/** Traduce una pestaña de biblioteca (BOOK/MANGA) al `TYPE` que consume el resto del feature. */
+export function tabToType(tab: LIBRARY_TAB): TYPE {
+  return tab === LIBRARY_TAB.MANGA ? TYPE.MANGA : TYPE.BOOK;
+}

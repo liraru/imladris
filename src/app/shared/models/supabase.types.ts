@@ -2,6 +2,7 @@ import { LANGUAGE } from '@shared/constants';
 import { GENRE, DEMOGRAPHIC } from '../constants/categories.constant';
 import { COUNTRY } from '../constants/countries.constant';
 import { READING_STATUS } from '../constants/reading-status.constant';
+import { RATING } from '../constants/rating.constant';
 
 /**
  * Tipos "crudos" tal y como los devuelve/espera Supabase (columnas en snake_case).
@@ -95,4 +96,44 @@ export interface ReadingPlanRow {
   pages: number;
   cover_url: string | null;
   order: number;
+}
+
+export interface FandomRow {
+  id: number;
+  name: string;
+  origin: string;
+}
+
+export interface ShipRow {
+  id: number;
+  fandom_id: number;
+  characters: string[];
+  fandom?: FandomRow;
+}
+
+export interface FanficRow {
+  id: number;
+  title: string;
+  authors: string[];
+  fandom_id: number;
+  ship_id: number;
+  rating: RATING;
+  words: number;
+  chapters: number;
+  pages: number | null;
+  reading_status: READING_STATUS;
+  release_date: string | null;
+  adquisition_date: string | null;
+  start_date: string | null;
+  finish_date: string | null;
+  trigger_warnings: string[] | null;
+  language: LANGUAGE;
+  tags: string[] | null;
+  summary: string | null;
+  file_url: string | null;
+  original_url: string | null;
+  cover_url: string | null;
+  notes: string | null;
+  fandom?: FandomRow;
+  ship?: ShipRow;
 }

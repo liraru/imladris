@@ -11,7 +11,7 @@ import {
   READING_STATUS_LABELS,
 } from '../../../../shared/constants/reading-status.constant';
 import { AuthService } from '../../../../services/auth.service';
-import { MODE, TYPE } from '../../constants/library.consants';
+import { MODE, TYPE } from '../../constants/library.constants';
 import { LibraryItem } from '../../models/library-item.model';
 import { MatDivider } from '@angular/material/divider';
 

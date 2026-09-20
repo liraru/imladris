@@ -1,21 +1,21 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   MatAutocompleteModule,
   MatAutocompleteSelectedEvent,
 } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { YearlyReading } from '@shared/models';
-import { YearlyReadingService } from '../../../../services/yearly-reading.service';
 import { BookService } from '../../../../services/book.service';
+import { FanficService } from '../../../../services/fanfic.service';
 import { MangaVolumeService } from '../../../../services/manga-volume.service';
+import { YearlyReadingService } from '../../../../services/yearly-reading.service';
 import { dateRangeValidator } from '../../../../shared/validators/date-range.validator';
 
 export interface YearlyReadingsFormModalData {
@@ -52,6 +52,7 @@ export class YearlyReadingsFormModal implements OnInit {
   private readonly _service = inject(YearlyReadingService);
   private readonly _bookService = inject(BookService);
   private readonly _mangaVolumeService = inject(MangaVolumeService);
+  private readonly _fanficService = inject(FanficService);
   protected readonly data = inject<YearlyReadingsFormModalData>(MAT_DIALOG_DATA);
 
   protected readonly isEdit = !!this.data.reading;
@@ -143,9 +144,10 @@ export class YearlyReadingsFormModal implements OnInit {
   }
 
   private async loadLibrarySuggestions(): Promise<void> {
-    const [books, volumes] = await Promise.all([
+    const [books, volumes, fanfics] = await Promise.all([
       this._bookService.getAll(),
       this._mangaVolumeService.getAll(),
+      this._fanficService.getAll(),
     ]);
 
     const fromBooks: LibrarySuggestion[] = books.map((b) => ({
@@ -160,7 +162,12 @@ export class YearlyReadingsFormModal implements OnInit {
       coverUrl: v.coverImageUrl,
     }));
 
-    const all = [...fromBooks, ...fromVolumes];
+    const fromFanfics: LibrarySuggestion[] = fanfics.map((f) => ({
+      title: f.title,
+      authors: f.authors.map((a) => a),
+      coverUrl: f.coverUrl,
+    }));
+    const all = [...fromBooks, ...fromVolumes, ...fromFanfics];
     this._librarySuggestions.set(all);
     this.filteredLibrarySuggestions.set(all);
   }

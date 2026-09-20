@@ -1,0 +1,145 @@
+@if (data().length === 0) {
+  <div class="fanfic-data-display__empty">
+    <mat-icon>favorite_border</mat-icon>
+    <p>No hay resultados con los filtros seleccionados.</p>
+  </div>
+} @else if (mode() === MODE.GALLERY) {
+  <div class="library-gallery">
+    @for (item of data(); track item.id) {
+      <article class="library-card">
+        <div class="library-card__cover">
+          @if (item.coverUrl) {
+            <img [src]="item.coverUrl" [alt]="'Portada de ' + item.title" loading="lazy" />
+          } @else {
+            <div class="library-card__placeholder">
+              <mat-icon>favorite_border</mat-icon>
+            </div>
+          }
+        </div>
+        <div class="library-card__body">
+          <div class="fanfic-card__title-row">
+            <h3 class="library-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
+            @if (authService.isAdmin()) {
+              <button
+                mat-icon-button
+                class="fanfic-card__menu-trigger"
+                type="button"
+                [matMenuTriggerFor]="itemMenu"
+                [matMenuTriggerData]="{ item: item }"
+                aria-label="Opciones"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            }
+          </div>
+          <p class="library-card__author">{{ authorNames(item) }}</p>
+          <p class="library-card__meta">{{ item.fandom.name }} · {{ shipLabel(item) }}</p>
+          <p class="library-card__meta">
+            {{
+              item.finishDate
+                ? 'Finalizado: ' + (item.finishDate | date: 'dd/MM/yyyy')
+                : readingStatusLabels[item.readingStatus]
+            }}
+          </p>
+        </div>
+      </article>
+    }
+  </div>
+} @else {
+  <div class="library-table-wrapper">
+    <table mat-table [dataSource]="data()" class="library-table">
+      <ng-container matColumnDef="cover">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let item">
+          @if (item.coverUrl) {
+            <img
+              class="library-table__cover"
+              [src]="item.coverUrl"
+              [alt]="'Portada de ' + item.title"
+            />
+          } @else {
+            <mat-icon>favorite_border</mat-icon>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Título</th>
+        <td mat-cell *matCellDef="let item">{{ item.title }}</td>
+      </ng-container>
+      <ng-container matColumnDef="authors">
+        <th mat-header-cell *matHeaderCellDef>Autores</th>
+        <td mat-cell *matCellDef="let item">{{ authorNames(item) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="fandom">
+        <th mat-header-cell *matHeaderCellDef>Fandom</th>
+        <td mat-cell *matCellDef="let item">{{ item.fandom.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="ship">
+        <th mat-header-cell *matHeaderCellDef>Ship</th>
+        <td mat-cell *matCellDef="let item">{{ shipLabel(item) }}</td>
+      </ng-container>
+      <!-- <ng-container matColumnDef="rating">
+        <th mat-header-cell *matHeaderCellDef>Rating</th>
+        <td mat-cell *matCellDef="let item">{{ ratingLabels[item.rating] }}</td>
+      </ng-container> -->
+      <ng-container matColumnDef="words">
+        <th mat-header-cell *matHeaderCellDef>Palabras</th>
+        <td mat-cell *matCellDef="let item">{{ item.words }}</td>
+      </ng-container>
+      <ng-container matColumnDef="chapters">
+        <th mat-header-cell *matHeaderCellDef>Cap.</th>
+        <td mat-cell *matCellDef="let item">{{ item.chapters }}</td>
+      </ng-container>
+      <!-- <ng-container matColumnDef="readingStatus">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let item">{{ readingStatusLabels[item.readingStatus] }}</td>
+      </ng-container> -->
+      <ng-container matColumnDef="adquisitionDate">
+        <th mat-header-cell *matHeaderCellDef>Adquisición</th>
+        <td mat-cell *matCellDef="let item">{{ item.adquisitionDate | date: 'dd/MM/yyyy' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="finishDate">
+        <th mat-header-cell *matHeaderCellDef>Fin lectura</th>
+        <td mat-cell *matCellDef="let item">{{ item.finishDate | date: 'dd/MM/yyyy' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let item">
+          @if (authService.isAdmin()) {
+            <button
+              mat-icon-button
+              type="button"
+              [matMenuTriggerFor]="itemMenu"
+              [matMenuTriggerData]="{ item: item }"
+              aria-label="Opciones"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+}
+
+<mat-menu #itemMenu="matMenu">
+  <ng-template matMenuContent let-item="item">
+    <button mat-menu-item type="button" (click)="viewDetail.emit(item)">
+      <mat-icon>visibility</mat-icon>
+      <span>Ver detalle</span>
+    </button>
+    @if (item.readingStatus !== READING_STATUS.FINISHED) {
+      <button mat-menu-item type="button" (click)="markFinished.emit(item)">
+        <mat-icon>done_all</mat-icon>
+        <span>Marcar como finalizado</span>
+      </button>
+    }
+    <button mat-menu-item type="button" (click)="deleteItem.emit(item)">
+      <mat-icon>delete</mat-icon>
+      <span>Eliminar</span>
+    </button>
+  </ng-template>
+</mat-menu>
