@@ -178,5 +178,7 @@ function fieldValue(item: Fanfic, field: FanficFilters['sortBy']): string | numb
       return item.finishDate;
     case 'adquisitionDate':
       return item.adquisitionDate;
+    default:
+      return undefined;
   }
 }
