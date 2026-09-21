@@ -2,23 +2,26 @@
   <header class="page-header">
     <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="library-page__tabs">
       @for (entry of tabs; track entry.tab) {
-        <a
-          mat-tab-link
-          [active]="activeTab() === entry.tab"
-          (click)="onTabChange(entry.tab)"
-        >
+        <a mat-tab-link [active]="activeTab() === entry.tab" (click)="onTabChange(entry.tab)">
           <mat-icon>{{ entry.icon }}</mat-icon>
-          {{ entry.label }}
+          <span class="library-page__tab-label">{{ entry.label }}</span>
         </a>
       }
     </nav>
     <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 
-    @if (activeTab() !== LIBRARY_TAB.FANFIC && authService.isAdmin()) {
+    @if (authService.isAdmin()) {
       <div class="page-header__actions">
-        <button mat-flat-button type="button" color="primary" (click)="openCreate()">
+        <button mat-flat-button type="button" color="primary" (click)="onAddClick()">
           <mat-icon>add</mat-icon>
-          Añadir {{ activeTab() === LIBRARY_TAB.MANGA ? 'tomo' : 'libro' }}
+          Añadir
+          {{
+            activeTab() === LIBRARY_TAB.MANGA
+              ? 'tomo'
+              : activeTab() === LIBRARY_TAB.FANFIC
+                ? 'fanfic'
+                : 'libro'
+          }}
         </button>
       </div>
     }

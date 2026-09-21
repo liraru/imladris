@@ -11,6 +11,8 @@ import { Authors } from './components/authors/authors';
 import { Editorials } from './components/editorials/editorials';
 import { BookSeries } from './components/book-series/book-series';
 import { Mangas } from './components/mangas/mangas';
+import { Fandoms } from './components/fandoms/fandoms';
+import { Ships } from './components/ships/ships';
 import { MANAGEMENT_MASTER, MANAGEMENT_MENU_ENTRIES } from './constants/management-menu.constants';
 
 @Component({
@@ -24,6 +26,8 @@ import { MANAGEMENT_MASTER, MANAGEMENT_MENU_ENTRIES } from './constants/manageme
     Editorials,
     BookSeries,
     Mangas,
+    Fandoms,
+    Ships,
   ],
   templateUrl: './management.html',
   styleUrl: './management.css',

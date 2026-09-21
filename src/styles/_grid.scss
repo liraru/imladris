@@ -35,6 +35,10 @@ $breakpoints: (
   display: grid;
   grid-template-columns: repeat($grid-columns, 1fr);
   gap: $grid-gap;
+  // Centra verticalmente cada campo dentro de su fila (inputs, selects, botones...)
+  // aunque tengan alturas distintas (hint, error, icono, etc.). Ver .grid--start
+  // para el caso puntual en que interese anclar arriba.
+  align-items: center;
 }
 
 // Variante con gap más ajustado, útil para tarjetas de libros/portadas
@@ -42,6 +46,7 @@ $breakpoints: (
   display: grid;
   grid-template-columns: repeat($grid-columns, 1fr);
   gap: 0.5rem;
+  align-items: center;
 }
 
 // -------------------------------

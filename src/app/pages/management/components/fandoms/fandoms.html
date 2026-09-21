@@ -1,0 +1,16 @@
+@if (error()) {
+  <p class="fandoms__error">{{ error() }}</p>
+}
+
+<app-master-data-table
+  [columns]="columns"
+  [items]="items()"
+  [loading]="loading()"
+  [isDeletable]="isDeletable"
+  addLabel="Añadir fandom"
+  searchPlaceholder="Buscar fandom…"
+  emptyMessage="Todavía no hay fandoms registrados."
+  (add)="openAdd()"
+  (edit)="openEdit($event)"
+  (delete)="remove($event)"
+/>

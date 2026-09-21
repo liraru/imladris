@@ -6,11 +6,9 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { firstValueFrom } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
 
 import { FandomService } from '../../../../services/fandom.service';
 import { FanficService } from '../../../../services/fanfic.service';
@@ -27,13 +25,7 @@ import {
 import { FanficSearch } from '../fanfic-search/fanfic-search';
 
 @Component({
-  imports: [
-    FanficDataDisplay,
-    FanficSearch,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-  ],
+  imports: [FanficDataDisplay, FanficSearch, MatIconModule, MatProgressSpinnerModule],
   selector: 'app-fanfic-section',
   styleUrl: './fanfic-section.css',
   templateUrl: './fanfic-section.html',
@@ -63,7 +55,8 @@ export class FanficSection implements OnInit {
     this.filters.set(filters);
   }
 
-  protected openCreate(): void {
+  /** Público: se invoca desde el botón "Añadir" de la cabecera común de `library.html`. */
+  public openCreate(): void {
     this._openFormModal({ mode: FORM_MODE.ALTA });
   }
 

@@ -92,4 +92,17 @@ export class ShipService {
     if (error) throw error;
     return new Set((data ?? []).map((row) => (row as { ship_id: number }).ship_id));
   }
+
+  /** Nº de fanfics asociados a cada ship. */
+  async getUsageCounts(): Promise<Map<number, number>> {
+    const { data, error } = await this.supabase.from('fanfics').select('ship_id');
+    if (error) throw error;
+
+    const counts = new Map<number, number>();
+    for (const row of data ?? []) {
+      const id = (row as { ship_id: number }).ship_id;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
+  }
 }

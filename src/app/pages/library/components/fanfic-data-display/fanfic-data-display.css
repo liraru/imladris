@@ -2,19 +2,6 @@
   display: block;
 }
 
-.fanfic-card__title-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.fanfic-card__menu-trigger {
-  flex-shrink: 0;
-  margin-top: -0.25rem;
-  margin-right: -0.5rem;
-}
-
 .fanfic-data-display__empty {
   display: flex;
   flex-direction: column;
