@@ -1,0 +1,153 @@
+// ============================================================
+// _library-card.scss
+// Estilos compartidos por las vistas de galería/tabla de
+// Biblioteca: novelas y manga (library-data-display) y
+// fanfics (fanfic-data-display). Viven en el global styles.scss
+// (en vez de en el CSS de un único componente) para que ambas
+// vistas queden sincronizadas automáticamente.
+// ============================================================
+
+.library-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  align-items: start; /* evita que una tarjeta más alta estire verticalmente las demás de su fila */
+}
+@media (min-width: 576px) {
+  .library-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 768px) {
+  .library-gallery {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+}
+@media (min-width: 1024px) {
+  .library-gallery {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.library-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--mat-sys-surface-container);
+  border-radius: var(--mat-sys-corner-medium, 10px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+.library-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
+}
+
+.library-card__menu-trigger {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 1;
+  background: color-mix(in srgb, var(--mat-sys-surface) 65%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+/* Portada: tamaño de visualización fijo (2:3) y recorte, independiente del tamaño real de la imagen */
+.library-card__cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: var(--mat-sys-surface-container-high);
+  flex-shrink: 0; /* evita que el flex column la comprima si el body crece */
+}
+.library-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.library-table__cover {
+  width: 100%;
+  max-height: 52px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.library-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+.library-card__placeholder mat-icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.library-card__body {
+  padding: 0.625rem 0.75rem 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.library-card__title {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  color: var(--mat-sys-on-surface);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(
+    1.25em * 2
+  ); /* reserva 2 líneas aunque el título sea corto, para que el resto de la leyenda arranque igual en todas las tarjetas */
+}
+.library-card__author,
+.library-card__meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.library-menu-trigger {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.library-menu-trigger .mat-mdc-button-touch-target {
+  width: 32px !important;
+  height: 32px !important;
+}
+.library-menu-trigger:hover,
+.library-menu-trigger:focus-visible {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 14%, transparent) !important;
+}
+
+.library-card__menu-trigger {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 1;
+  border: none;
+}
