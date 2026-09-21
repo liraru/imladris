@@ -49,6 +49,9 @@ export class ReadingPlan implements OnInit {
   protected readonly reordering = signal<boolean>(false);
   protected readonly error = signal<string | null>(null);
 
+  /** Portada mostrada en grande al pasar el ratón por encima de una miniatura. */
+  protected readonly previewItem = signal<ReadingPlanItem | null>(null);
+
   async ngOnInit(): Promise<void> {
     await this.load();
   }
@@ -93,6 +96,17 @@ export class ReadingPlan implements OnInit {
         console.error(err);
       })
       .finally(() => this.reordering.set(false));
+  }
+
+  /** Muestra la portada ampliada al pasar el ratón por encima de la miniatura. */
+  protected showCoverPreview(item: ReadingPlanItem): void {
+    if (!item.coverUrl) return;
+    this.previewItem.set(item);
+  }
+
+  /** Oculta la portada ampliada al retirar el ratón de la miniatura. */
+  protected hideCoverPreview(): void {
+    this.previewItem.set(null);
   }
 
   protected async openCreateModal(): Promise<void> {

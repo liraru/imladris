@@ -62,6 +62,8 @@
                   [alt]="'Portada de ' + item.title"
                   class="reading-plan-table__cover"
                   loading="lazy"
+                  (mouseenter)="showCoverPreview(item)"
+                  (mouseleave)="hideCoverPreview()"
                 />
               } @else {
                 <span class="reading-plan-table__cover reading-plan-table__cover--placeholder">
@@ -143,6 +145,16 @@
           </div>
         }
       </div>
+    </div>
+  }
+
+  @if (previewItem(); as preview) {
+    <div class="cover-preview-overlay">
+      <img
+        [src]="preview.coverUrl"
+        [alt]="'Portada ampliada de ' + preview.title"
+        class="cover-preview-overlay__image"
+      />
     </div>
   }
 </section>
