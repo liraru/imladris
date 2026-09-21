@@ -40,7 +40,7 @@
     mat-flat-button
     type="button"
     color="tertiary"
-    [disabled]="saving() || loading()"
+    [disabled]="saving() || loading() || form.invalid"
     (click)="save()"
   >
     @if (saving()) {

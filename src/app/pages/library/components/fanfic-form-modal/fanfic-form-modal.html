@@ -283,7 +283,12 @@
         Editar
       </button>
     } @else {
-      <button mat-flat-button color="primary" type="submit" [disabled]="saving() || loading()">
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="saving() || loading() || form.invalid"
+      >
         @if (saving()) {
           <mat-spinner diameter="18"></mat-spinner>
         } @else {

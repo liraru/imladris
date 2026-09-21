@@ -31,8 +31,8 @@
         </div>
         <div class="library-card__body">
           <h3 class="library-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
-          <p class="library-card__author">{{ authorNames(item) }}</p>
-          <p class="library-card__meta">{{ item.fandom.name }} · {{ shipLabel(item) }}</p>
+          <p class="library-card__author">{{ shipLabel(item) }}</p>
+          <p class="library-card__meta">{{ item.fandom.name }}</p>
           <p class="library-card__meta">
             {{
               item.finishDate

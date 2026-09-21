@@ -1,6 +1,4 @@
-<h2 mat-dialog-title>
-  {{ formModeLabels[mode()] }} {{ isBook ? 'libro' : 'tomo de manga' }}
-</h2>
+<h2 mat-dialog-title>{{ formModeLabels[mode()] }} {{ isBook ? 'libro' : 'tomo de manga' }}</h2>
 
 <mat-dialog-content class="library-form-modal">
   @if (loading()) {
@@ -30,7 +28,10 @@
             placeholder="Buscar autor…"
             autocomplete="off"
           />
-          <mat-autocomplete #authorAuto="matAutocomplete" (optionSelected)="onAuthorSelected($event)">
+          <mat-autocomplete
+            #authorAuto="matAutocomplete"
+            (optionSelected)="onAuthorSelected($event)"
+          >
             @for (author of filteredAuthors(); track author.id) {
               <mat-option [value]="author">{{ author.name }}</mat-option>
             }
@@ -98,7 +99,13 @@
             autocomplete="off"
           />
           @if (editorialSearchCtrl.value && !isReadOnly()) {
-            <button matSuffix mat-icon-button type="button" (click)="clearEditorial()" aria-label="Limpiar">
+            <button
+              matSuffix
+              mat-icon-button
+              type="button"
+              (click)="clearEditorial()"
+              aria-label="Limpiar"
+            >
               <mat-icon>close</mat-icon>
             </button>
           }
@@ -171,7 +178,13 @@
               autocomplete="off"
             />
             @if (serieSearchCtrl.value && !isReadOnly()) {
-              <button matSuffix mat-icon-button type="button" (click)="clearSerie()" aria-label="Limpiar">
+              <button
+                matSuffix
+                mat-icon-button
+                type="button"
+                (click)="clearSerie()"
+                aria-label="Limpiar"
+              >
                 <mat-icon>close</mat-icon>
               </button>
             }
@@ -244,7 +257,13 @@
               autocomplete="off"
             />
             @if (mangaSearchCtrl.value && !isReadOnly()) {
-              <button matSuffix mat-icon-button type="button" (click)="clearManga()" aria-label="Limpiar">
+              <button
+                matSuffix
+                mat-icon-button
+                type="button"
+                (click)="clearManga()"
+                aria-label="Limpiar"
+              >
                 <mat-icon>close</mat-icon>
               </button>
             }
@@ -285,7 +304,9 @@
               <mat-label>Demografía</mat-label>
               <mat-select formControlName="demographic">
                 @for (demographic of demographics; track demographic) {
-                  <mat-option [value]="demographic">{{ demographicLabels[demographic] }}</mat-option>
+                  <mat-option [value]="demographic">{{
+                    demographicLabels[demographic]
+                  }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -363,7 +384,7 @@
       mat-flat-button
       type="button"
       color="tertiary"
-      [disabled]="saving() || loading()"
+      [disabled]="saving() || loading() || form.invalid"
       (click)="save()"
     >
       @if (saving()) {
