@@ -93,6 +93,7 @@
   overflow: hidden;
   object-fit: cover;
   display: block;
+  cursor: zoom-in;
 }
 
 .reading-plan-table__cover--placeholder {
@@ -192,6 +193,39 @@
 .reading-plan-table__body.cdk-drop-list-dragging
   .reading-plan-table__row:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ---------- Previsualización de portada al pasar el ratón ---------- */
+.cover-preview-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+  background: color-mix(in srgb, black 45%, transparent);
+  animation: cover-preview-fade-in 120ms ease-out;
+}
+
+.cover-preview-overlay__image {
+  height: 80vh;
+  max-width: 90vw;
+  width: auto;
+  object-fit: contain;
+  border-radius: var(--mat-sys-corner-medium, 10px);
+  box-shadow:
+    0 20px 40px -12px rgba(0, 0, 0, 0.65),
+    0 0 0 1px color-mix(in srgb, white 10%, transparent);
+}
+
+@keyframes cover-preview-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---------- Móvil: solo arrastre · título · páginas · menú de 3 puntos ---------- */

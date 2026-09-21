@@ -72,4 +72,17 @@ export class FandomService {
     for (const row of ships.data ?? []) ids.add((row as { fandom_id: number }).fandom_id);
     return ids;
   }
+
+  /** Nº de fanfics asociados a cada fandom (a través de su fandom_id directo). */
+  async getUsageCounts(): Promise<Map<number, number>> {
+    const { data, error } = await this.supabase.from('fanfics').select('fandom_id');
+    if (error) throw error;
+
+    const counts = new Map<number, number>();
+    for (const row of data ?? []) {
+      const id = (row as { fandom_id: number }).fandom_id;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
+  }
 }

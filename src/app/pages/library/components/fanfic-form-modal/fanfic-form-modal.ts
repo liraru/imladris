@@ -159,9 +159,15 @@ export class FanficFormModal implements OnInit {
 
   protected readonly shipSearchCtrl = new FormControl<NameableRef<Ship>>(null);
   private readonly shipQuery = toSignal(this.shipSearchCtrl.valueChanges, { initialValue: null });
+  /** Valor reactivo de fandomId: `computed()` no detecta cambios en `FormControl.value` directamente,
+   *  solo en signals, así que hace falta convertir `valueChanges` en una para que `shipsForFandom`
+   *  se recalcule cuando cambia el fandom seleccionado. */
+  private readonly fandomIdValue = toSignal(this.form.controls.fandomId.valueChanges, {
+    initialValue: this.form.controls.fandomId.value,
+  });
   /** Solo se pueden elegir ships del fandom ya seleccionado. */
   protected readonly shipsForFandom = computed(() => {
-    const fandomId = this.form.controls.fandomId.value;
+    const fandomId = this.fandomIdValue();
     return this.ships().filter((s) => s.fandom.id === fandomId);
   });
   protected readonly filteredShips = computed(() =>

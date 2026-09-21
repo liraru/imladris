@@ -1,19 +1,4 @@
 <div class="fanfic-section">
-  <header class="page-header">
-    <div class="heading">
-      <h1>Fanfic</h1>
-    </div>
-
-    @if (authService.isAdmin()) {
-      <div class="page-header__actions">
-        <button mat-flat-button type="button" color="primary" (click)="openCreate()">
-          <mat-icon>add</mat-icon>
-          Añadir fanfic
-        </button>
-      </div>
-    }
-  </header>
-
   <app-fanfic-search
     [fandoms]="fandoms()"
     [resultCount]="displayItems().length"

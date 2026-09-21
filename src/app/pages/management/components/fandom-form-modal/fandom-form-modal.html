@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>{{ formModeLabels[data.mode] }} fandom</h2>
+
+<mat-dialog-content class="fandom-form-modal">
+  @if (error()) {
+    <p class="fandom-form-modal__error">{{ error() }}</p>
+  }
+
+  <form [formGroup]="form" class="fandom-form-modal__form grid">
+    <mat-form-field appearance="outline" class="col-12">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" autocomplete="off" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-12">
+      <mat-label>Origen</mat-label>
+      <input
+        matInput
+        formControlName="origin"
+        placeholder="Libro, serie, película…"
+        autocomplete="off"
+      />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button mat-flat-button type="button" color="tertiary" [disabled]="saving()" (click)="save()">
+    @if (saving()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      <mat-icon>save</mat-icon>
+    }
+    Guardar
+  </button>
+</mat-dialog-actions>

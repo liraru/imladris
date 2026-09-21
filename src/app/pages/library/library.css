@@ -17,3 +17,13 @@
 .library-page__state--error {
   color: #e08585;
 }
+
+.library-page__tabs a mat-icon {
+  margin-inline-end: 0.4rem;
+}
+
+@media (max-width: 767px) {
+  .library-page__tab-label {
+    display: none;
+  }
+}

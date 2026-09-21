@@ -7,6 +7,19 @@
   <div class="library-gallery">
     @for (item of data(); track item.id) {
       <article class="library-card">
+        @if (authService.isAdmin()) {
+          <button
+            mat-icon-button
+            class="library-card__menu-trigger library-menu-trigger"
+            type="button"
+            [matMenuTriggerFor]="itemMenu"
+            [matMenuTriggerData]="{ item: item }"
+            (click)="$event.stopPropagation()"
+            aria-label="Opciones"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        }
         <div class="library-card__cover">
           @if (item.coverUrl) {
             <img [src]="item.coverUrl" [alt]="'Portada de ' + item.title" loading="lazy" />
@@ -17,28 +30,14 @@
           }
         </div>
         <div class="library-card__body">
-          <div class="fanfic-card__title-row">
-            <h3 class="library-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
-            @if (authService.isAdmin()) {
-              <button
-                mat-icon-button
-                class="fanfic-card__menu-trigger"
-                type="button"
-                [matMenuTriggerFor]="itemMenu"
-                [matMenuTriggerData]="{ item: item }"
-                aria-label="Opciones"
-              >
-                <mat-icon>more_vert</mat-icon>
-              </button>
-            }
-          </div>
+          <h3 class="library-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
           <p class="library-card__author">{{ authorNames(item) }}</p>
           <p class="library-card__meta">{{ item.fandom.name }} · {{ shipLabel(item) }}</p>
           <p class="library-card__meta">
             {{
               item.finishDate
                 ? 'Finalizado: ' + (item.finishDate | date: 'dd/MM/yyyy')
-                : readingStatusLabels[item.readingStatus]
+                : readingStatusLabel(item)
             }}
           </p>
         </div>
@@ -78,10 +77,10 @@
         <th mat-header-cell *matHeaderCellDef>Ship</th>
         <td mat-cell *matCellDef="let item">{{ shipLabel(item) }}</td>
       </ng-container>
-      <!-- <ng-container matColumnDef="rating">
+      <ng-container matColumnDef="rating">
         <th mat-header-cell *matHeaderCellDef>Rating</th>
-        <td mat-cell *matCellDef="let item">{{ ratingLabels[item.rating] }}</td>
-      </ng-container> -->
+        <td mat-cell *matCellDef="let item">{{ ratingLabel(item) }}</td>
+      </ng-container>
       <ng-container matColumnDef="words">
         <th mat-header-cell *matHeaderCellDef>Palabras</th>
         <td mat-cell *matCellDef="let item">{{ item.words }}</td>
@@ -90,10 +89,10 @@
         <th mat-header-cell *matHeaderCellDef>Cap.</th>
         <td mat-cell *matCellDef="let item">{{ item.chapters }}</td>
       </ng-container>
-      <!-- <ng-container matColumnDef="readingStatus">
+      <ng-container matColumnDef="readingStatus">
         <th mat-header-cell *matHeaderCellDef>Estado</th>
-        <td mat-cell *matCellDef="let item">{{ readingStatusLabels[item.readingStatus] }}</td>
-      </ng-container> -->
+        <td mat-cell *matCellDef="let item">{{ readingStatusLabel(item) }}</td>
+      </ng-container>
       <ng-container matColumnDef="adquisitionDate">
         <th mat-header-cell *matHeaderCellDef>Adquisición</th>
         <td mat-cell *matCellDef="let item">{{ item.adquisitionDate | date: 'dd/MM/yyyy' }}</td>
@@ -107,6 +106,7 @@
         <td mat-cell *matCellDef="let item">
           @if (authService.isAdmin()) {
             <button
+              class="library-menu-trigger"
               mat-icon-button
               type="button"
               [matMenuTriggerFor]="itemMenu"
@@ -119,7 +119,7 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>
@@ -137,6 +137,7 @@
         <span>Marcar como finalizado</span>
       </button>
     }
+    <mat-divider></mat-divider>
     <button mat-menu-item type="button" (click)="deleteItem.emit(item)">
       <mat-icon>delete</mat-icon>
       <span>Eliminar</span>

@@ -1,0 +1,16 @@
+@if (error()) {
+  <p class="ships__error">{{ error() }}</p>
+}
+
+<app-master-data-table
+  [columns]="columns"
+  [items]="items()"
+  [loading]="loading()"
+  [isDeletable]="isDeletable"
+  addLabel="Añadir ship"
+  searchPlaceholder="Buscar ship…"
+  emptyMessage="Todavía no hay ships registrados."
+  (add)="openAdd()"
+  (edit)="openEdit($event)"
+  (delete)="remove($event)"
+/>

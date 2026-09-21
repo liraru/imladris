@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -101,6 +102,9 @@ export class Library implements OnInit {
   protected readonly tabs = LIBRARY_TABS;
   protected readonly activeTab = signal<LIBRARY_TAB>(loadStoredTab());
 
+  /** Referencia a la sección de fanfics, para invocar su alta desde la cabecera común. */
+  private readonly fanficSectionRef = viewChild(FanficSection);
+
   private readonly sourceItems = computed<LibraryItem[]>(() =>
     this.filters().type === TYPE.BOOK ? this.books() : this.mangaVolumes(),
   );
@@ -147,7 +151,16 @@ export class Library implements OnInit {
 
   // ---------- Alta ----------
 
-  protected openCreate(): void {
+  /** Botón "Añadir" de la cabecera común: delega en el modal de libro/tomo o en el de fanfic. */
+  protected onAddClick(): void {
+    if (this.activeTab() === LIBRARY_TAB.FANFIC) {
+      this.fanficSectionRef()?.openCreate();
+    } else {
+      this.openCreate();
+    }
+  }
+
+  private openCreate(): void {
     this.openFormModal({ mode: FORM_MODE.ALTA, type: this.filters().type });
   }
 

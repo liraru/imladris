@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
@@ -10,7 +11,14 @@ import { AuthService } from '../../../../services/auth.service';
 import { MODE } from '../../constants/library.constants';
 
 @Component({
-  imports: [DatePipe, MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule],
+  imports: [
+    DatePipe,
+    MatDividerModule,
+    MatIconModule,
+    MatMenuModule,
+    MatTableModule,
+    MatTooltipModule,
+  ],
   selector: 'app-fanfic-data-display',
   styleUrl: './fanfic-data-display.css',
   templateUrl: './fanfic-data-display.html',
@@ -28,8 +36,6 @@ export class FanficDataDisplay {
 
   protected readonly MODE = MODE;
   protected readonly READING_STATUS = READING_STATUS;
-  protected readonly readingStatusLabels = READING_STATUS_LABELS;
-  protected readonly ratingLabels = RATING_LABELS;
 
   protected readonly displayedColumns = [
     'cover',
@@ -52,5 +58,15 @@ export class FanficDataDisplay {
 
   protected shipLabel(item: Fanfic): string {
     return item.ship.characters.join(' / ');
+  }
+
+  /** Evita indexar `RATING_LABELS[item.rating]` directamente en la plantilla (falla el checker de Angular). */
+  protected ratingLabel(item: Fanfic): string {
+    return RATING_LABELS[item.rating];
+  }
+
+  /** Evita indexar `READING_STATUS_LABELS[item.readingStatus]` directamente en la plantilla. */
+  protected readingStatusLabel(item: Fanfic): string {
+    return READING_STATUS_LABELS[item.readingStatus];
   }
 }
