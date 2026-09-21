@@ -41,9 +41,24 @@
   margin-inline-start: 0.375rem;
 }
 
+.fanfic-search__sort-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.fanfic-search__status-field {
+  flex: 1 1 220px;
+}
+
+.fanfic-search__sort-field {
+  flex: 1 1 220px;
+}
+
 .fanfic-search__direction {
   flex: 0 0 auto;
-  align-self: center;
 }
 
 .fanfic-search__footer {
@@ -62,6 +77,12 @@
   }
   .fanfic-search__toggle-text {
     display: none;
+  }
+  .fanfic-search__sort-row {
+    align-items: stretch;
+  }
+  .fanfic-search__sort-row mat-form-field {
+    flex: 1 1 100%;
   }
   .fanfic-search__footer {
     flex-direction: column;

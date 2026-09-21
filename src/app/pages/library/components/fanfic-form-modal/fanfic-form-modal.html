@@ -55,7 +55,7 @@
               (optionSelected)="onFandomSelected($event)"
             >
               @for (fandom of filteredFandoms(); track fandom.id) {
-                <mat-option [value]="fandom">{{ fandom.name }} ({{ fandom.origin }})</mat-option>
+                <mat-option [value]="fandom">{{ fandom.name }}</mat-option>
               }
             </mat-autocomplete>
           </mat-form-field>

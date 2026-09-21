@@ -31,6 +31,7 @@
     <app-fanfic-section />
   } @else {
     <app-library-search
+      [type]="filters().type"
       [authors]="authors()"
       [series]="series()"
       [editorials]="editorials()"
