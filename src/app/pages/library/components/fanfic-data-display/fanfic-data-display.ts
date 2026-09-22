@@ -61,8 +61,12 @@ export class FanficDataDisplay {
     return item.authors.length ? item.authors.join(', ') : 'Autor desconocido';
   }
 
+  protected fandomNames(item: Fanfic): string {
+    return item.fandoms.map((f) => f.name).join(', ');
+  }
+
   protected shipLabel(item: Fanfic): string {
-    return item.ship.characters.join(' / ');
+    return item.ships.map((s) => s.characters.join(' / ')).join(' · ');
   }
 
   /** Evita indexar `RATING_LABELS[item.rating]` directamente en la plantilla (falla el checker de Angular). */

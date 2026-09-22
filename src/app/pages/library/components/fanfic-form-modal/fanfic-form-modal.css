@@ -5,8 +5,18 @@
 /* Botones in-form alineados horizontalmente con su input, como en library-form-modal */
 .fanfic-form-modal__row-with-action {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* antes: center — con hint bajo un solo campo, "center" los descentra */
   gap: 0.5rem;
+}
+
+.fanfic-form-modal__row-with-action > button {
+  /* Centra el botón respecto a la caja del input (56px fija), no respecto al bloque
+     completo campo+hint, que varía de altura según si hay hint visible o no. */
+  margin-top: 8px;
+}
+
+.fanfic-form-modal__grow {
+  flex: 1 1 auto;
 }
 
 .fanfic-form-modal__grow {

@@ -86,16 +86,16 @@ export class ShipService {
     if (error) throw error;
   }
 
-  /** Ids de ships referenciados desde fanfics (para no permitir borrarlos). */
+  /** Ids de ships referenciados desde fanfics (vía `fanfic_ships`), para no permitir borrarlos. */
   async getUsedIds(): Promise<Set<number>> {
-    const { data, error } = await this.supabase.from('fanfics').select('ship_id');
+    const { data, error } = await this.supabase.from('fanfic_ships').select('ship_id');
     if (error) throw error;
     return new Set((data ?? []).map((row) => (row as { ship_id: number }).ship_id));
   }
 
-  /** Nº de fanfics asociados a cada ship. */
+  /** Nº de fanfics asociados a cada ship (vía `fanfic_ships`). */
   async getUsageCounts(): Promise<Map<number, number>> {
-    const { data, error } = await this.supabase.from('fanfics').select('ship_id');
+    const { data, error } = await this.supabase.from('fanfic_ships').select('ship_id');
     if (error) throw error;
 
     const counts = new Map<number, number>();

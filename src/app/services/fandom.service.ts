@@ -58,24 +58,24 @@ export class FandomService {
     if (error) throw error;
   }
 
-  /** Ids de fandoms referenciados desde fanfics o ships (para no permitir borrarlos). */
+  /** Ids de fandoms referenciados desde fanfics (vía `fanfic_fandoms`) o ships, para no permitir borrarlos. */
   async getUsedIds(): Promise<Set<number>> {
-    const [fanfics, ships] = await Promise.all([
-      this.supabase.from('fanfics').select('fandom_id'),
+    const [fanficFandoms, ships] = await Promise.all([
+      this.supabase.from('fanfic_fandoms').select('fandom_id'),
       this.supabase.from('ships').select('fandom_id'),
     ]);
-    if (fanfics.error) throw fanfics.error;
+    if (fanficFandoms.error) throw fanficFandoms.error;
     if (ships.error) throw ships.error;
 
     const ids = new Set<number>();
-    for (const row of fanfics.data ?? []) ids.add((row as { fandom_id: number }).fandom_id);
+    for (const row of fanficFandoms.data ?? []) ids.add((row as { fandom_id: number }).fandom_id);
     for (const row of ships.data ?? []) ids.add((row as { fandom_id: number }).fandom_id);
     return ids;
   }
 
-  /** Nº de fanfics asociados a cada fandom (a través de su fandom_id directo). */
+  /** Nº de fanfics asociados a cada fandom (vía `fanfic_fandoms`). */
   async getUsageCounts(): Promise<Map<number, number>> {
-    const { data, error } = await this.supabase.from('fanfics').select('fandom_id');
+    const { data, error } = await this.supabase.from('fanfic_fandoms').select('fandom_id');
     if (error) throw error;
 
     const counts = new Map<number, number>();

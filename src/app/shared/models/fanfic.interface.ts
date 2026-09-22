@@ -8,8 +8,8 @@ export interface Fanfic {
   id: number;
   title: string;
   authors: string[];
-  fandom: Fandom;
-  ship: Ship;
+  fandoms: Fandom[];
+  ships: Ship[];
   rating: RATING;
   words: number;
   chapters: number;

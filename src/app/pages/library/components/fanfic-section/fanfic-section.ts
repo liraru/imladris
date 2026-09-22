@@ -149,7 +149,7 @@ function applyFilters(items: Fanfic[], filters: FanficFilters): Fanfic[] {
     result = result.filter((i) => i.title.toLowerCase().includes(q));
   }
   if (filters.fandomId != null) {
-    result = result.filter((i) => i.fandom.id === filters.fandomId);
+    result = result.filter((i) => i.fandoms.some((f) => f.id === filters.fandomId));
   }
   if (filters.rating != null) {
     result = result.filter((i) => i.rating === filters.rating);
@@ -179,9 +179,9 @@ function fieldValue(item: Fanfic, field: FanficFilters['sortBy']): string | numb
     case 'author':
       return item.authors[0];
     case 'fandom':
-      return item.fandom.name;
+      return item.fandoms.map((f) => f.name).join(', ');
     case 'ship':
-      return item.ship.characters.join(' / ');
+      return item.ships.map((s) => s.characters.join(' / ')).join(' · ');
     case 'rating':
       return item.rating;
     case 'words':

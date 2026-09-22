@@ -115,8 +115,6 @@ export interface FanficRow {
   id: number;
   title: string;
   authors: string[];
-  fandom_id: number;
-  ship_id: number;
   rating: RATING;
   words: number;
   chapters: number;
@@ -134,6 +132,6 @@ export interface FanficRow {
   original_url: string | null;
   cover_url: string | null;
   notes: string | null;
-  fandom?: FandomRow;
-  ship?: ShipRow;
+  fanfic_fandoms?: { fandom: FandomRow }[];
+  fanfic_ships?: { ship: ShipRow }[];
 }

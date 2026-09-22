@@ -28,36 +28,39 @@
           />
         </mat-form-field>
 
-        <!-- Fandom -->
+        <!-- Fandoms -->
         <div class="col-12 col-md-6 fanfic-form-modal__row-with-action">
           <mat-form-field appearance="outline" class="fanfic-form-modal__grow">
-            <mat-label>Fandom</mat-label>
-            <input
-              matInput
-              [formControl]="fandomSearchCtrl"
-              [matAutocomplete]="fandomAuto"
-              autocomplete="off"
-            />
-            @if (fandomSearchCtrl.value) {
-              <button
-                matSuffix
-                mat-icon-button
-                type="button"
-                (click)="clearFandom()"
-                aria-label="Limpiar"
-              >
-                <mat-icon>close</mat-icon>
-              </button>
-            }
+            <mat-label>Fandoms</mat-label>
+            <mat-chip-grid #fandomChipGrid aria-label="Fandoms seleccionados">
+              @for (fandom of selectedFandoms(); track fandom.id) {
+                <mat-chip-row (removed)="removeFandom(fandom)">
+                  {{ fandom.name }}
+                  <button matChipRemove type="button" aria-label="Quitar fandom">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+              <input
+                matInput
+                [formControl]="fandomSearchCtrl"
+                [matChipInputFor]="fandomChipGrid"
+                [matAutocomplete]="fandomAuto"
+                placeholder="Añadir fandom…"
+                autocomplete="off"
+              />
+            </mat-chip-grid>
             <mat-autocomplete
               #fandomAuto="matAutocomplete"
-              [displayWith]="displayFandom"
               (optionSelected)="onFandomSelected($event)"
             >
               @for (fandom of filteredFandoms(); track fandom.id) {
                 <mat-option [value]="fandom">{{ fandom.name }}</mat-option>
               }
             </mat-autocomplete>
+            @if (selectedFandoms().length === 0) {
+              <mat-hint>Añade al menos un fandom.</mat-hint>
+            }
           </mat-form-field>
           <button
             mat-icon-button
@@ -87,46 +90,45 @@
           </div>
         }
 
-        <!-- Ship -->
+        <!-- Ships -->
         <div class="col-12 col-md-6 fanfic-form-modal__row-with-action">
           <mat-form-field appearance="outline" class="fanfic-form-modal__grow">
-            <mat-label>Ship</mat-label>
-            <input
-              matInput
-              [formControl]="shipSearchCtrl"
-              [matAutocomplete]="shipAuto"
-              [disabled]="!form.controls.fandomId.value"
-              autocomplete="off"
-            />
-            @if (shipSearchCtrl.value) {
-              <button
-                matSuffix
-                mat-icon-button
-                type="button"
-                (click)="clearShip()"
-                aria-label="Limpiar"
-              >
-                <mat-icon>close</mat-icon>
-              </button>
-            }
-            <mat-autocomplete
-              #shipAuto="matAutocomplete"
-              [displayWith]="displayShip"
-              (optionSelected)="onShipSelected($event)"
-            >
+            <mat-label>Ships</mat-label>
+            <mat-chip-grid #shipChipGrid aria-label="Ships seleccionados">
+              @for (ship of selectedShips(); track ship.id) {
+                <mat-chip-row (removed)="removeShip(ship)">
+                  {{ ship.characters.join(' / ') }}
+                  <button matChipRemove type="button" aria-label="Quitar ship">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+              <input
+                matInput
+                [formControl]="shipSearchCtrl"
+                [matChipInputFor]="shipChipGrid"
+                [matAutocomplete]="shipAuto"
+                [disabled]="selectedFandoms().length === 0"
+                placeholder="Añadir ship…"
+                autocomplete="off"
+              />
+            </mat-chip-grid>
+            <mat-autocomplete #shipAuto="matAutocomplete" (optionSelected)="onShipSelected($event)">
               @for (ship of filteredShips(); track ship.id) {
                 <mat-option [value]="ship">{{ ship.characters.join(' / ') }}</mat-option>
               }
             </mat-autocomplete>
-            @if (!form.controls.fandomId.value) {
-              <mat-hint>Elige antes un fandom.</mat-hint>
+            @if (selectedFandoms().length === 0) {
+              <mat-hint>Elige antes al menos un fandom.</mat-hint>
+            } @else if (selectedShips().length === 0) {
+              <mat-hint>Añade al menos un ship.</mat-hint>
             }
           </mat-form-field>
           <button
             mat-icon-button
             type="button"
             matTooltip="Añadir ship rápido"
-            [disabled]="!form.controls.fandomId.value"
+            [disabled]="selectedFandoms().length === 0"
             (click)="toggleQuickShip()"
           >
             <mat-icon>{{ showQuickShip() ? 'close' : 'playlist_add' }}</mat-icon>
@@ -135,11 +137,19 @@
 
         @if (showQuickShip()) {
           <div class="col-12 fanfic-form-modal__quick-panel" [formGroup]="quickShipForm">
-            <mat-form-field appearance="outline" class="col-12 col-md-10">
+            <mat-form-field appearance="outline" class="col-12 col-md-5">
               <mat-label>Personajes (separados por comas)</mat-label>
               <input matInput formControlName="characters" autocomplete="off" />
             </mat-form-field>
-            <div class="col-12 col-md-2 fanfic-form-modal__quick-panel-actions">
+            <mat-form-field appearance="outline" class="col-8 col-md-5">
+              <mat-label>Fandom del ship</mat-label>
+              <mat-select formControlName="fandomId">
+                @for (fandom of selectedFandoms(); track fandom.id) {
+                  <mat-option [value]="fandom.id">{{ fandom.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <div class="col-4 col-md-2 fanfic-form-modal__quick-panel-actions">
               <button mat-flat-button type="button" color="tertiary" (click)="createQuickShip()">
                 Añadir
               </button>
@@ -273,12 +283,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-button type="button" (click)="cancel()" [disabled]="saving()">Cerrar</button>
-    <button
-      mat-flat-button
-      color="primary"
-      type="submit"
-      [disabled]="saving() || loading() || form.invalid"
-    >
+    <button mat-flat-button color="primary" type="submit" [disabled]="!canSubmit()">
       @if (saving()) {
         <mat-spinner diameter="18"></mat-spinner>
       } @else {
