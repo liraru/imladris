@@ -145,7 +145,7 @@ export class ReadingPlanFormModal implements OnInit {
     }));
 
     const fromVolumes: LibrarySuggestion[] = volumes.map((v) => ({
-      title: v.title,
+      title: `${v.title} ${!!v.volumeNumber ? `Vol. ${v.volumeNumber}` : v.notes}`,
       authors: v.authors.map((a) => a.name),
       coverUrl: v.coverImageUrl,
     }));
