@@ -148,6 +148,17 @@ export class FanficFormModal implements OnInit {
     notes: [''],
   });
 
+  /**
+   * `form.invalid` no es una signal: leerla dentro de un `computed()` no la registra como
+   * dependencia, así que ese computed no se recalcularía al cambiar la validez del form si
+   * ningún otro signal leído dentro cambia a la vez (bug real: el botón "Añadir" se quedaba
+   * deshabilitado aunque el formulario ya fuera válido). Se expone el estado como signal vía
+   * `toSignal(statusChanges)` para que `canSubmit` sí reaccione a cada cambio de validez.
+   */
+  private readonly formStatus = toSignal(this.form.statusChanges, {
+    initialValue: this.form.status,
+  });
+
   protected readonly fandomSearchCtrl = new FormControl('', { nonNullable: true });
   private readonly fandomQuery = toSignal(this.fandomSearchCtrl.valueChanges, { initialValue: '' });
   /** Fandoms disponibles para añadir: excluye los ya seleccionados y filtra por texto de búsqueda. */
@@ -181,7 +192,7 @@ export class FanficFormModal implements OnInit {
     () =>
       !this.saving() &&
       !this.loading() &&
-      !this.form.invalid &&
+      this.formStatus() !== 'INVALID' &&
       this.selectedFandoms().length > 0 &&
       this.selectedShips().length > 0,
   );
