@@ -9,6 +9,7 @@ import { RATING_LABELS, READING_STATUS, READING_STATUS_LABELS } from '@shared/co
 import { Fanfic } from '@shared/models';
 import { AuthService } from '../../../../services/auth.service';
 import { MODE } from '../../constants/library.constants';
+import { ThousandsPipe } from '../../../../shared/pipes/thousands.pipe';
 
 @Component({
   imports: [
@@ -18,6 +19,7 @@ import { MODE } from '../../constants/library.constants';
     MatMenuModule,
     MatTableModule,
     MatTooltipModule,
+    ThousandsPipe,
   ],
   selector: 'app-fanfic-data-display',
   styleUrl: './fanfic-data-display.css',
@@ -30,7 +32,10 @@ export class FanficDataDisplay {
   public mode = input.required<MODE>();
   public data = input.required<Fanfic[]>();
 
+  /** Se emite al clicar sobre la tarjeta/fila de un elemento: abre la ficha de detalle. */
   public readonly viewDetail = output<Fanfic>();
+  /** Se emite cuando el usuario elige "Editar" en el menú contextual de un elemento. */
+  public readonly editItem = output<Fanfic>();
   public readonly deleteItem = output<Fanfic>();
   public readonly markFinished = output<Fanfic>();
 

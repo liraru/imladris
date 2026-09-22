@@ -19,6 +19,11 @@ import {
   LibraryDeleteDialogData,
 } from './components/library-delete-dialog/library-delete-dialog';
 import {
+  LibraryDetailModal,
+  LibraryDetailModalData,
+  LibraryDetailModalResult,
+} from './components/library-detail-modal/library-detail-modal';
+import {
   LibraryFormModal,
   LibraryFormModalData,
   LibraryFormModalResult,
@@ -164,10 +169,33 @@ export class Library implements OnInit {
     this.openFormModal({ mode: FORM_MODE.ALTA, type: this.filters().type });
   }
 
-  // ---------- Ver detalle (desde el menú contextual) ----------
+  // ---------- Ver detalle (al clicar sobre la tarjeta/fila) ----------
 
   protected onViewDetail(item: LibraryItem): void {
-    this.openFormModal({ mode: FORM_MODE.DETALLE, type: this.filters().type, itemId: item.id });
+    const ref = this._dialog.open<
+      LibraryDetailModal,
+      LibraryDetailModalData,
+      LibraryDetailModalResult
+    >(LibraryDetailModal, {
+      data: { item, type: this.filters().type },
+      width: '620px',
+      maxWidth: '95vw',
+      autoFocus: false,
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (result?.edit) this.openEditModal(item);
+    });
+  }
+
+  // ---------- Editar (desde el menú contextual) ----------
+
+  protected onEditItem(item: LibraryItem): void {
+    this.openEditModal(item);
+  }
+
+  private openEditModal(item: LibraryItem): void {
+    this.openFormModal({ mode: FORM_MODE.EDICION, type: this.filters().type, itemId: item.id });
   }
 
   private openFormModal(data: LibraryFormModalData): void {
@@ -185,7 +213,7 @@ export class Library implements OnInit {
     });
   }
 
-  // ---------- Eliminar (desde el menú contextual) ----------
+  // ---------- Eliminar (desde el menú contextual, con confirmación previa) ----------
 
   protected async onDeleteItem(item: LibraryItem): Promise<void> {
     const type = this.filters().type;

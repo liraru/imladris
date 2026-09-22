@@ -51,7 +51,7 @@ import { TYPE, TYPE_LABELS } from '../../constants/library.constants';
 export interface LibraryFormModalData {
   mode: FORM_MODE;
   type: TYPE;
-  /** Id del libro o tomo de manga. Requerido en modo DETALLE y EDICION. */
+  /** Id del libro o tomo de manga. Requerido en modo EDICION. */
   itemId?: number;
 }
 
@@ -128,8 +128,6 @@ export class LibraryFormModal implements OnInit {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
-
-  protected readonly isReadOnly = computed(() => this.mode() === FORM_MODE.DETALLE);
 
   protected readonly authors = signal<Author[]>([]);
   protected readonly editorials = signal<Editorial[]>([]);
@@ -275,14 +273,6 @@ export class LibraryFormModal implements OnInit {
       if (this.data.itemId != null) {
         await this.loadItem(this.data.itemId);
       }
-
-      if (this.mode() === FORM_MODE.DETALLE) {
-        this.form.disable();
-        this.authorSearchCtrl.disable();
-        this.editorialSearchCtrl.disable();
-        this.serieSearchCtrl.disable();
-        this.mangaSearchCtrl.disable();
-      }
     } catch {
       this.error.set('No se ha podido cargar la información necesaria para el formulario.');
     } finally {
@@ -339,17 +329,6 @@ export class LibraryFormModal implements OnInit {
         volumeNumber: volume.volumeNumber ?? null,
       });
     }
-  }
-
-  // ---------- Cambio de modo ----------
-
-  protected enableEdit(): void {
-    this.mode.set(FORM_MODE.EDICION);
-    this.form.enable();
-    this.authorSearchCtrl.enable();
-    this.editorialSearchCtrl.enable();
-    this.serieSearchCtrl.enable();
-    this.mangaSearchCtrl.enable();
   }
 
   // ---------- Autores (autocompletado + chips) ----------

@@ -36,7 +36,7 @@
   </header>
 
   @if (!loading()) {
-    <p class="summary">{{ readings().length }} lecturas · {{ totalPages() }} páginas</p>
+    <p class="summary">{{ readings().length }} lecturas · {{ totalPages() | thousands }} páginas</p>
   }
 
   @if (loading()) {
@@ -53,7 +53,7 @@
       <div class="capture-area__header" [class.capture-area__header--visible]="showCaptureHeader()">
         <h2>Lecturas de {{ selectedYear() }}</h2>
         <p class="capture-area__summary">
-          {{ readings().length }} lecturas · {{ totalPages() }} páginas
+          {{ readings().length }} lecturas · {{ totalPages() | thousands }} páginas
         </p>
       </div>
 
@@ -100,7 +100,7 @@
                     Leyendo
                   }
                 </p>
-                <p class="pages">{{ reading.pages }} pág.</p>
+                <p class="pages">{{ reading.pages | thousands }} pág.</p>
               </div>
               <p class="title">{{ reading.title }}</p>
               <p class="author">{{ reading.authors.join(', ') }}</p>

@@ -1,0 +1,119 @@
+<button
+  mat-icon-button
+  type="button"
+  class="fanfic-detail-modal__close"
+  aria-label="Cerrar"
+  (click)="close()"
+>
+  <mat-icon>close</mat-icon>
+</button>
+
+<mat-dialog-content class="fanfic-detail-modal">
+  <div class="fanfic-detail-modal__cover">
+    @if (item.coverUrl) {
+      <img [src]="item.coverUrl" [alt]="'Portada de ' + item.title" />
+    } @else {
+      <div class="fanfic-detail-modal__placeholder">
+        <mat-icon>favorite_border</mat-icon>
+      </div>
+    }
+  </div>
+
+  <div class="fanfic-detail-modal__body">
+    <p class="fanfic-detail-modal__kicker">Fanfic</p>
+    <h2 class="fanfic-detail-modal__title">{{ item.title }}</h2>
+    <p class="fanfic-detail-modal__author">{{ authorNames }}</p>
+
+    <dl class="fanfic-detail-modal__facts">
+      <dt>Fandom</dt>
+      <dd>{{ item.fandom.name }}</dd>
+
+      <dt>Ship</dt>
+      <dd>{{ shipLabel }}</dd>
+
+      <dt>Rating</dt>
+      <dd>{{ ratingLabels[item.rating] }}</dd>
+
+      <dt>Palabras / Capítulos</dt>
+      <dd>
+        {{ item.words | thousands }} / {{ item.chapters
+        }}{{ item.pages ? ' · ' + item.pages + ' pág.' : '' }}
+      </dd>
+
+      <dt>Idioma</dt>
+      <dd>{{ languageLabels[item.language] }}</dd>
+
+      <dt>Estado de lectura</dt>
+      <dd>{{ readingStatusLabels[item.readingStatus] }}</dd>
+
+      @if (item.triggerWarnings?.length) {
+        <dt>Trigger warnings</dt>
+        <dd>{{ item.triggerWarnings!.join(', ') }}</dd>
+      }
+
+      @if (item.tags?.length) {
+        <dt>Tags</dt>
+        <dd>{{ item.tags!.join(', ') }}</dd>
+      }
+
+      @if (item.releaseDate) {
+        <dt>Publicación</dt>
+        <dd>{{ item.releaseDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+
+      @if (item.adquisitionDate) {
+        <dt>Adquisición</dt>
+        <dd>{{ item.adquisitionDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+
+      @if (item.startDate) {
+        <dt>Inicio de lectura</dt>
+        <dd>{{ item.startDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+
+      @if (item.finishDate) {
+        <dt>Fin de lectura</dt>
+        <dd>{{ item.finishDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+    </dl>
+
+    @if (item.summary) {
+      <div class="fanfic-detail-modal__notes">
+        <p class="fanfic-detail-modal__notes-label">Resumen</p>
+        <p class="fanfic-detail-modal__notes-text">{{ item.summary }}</p>
+      </div>
+    }
+
+    @if (item.notes) {
+      <div class="fanfic-detail-modal__notes">
+        <p class="fanfic-detail-modal__notes-label">Notas</p>
+        <p class="fanfic-detail-modal__notes-text">{{ item.notes }}</p>
+      </div>
+    }
+
+    @if (item.originalUrl || item.fileUrl) {
+      <div class="fanfic-detail-modal__links">
+        @if (item.originalUrl) {
+          <a [href]="item.originalUrl" target="_blank" rel="noopener">
+            <mat-icon>link</mat-icon>
+            Enlace original
+          </a>
+        }
+        @if (item.fileUrl) {
+          <a [href]="item.fileUrl" target="_blank" rel="noopener">
+            <mat-icon>download</mat-icon>
+            Archivo descargado
+          </a>
+        }
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Cerrar</button>
+  <button mat-flat-button type="button" color="primary" (click)="edit()">
+    <mat-icon>edit</mat-icon>
+    Editar
+  </button>
+</mat-dialog-actions>

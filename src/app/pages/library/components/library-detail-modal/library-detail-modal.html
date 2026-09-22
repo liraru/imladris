@@ -1,0 +1,83 @@
+<button
+  mat-icon-button
+  type="button"
+  class="library-detail-modal__close"
+  aria-label="Cerrar"
+  (click)="close()"
+>
+  <mat-icon>close</mat-icon>
+</button>
+
+<mat-dialog-content class="library-detail-modal">
+  <div class="library-detail-modal__cover">
+    @if (item.coverImageUrl) {
+      <img [src]="item.coverImageUrl" [alt]="'Portada de ' + item.title" />
+    } @else {
+      <div class="library-detail-modal__placeholder">
+        <mat-icon>{{ isManga ? 'auto_stories' : 'menu_book' }}</mat-icon>
+      </div>
+    }
+  </div>
+
+  <div class="library-detail-modal__body">
+    <p class="library-detail-modal__kicker">{{ typeLabels[data.type] }}</p>
+    <h2 class="library-detail-modal__title">{{ item.title }}</h2>
+    <p class="library-detail-modal__author">{{ authorNames }}</p>
+
+    <dl class="library-detail-modal__facts">
+      <dt>Editorial</dt>
+      <dd>{{ item.editorial?.name ?? '—' }}</dd>
+
+      @if (serieLabel) {
+        <dt>{{ isManga ? 'Manga' : 'Serie' }}</dt>
+        <dd>{{ serieLabel }}</dd>
+      }
+
+      @if (genreNames) {
+        <dt>Géneros</dt>
+        <dd>{{ genreNames }}</dd>
+      }
+
+      <dt>Idioma</dt>
+      <dd>{{ languageLabels[item.language] }}</dd>
+
+      <dt>Estado de lectura</dt>
+      <dd>{{ readingStatusLabels[item.readingStatus] }}</dd>
+
+      @if (item.releaseDate) {
+        <dt>Publicación</dt>
+        <dd>{{ item.releaseDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+
+      @if (item.adquisitionDate) {
+        <dt>Adquisición</dt>
+        <dd>{{ item.adquisitionDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+
+      @if (item.startDate) {
+        <dt>Inicio de lectura</dt>
+        <dd>{{ item.startDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+
+      @if (item.finishDate) {
+        <dt>Fin de lectura</dt>
+        <dd>{{ item.finishDate | date: 'dd/MM/yyyy' }}</dd>
+      }
+    </dl>
+
+    @if (item.notes) {
+      <div class="library-detail-modal__notes">
+        <p class="library-detail-modal__notes-label">Notas</p>
+        <p class="library-detail-modal__notes-text">{{ item.notes }}</p>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Cerrar</button>
+  <button mat-flat-button type="button" color="primary" (click)="edit()">
+    <mat-icon>edit</mat-icon>
+    Editar
+  </button>
+</mat-dialog-actions>
