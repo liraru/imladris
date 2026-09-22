@@ -29,8 +29,10 @@ export class LibraryDataDisplay {
   public type = input.required<TYPE>();
   public data = input.required<LibraryItem[]>();
 
-  /** Se emite cuando el usuario elige "Ver detalle" en el menú contextual de un elemento. */
+  /** Se emite al clicar sobre la tarjeta/fila de un elemento: abre la ficha de detalle. */
   public readonly viewDetail = output<LibraryItem>();
+  /** Se emite cuando el usuario elige "Editar" en el menú contextual de un elemento. */
+  public readonly editItem = output<LibraryItem>();
   /** Se emite cuando el usuario elige "Eliminar" en el menú contextual de un elemento. */
   public readonly deleteItem = output<LibraryItem>();
   public readonly markFinished = output<LibraryItem>();

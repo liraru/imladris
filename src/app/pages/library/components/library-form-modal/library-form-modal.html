@@ -37,26 +37,22 @@
             }
           </mat-autocomplete>
         </mat-form-field>
-        @if (!isReadOnly()) {
-          <button
-            mat-icon-button
-            type="button"
-            matTooltip="Añadir autor rápido"
-            (click)="toggleQuickAuthor()"
-          >
-            <mat-icon>{{ showQuickAuthor() ? 'close' : 'person_add' }}</mat-icon>
-          </button>
-        }
+        <button
+          mat-icon-button
+          type="button"
+          matTooltip="Añadir autor rápido"
+          (click)="toggleQuickAuthor()"
+        >
+          <mat-icon>{{ showQuickAuthor() ? 'close' : 'person_add' }}</mat-icon>
+        </button>
       </div>
 
       @if (selectedAuthors().length) {
         <mat-chip-set class="col-12 library-form-modal__chips">
           @for (author of selectedAuthors(); track author.id) {
-            <mat-chip [removable]="!isReadOnly()" (removed)="removeAuthor(author.id)">
+            <mat-chip removable (removed)="removeAuthor(author.id)">
               {{ author.name }}
-              @if (!isReadOnly()) {
-                <mat-icon matChipRemove>cancel</mat-icon>
-              }
+              <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip>
           }
         </mat-chip-set>
@@ -98,7 +94,7 @@
             [matAutocomplete]="editorialAuto"
             autocomplete="off"
           />
-          @if (editorialSearchCtrl.value && !isReadOnly()) {
+          @if (editorialSearchCtrl.value) {
             <button
               matSuffix
               mat-icon-button
@@ -119,16 +115,14 @@
             }
           </mat-autocomplete>
         </mat-form-field>
-        @if (!isReadOnly()) {
-          <button
-            mat-icon-button
-            type="button"
-            matTooltip="Añadir editorial rápida"
-            (click)="toggleQuickEditorial()"
-          >
-            <mat-icon>{{ showQuickEditorial() ? 'close' : 'add_business' }}</mat-icon>
-          </button>
-        }
+        <button
+          mat-icon-button
+          type="button"
+          matTooltip="Añadir editorial rápida"
+          (click)="toggleQuickEditorial()"
+        >
+          <mat-icon>{{ showQuickEditorial() ? 'close' : 'add_business' }}</mat-icon>
+        </button>
       </div>
 
       @if (showQuickEditorial()) {
@@ -177,7 +171,7 @@
               [matAutocomplete]="serieAuto"
               autocomplete="off"
             />
-            @if (serieSearchCtrl.value && !isReadOnly()) {
+            @if (serieSearchCtrl.value) {
               <button
                 matSuffix
                 mat-icon-button
@@ -198,16 +192,14 @@
               }
             </mat-autocomplete>
           </mat-form-field>
-          @if (!isReadOnly()) {
-            <button
-              mat-icon-button
-              type="button"
-              matTooltip="Añadir serie rápida"
-              (click)="toggleQuickSerie()"
-            >
-              <mat-icon>{{ showQuickSerie() ? 'close' : 'playlist_add' }}</mat-icon>
-            </button>
-          }
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Añadir serie rápida"
+            (click)="toggleQuickSerie()"
+          >
+            <mat-icon>{{ showQuickSerie() ? 'close' : 'playlist_add' }}</mat-icon>
+          </button>
         </div>
 
         <mat-form-field appearance="outline" class="col-12 col-md-4">
@@ -256,7 +248,7 @@
               [matAutocomplete]="mangaAuto"
               autocomplete="off"
             />
-            @if (mangaSearchCtrl.value && !isReadOnly()) {
+            @if (mangaSearchCtrl.value) {
               <button
                 matSuffix
                 mat-icon-button
@@ -277,16 +269,14 @@
               }
             </mat-autocomplete>
           </mat-form-field>
-          @if (!isReadOnly()) {
-            <button
-              mat-icon-button
-              type="button"
-              matTooltip="Añadir manga rápido"
-              (click)="toggleQuickManga()"
-            >
-              <mat-icon>{{ showQuickManga() ? 'close' : 'auto_stories' }}</mat-icon>
-            </button>
-          }
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Añadir manga rápido"
+            (click)="toggleQuickManga()"
+          >
+            <mat-icon>{{ showQuickManga() ? 'close' : 'auto_stories' }}</mat-icon>
+          </button>
         </div>
 
         <mat-form-field appearance="outline" class="col-12 col-md-4">
@@ -370,29 +360,20 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">
-    {{ mode() === FORM_MODE.DETALLE ? 'Cerrar' : 'Cancelar' }}
-  </button>
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
 
-  @if (mode() === FORM_MODE.DETALLE) {
-    <button mat-flat-button type="button" color="primary" (click)="enableEdit()">
-      <mat-icon>edit</mat-icon>
-      Editar
-    </button>
-  } @else {
-    <button
-      mat-flat-button
-      type="button"
-      color="tertiary"
-      [disabled]="saving() || loading() || form.invalid"
-      (click)="save()"
-    >
-      @if (saving()) {
-        <mat-spinner diameter="18" />
-      } @else {
-        <mat-icon>save</mat-icon>
-      }
-      Guardar
-    </button>
-  }
+  <button
+    mat-flat-button
+    type="button"
+    color="tertiary"
+    [disabled]="saving() || loading() || form.invalid"
+    (click)="save()"
+  >
+    @if (saving()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      <mat-icon>save</mat-icon>
+    }
+    Guardar
+  </button>
 </mat-dialog-actions>

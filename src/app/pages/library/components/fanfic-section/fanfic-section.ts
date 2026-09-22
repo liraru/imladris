@@ -18,6 +18,11 @@ import { FORM_MODE } from '../../constants/library-form.constants';
 import { DEFAULT_FANFIC_FILTERS, FanficFilters } from '../../models/fanfic-filters.model';
 import { FanficDataDisplay } from '../fanfic-data-display/fanfic-data-display';
 import {
+  FanficDetailModal,
+  FanficDetailModalData,
+  FanficDetailModalResult,
+} from '../fanfic-detail-modal/fanfic-detail-modal';
+import {
   FanficFormModal,
   FanficFormModalData,
   FanficFormModalResult,
@@ -60,8 +65,24 @@ export class FanficSection implements OnInit {
     this._openFormModal({ mode: FORM_MODE.ALTA });
   }
 
+  // ---------- Ver detalle (al clicar sobre la tarjeta/fila) ----------
+
   protected onViewDetail(item: Fanfic): void {
-    this._openFormModal({ mode: FORM_MODE.DETALLE, fanficId: item.id });
+    const ref = this._dialog.open<
+      FanficDetailModal,
+      FanficDetailModalData,
+      FanficDetailModalResult
+    >(FanficDetailModal, { data: { item }, width: '620px', maxWidth: '95vw', autoFocus: false });
+
+    ref.afterClosed().subscribe((result) => {
+      if (result?.edit) this._openFormModal({ mode: FORM_MODE.EDICION, fanficId: item.id });
+    });
+  }
+
+  // ---------- Editar (desde el menú contextual) ----------
+
+  protected onEditItem(item: Fanfic): void {
+    this._openFormModal({ mode: FORM_MODE.EDICION, fanficId: item.id });
   }
 
   private _openFormModal(data: FanficFormModalData): void {

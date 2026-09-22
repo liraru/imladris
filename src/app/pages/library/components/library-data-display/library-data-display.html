@@ -6,7 +6,14 @@
 } @else if (mode() === MODE.GALLERY) {
   <div class="library-gallery">
     @for (item of data(); track item.id) {
-      <article class="library-card">
+      <article
+        class="library-card"
+        role="button"
+        tabindex="0"
+        style="cursor: pointer"
+        (click)="viewDetail.emit(item)"
+        (keyup.enter)="viewDetail.emit(item)"
+      >
         @if (authService.isAdmin()) {
           <button
             mat-icon-button
@@ -126,6 +133,7 @@
               type="button"
               [matMenuTriggerFor]="itemMenu"
               [matMenuTriggerData]="{ item: item }"
+              (click)="$event.stopPropagation()"
               aria-label="Opciones"
             >
               <mat-icon>more_vert</mat-icon>
@@ -135,16 +143,21 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        style="cursor: pointer"
+        (click)="viewDetail.emit(row)"
+      ></tr>
     </table>
   </div>
 }
 
 <mat-menu #itemMenu="matMenu">
   <ng-template matMenuContent let-item="item">
-    <button mat-menu-item type="button" (click)="viewDetail.emit(item)">
-      <mat-icon>visibility</mat-icon>
-      <span>Ver detalle</span>
+    <button mat-menu-item type="button" (click)="editItem.emit(item)">
+      <mat-icon>edit</mat-icon>
+      <span>Editar</span>
     </button>
     @if (item.readingStatus !== READING_STATUS.FINISHED) {
       <button mat-menu-item type="button" (click)="markFinished.emit(item)">

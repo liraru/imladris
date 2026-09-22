@@ -39,7 +39,7 @@ import { FORM_MODE, FORM_MODE_LABELS } from '../../constants/library-form.consta
 
 export interface FanficFormModalData {
   mode: FORM_MODE;
-  /** Id del fanfic. Requerido en modo DETALLE y EDICION. */
+  /** Id del fanfic. Requerido en modo EDICION. */
   fanficId?: number;
 }
 
@@ -106,8 +106,6 @@ export class FanficFormModal implements OnInit {
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
 
-  protected readonly isReadOnly = computed(() => this.mode() === FORM_MODE.DETALLE);
-
   protected readonly fandoms = signal<Fandom[]>([]);
   protected readonly ships = signal<Ship[]>([]);
 
@@ -133,7 +131,7 @@ export class FanficFormModal implements OnInit {
     chapters: [1, [Validators.required, Validators.min(1)]],
     pages: [null as number | null],
     readingStatus: [READING_STATUS.NOT_STARTED, Validators.required],
-    language: [LANGUAGE.ES, Validators.required],
+    language: [LANGUAGE.EN, Validators.required],
     triggerWarnings: [''],
     tags: [''],
     summary: [''],
@@ -187,8 +185,6 @@ export class FanficFormModal implements OnInit {
         const fanfic = await this.fanficSrv.getById(this.data.fanficId);
         if (fanfic) this._patchForm(fanfic);
       }
-
-      if (this.isReadOnly()) this.form.disable();
     } catch (err) {
       this.error.set('No se ha podido cargar el fanfic. Inténtalo de nuevo.');
       console.error(err);
@@ -345,11 +341,6 @@ export class FanficFormModal implements OnInit {
 
   protected cancel(): void {
     this.dialogRef.close({ saved: false });
-  }
-
-  protected switchToEdit(): void {
-    this.mode.set(FORM_MODE.EDICION);
-    this.form.enable();
   }
 }
 

@@ -38,7 +38,7 @@
               [matAutocomplete]="fandomAuto"
               autocomplete="off"
             />
-            @if (fandomSearchCtrl.value && !isReadOnly()) {
+            @if (fandomSearchCtrl.value) {
               <button
                 matSuffix
                 mat-icon-button
@@ -59,16 +59,14 @@
               }
             </mat-autocomplete>
           </mat-form-field>
-          @if (!isReadOnly()) {
-            <button
-              mat-icon-button
-              type="button"
-              matTooltip="Añadir fandom rápido"
-              (click)="toggleQuickFandom()"
-            >
-              <mat-icon>{{ showQuickFandom() ? 'close' : 'playlist_add' }}</mat-icon>
-            </button>
-          }
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Añadir fandom rápido"
+            (click)="toggleQuickFandom()"
+          >
+            <mat-icon>{{ showQuickFandom() ? 'close' : 'playlist_add' }}</mat-icon>
+          </button>
         </div>
 
         @if (showQuickFandom()) {
@@ -100,7 +98,7 @@
               [disabled]="!form.controls.fandomId.value"
               autocomplete="off"
             />
-            @if (shipSearchCtrl.value && !isReadOnly()) {
+            @if (shipSearchCtrl.value) {
               <button
                 matSuffix
                 mat-icon-button
@@ -124,17 +122,15 @@
               <mat-hint>Elige antes un fandom.</mat-hint>
             }
           </mat-form-field>
-          @if (!isReadOnly()) {
-            <button
-              mat-icon-button
-              type="button"
-              matTooltip="Añadir ship rápido"
-              [disabled]="!form.controls.fandomId.value"
-              (click)="toggleQuickShip()"
-            >
-              <mat-icon>{{ showQuickShip() ? 'close' : 'playlist_add' }}</mat-icon>
-            </button>
-          }
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Añadir ship rápido"
+            [disabled]="!form.controls.fandomId.value"
+            (click)="toggleQuickShip()"
+          >
+            <mat-icon>{{ showQuickShip() ? 'close' : 'playlist_add' }}</mat-icon>
+          </button>
         </div>
 
         @if (showQuickShip()) {
@@ -277,24 +273,17 @@
 
   <mat-dialog-actions align="end">
     <button mat-button type="button" (click)="cancel()" [disabled]="saving()">Cerrar</button>
-    @if (mode() === FORM_MODE.DETALLE) {
-      <button mat-flat-button type="button" color="primary" (click)="switchToEdit()">
-        <mat-icon>edit</mat-icon>
-        Editar
-      </button>
-    } @else {
-      <button
-        mat-flat-button
-        color="primary"
-        type="submit"
-        [disabled]="saving() || loading() || form.invalid"
-      >
-        @if (saving()) {
-          <mat-spinner diameter="18"></mat-spinner>
-        } @else {
-          {{ mode() === FORM_MODE.EDICION ? 'Guardar cambios' : 'Añadir' }}
-        }
-      </button>
-    }
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="saving() || loading() || form.invalid"
+    >
+      @if (saving()) {
+        <mat-spinner diameter="18"></mat-spinner>
+      } @else {
+        {{ mode() === FORM_MODE.EDICION ? 'Guardar cambios' : 'Añadir' }}
+      }
+    </button>
   </mat-dialog-actions>
 </form>

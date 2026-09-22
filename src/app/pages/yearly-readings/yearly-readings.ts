@@ -23,6 +23,7 @@ import {
 import { AuthService } from '../../services/auth.service';
 import { YearlyReadingService } from '../../services/yearly-reading.service';
 import { YearlyReading } from '@shared/models';
+import { ThousandsPipe } from '../../shared/pipes/thousands.pipe';
 
 @Component({
   imports: [
@@ -32,6 +33,7 @@ import { YearlyReading } from '@shared/models';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    ThousandsPipe,
   ],
   selector: 'app-yearly-readings',
   styleUrl: './yearly-readings.css',

@@ -124,3 +124,35 @@ mat-card-title {
     justify-content: space-between;
   }
 }
+
+/* ============================================================
+ * Scrollbar global: muy fina y discreta, se funde con el fondo
+ * en vez de llamar la atención. Aplica a toda la app (tablas,
+ * diálogos, paneles de autocompletado/select, etc.).
+ * ============================================================ */
+* {
+  scrollbar-width: thin; /* Firefox: opción más fina disponible además de "none" */
+  scrollbar-color: color-mix(in srgb, var(--mat-sys-on-surface) 25%, transparent) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 25%, transparent);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 45%, transparent);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
