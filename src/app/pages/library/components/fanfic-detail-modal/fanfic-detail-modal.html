@@ -25,10 +25,10 @@
     <p class="fanfic-detail-modal__author">{{ authorNames }}</p>
 
     <dl class="fanfic-detail-modal__facts">
-      <dt>Fandom</dt>
-      <dd>{{ item.fandom.name }}</dd>
+      <dt>Fandom{{ item.fandoms.length > 1 ? 's' : '' }}</dt>
+      <dd>{{ fandomNames }}</dd>
 
-      <dt>Ship</dt>
+      <dt>Ship{{ item.ships.length > 1 ? 's' : '' }}</dt>
       <dd>{{ shipLabel }}</dd>
 
       <dt>Rating</dt>

@@ -38,8 +38,12 @@ export class FanficDetailModal {
     return this.item.authors.length ? this.item.authors.join(', ') : 'Autor desconocido';
   }
 
+  protected get fandomNames(): string {
+    return this.item.fandoms.map((f) => f.name).join(', ');
+  }
+
   protected get shipLabel(): string {
-    return this.item.ship.characters.join(' / ');
+    return this.item.ships.map((s) => s.characters.join(' / ')).join(' · ');
   }
 
   protected close(): void {

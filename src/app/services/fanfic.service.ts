@@ -5,25 +5,32 @@ import { Fanfic } from '@shared/models';
 
 const SELECT_FULL = `
   *,
-  fandom:fandoms(*),
-  ship:ships(*, fandom:fandoms(*))
+  fanfic_fandoms(fandom:fandoms(*)),
+  fanfic_ships(ship:ships(*, fandom:fandoms(*)))
 `;
 
 function toFanfic(row: FanficRow): Fanfic {
-  const fandom = row.fandom as FandomRow;
-  const ship = row.ship as ShipRow;
-  const shipFandom = ship.fandom as FandomRow;
+  const fandoms = (row.fanfic_fandoms ?? []).map(({ fandom }) => ({
+    id: fandom.id,
+    name: fandom.name,
+    origin: fandom.origin,
+  }));
+
+  const ships = (row.fanfic_ships ?? []).map(({ ship }) => {
+    const shipFandom = ship.fandom as FandomRow;
+    return {
+      id: ship.id,
+      characters: ship.characters ?? [],
+      fandom: { id: shipFandom.id, name: shipFandom.name, origin: shipFandom.origin },
+    };
+  });
 
   return {
     id: row.id,
     title: row.title,
     authors: row.authors ?? [],
-    fandom: { id: fandom.id, name: fandom.name, origin: fandom.origin },
-    ship: {
-      id: ship.id,
-      characters: ship.characters ?? [],
-      fandom: { id: shipFandom.id, name: shipFandom.name, origin: shipFandom.origin },
-    },
+    fandoms,
+    ships,
     rating: row.rating,
     words: row.words,
     chapters: row.chapters,
@@ -48,8 +55,8 @@ function toFanfic(row: FanficRow): Fanfic {
 export interface FanficInput {
   title: string;
   authors: string[];
-  fandomId: number;
-  shipId: number;
+  fandomIds: number[];
+  shipIds: number[];
   rating: Fanfic['rating'];
   words: number;
   chapters: number;
@@ -81,8 +88,6 @@ function toRow(input: Partial<FanficInput>) {
   const row: Record<string, unknown> = {};
   if (input.title !== undefined) row['title'] = input.title;
   if (input.authors !== undefined) row['authors'] = input.authors;
-  if (input.fandomId !== undefined) row['fandom_id'] = input.fandomId;
-  if (input.shipId !== undefined) row['ship_id'] = input.shipId;
   if (input.rating !== undefined) row['rating'] = input.rating;
   if (input.words !== undefined) row['words'] = input.words;
   if (input.chapters !== undefined) row['chapters'] = input.chapters;
@@ -133,7 +138,11 @@ export class FanficService {
       .single();
     if (error) throw error;
 
-    const created = await this.getById((data as { id: number }).id);
+    const fanficId = (data as { id: number }).id;
+    await this._syncFandoms(fanficId, input.fandomIds);
+    await this._syncShips(fanficId, input.shipIds);
+
+    const created = await this.getById(fanficId);
     if (!created) throw new Error('No se pudo recuperar el fanfic recién creado.');
     return created;
   }
@@ -145,6 +154,9 @@ export class FanficService {
       if (error) throw error;
     }
 
+    if (input.fandomIds !== undefined) await this._syncFandoms(id, input.fandomIds);
+    if (input.shipIds !== undefined) await this._syncShips(id, input.shipIds);
+
     const updated = await this.getById(id);
     if (!updated) throw new Error('No se pudo recuperar el fanfic actualizado.');
     return updated;
@@ -153,5 +165,35 @@ export class FanficService {
   async remove(id: number): Promise<void> {
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
     if (error) throw error;
+  }
+
+  /** Sincroniza `fanfic_fandoms` para un fanfic: borra las asociaciones actuales y reinserta las nuevas. */
+  private async _syncFandoms(fanficId: number, fandomIds: number[]): Promise<void> {
+    const { error: delError } = await this.supabase
+      .from('fanfic_fandoms')
+      .delete()
+      .eq('fanfic_id', fanficId);
+    if (delError) throw delError;
+
+    if (fandomIds.length === 0) return;
+    const { error: insError } = await this.supabase
+      .from('fanfic_fandoms')
+      .insert(fandomIds.map((fandomId) => ({ fanfic_id: fanficId, fandom_id: fandomId })));
+    if (insError) throw insError;
+  }
+
+  /** Sincroniza `fanfic_ships` para un fanfic: borra las asociaciones actuales y reinserta las nuevas. */
+  private async _syncShips(fanficId: number, shipIds: number[]): Promise<void> {
+    const { error: delError } = await this.supabase
+      .from('fanfic_ships')
+      .delete()
+      .eq('fanfic_id', fanficId);
+    if (delError) throw delError;
+
+    if (shipIds.length === 0) return;
+    const { error: insError } = await this.supabase
+      .from('fanfic_ships')
+      .insert(shipIds.map((shipId) => ({ fanfic_id: fanficId, ship_id: shipId })));
+    if (insError) throw insError;
   }
 }

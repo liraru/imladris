@@ -13,6 +13,7 @@ import {
   MatAutocompleteSelectedEvent,
 } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
@@ -24,7 +25,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { FandomService } from '../../../../services/fandom.service';
 import { FanficInput, FanficService } from '../../../../services/fanfic.service';
-import { ShipInput, ShipService } from '../../../../services/ship.service';
+import { ShipService } from '../../../../services/ship.service';
 
 import {
   LANGUAGE,
@@ -47,8 +48,6 @@ export interface FanficFormModalResult {
   saved: boolean;
 }
 
-type NameableRef<T> = T | string | null;
-
 function toDate(value?: string): Date | null {
   return value ? new Date(`${value}T00:00:00`) : null;
 }
@@ -66,6 +65,7 @@ function toStringList(value: string): string[] {
     ReactiveFormsModule,
     MatAutocompleteModule,
     MatButtonModule,
+    MatChipsModule,
     MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -109,6 +109,10 @@ export class FanficFormModal implements OnInit {
   protected readonly fandoms = signal<Fandom[]>([]);
   protected readonly ships = signal<Ship[]>([]);
 
+  /** Fandoms/ships ya elegidos para este fanfic (N:M, en vez de un único valor). */
+  protected readonly selectedFandoms = signal<Fandom[]>([]);
+  protected readonly selectedShips = signal<Ship[]>([]);
+
   protected readonly showQuickFandom = signal(false);
   protected readonly showQuickShip = signal(false);
 
@@ -119,13 +123,12 @@ export class FanficFormModal implements OnInit {
 
   protected readonly quickShipForm = this.fb.nonNullable.group({
     characters: ['', Validators.required],
+    fandomId: [null as number | null, Validators.required],
   });
 
   protected readonly form = this.fb.group({
     title: ['', Validators.required],
     authors: ['', Validators.required],
-    fandomId: [null as number | null, Validators.required],
-    shipId: [null as number | null, Validators.required],
     rating: [RATING.NR, Validators.required],
     words: [0, [Validators.required, Validators.min(0)]],
     chapters: [1, [Validators.required, Validators.min(1)]],
@@ -145,34 +148,43 @@ export class FanficFormModal implements OnInit {
     notes: [''],
   });
 
-  protected readonly fandomSearchCtrl = new FormControl<NameableRef<Fandom>>(null);
-  private readonly fandomQuery = toSignal(this.fandomSearchCtrl.valueChanges, {
-    initialValue: null,
+  protected readonly fandomSearchCtrl = new FormControl('', { nonNullable: true });
+  private readonly fandomQuery = toSignal(this.fandomSearchCtrl.valueChanges, { initialValue: '' });
+  /** Fandoms disponibles para añadir: excluye los ya seleccionados y filtra por texto de búsqueda. */
+  protected readonly filteredFandoms = computed(() => {
+    const search = this.fandomQuery().toLowerCase();
+    const selectedIds = new Set(this.selectedFandoms().map((f) => f.id));
+    const available = this.fandoms().filter((f) => !selectedIds.has(f.id));
+    if (!search) return available.slice(0, 30);
+    return available.filter((f) => f.name.toLowerCase().includes(search)).slice(0, 30);
   });
-  protected readonly filteredFandoms = computed(() =>
-    filterByName(this.fandoms(), this.fandomQuery(), (f) => f.name),
-  );
-  protected displayFandom = (v: NameableRef<Fandom>) =>
-    typeof v === 'string' ? v : (v?.name ?? '');
 
-  protected readonly shipSearchCtrl = new FormControl<NameableRef<Ship>>(null);
-  private readonly shipQuery = toSignal(this.shipSearchCtrl.valueChanges, { initialValue: null });
-  /** Valor reactivo de fandomId: `computed()` no detecta cambios en `FormControl.value` directamente,
-   *  solo en signals, así que hace falta convertir `valueChanges` en una para que `shipsForFandom`
-   *  se recalcule cuando cambia el fandom seleccionado. */
-  private readonly fandomIdValue = toSignal(this.form.controls.fandomId.valueChanges, {
-    initialValue: this.form.controls.fandomId.value,
-  });
-  /** Solo se pueden elegir ships del fandom ya seleccionado. */
+  protected readonly shipSearchCtrl = new FormControl('', { nonNullable: true });
+  private readonly shipQuery = toSignal(this.shipSearchCtrl.valueChanges, { initialValue: '' });
+  /** Solo se pueden elegir ships de alguno de los fandoms ya seleccionados. */
   protected readonly shipsForFandom = computed(() => {
-    const fandomId = this.fandomIdValue();
-    return this.ships().filter((s) => s.fandom.id === fandomId);
+    const fandomIds = new Set(this.selectedFandoms().map((f) => f.id));
+    return this.ships().filter((s) => fandomIds.has(s.fandom.id));
   });
-  protected readonly filteredShips = computed(() =>
-    filterByName(this.shipsForFandom(), this.shipQuery(), (s) => s.characters.join(' / ')),
+  /** Ships disponibles para añadir: excluye los ya seleccionados y filtra por texto de búsqueda. */
+  protected readonly filteredShips = computed(() => {
+    const search = this.shipQuery().toLowerCase();
+    const selectedIds = new Set(this.selectedShips().map((s) => s.id));
+    const available = this.shipsForFandom().filter((s) => !selectedIds.has(s.id));
+    if (!search) return available.slice(0, 30);
+    return available
+      .filter((s) => s.characters.join(' / ').toLowerCase().includes(search))
+      .slice(0, 30);
+  });
+
+  protected readonly canSubmit = computed(
+    () =>
+      !this.saving() &&
+      !this.loading() &&
+      !this.form.invalid &&
+      this.selectedFandoms().length > 0 &&
+      this.selectedShips().length > 0,
   );
-  protected displayShip = (v: NameableRef<Ship>) =>
-    typeof v === 'string' ? v : (v?.characters.join(' / ') ?? '');
 
   async ngOnInit(): Promise<void> {
     this.loading.set(true);
@@ -197,8 +209,6 @@ export class FanficFormModal implements OnInit {
     this.form.patchValue({
       title: fanfic.title,
       authors: fanfic.authors.join(', '),
-      fandomId: fanfic.fandom.id,
-      shipId: fanfic.ship.id,
       rating: fanfic.rating,
       words: fanfic.words,
       chapters: fanfic.chapters,
@@ -217,25 +227,24 @@ export class FanficFormModal implements OnInit {
       finishDate: toDate(fanfic.finishDate),
       notes: fanfic.notes ?? '',
     });
-    this.fandomSearchCtrl.setValue(fanfic.fandom, { emitEvent: false });
-    this.shipSearchCtrl.setValue(fanfic.ship, { emitEvent: false });
+    this.selectedFandoms.set(fanfic.fandoms);
+    this.selectedShips.set(fanfic.ships);
   }
 
-  // ---------- Fandom ----------
+  // ---------- Fandoms ----------
 
   protected onFandomSelected(event: MatAutocompleteSelectedEvent): void {
     const fandom = event.option.value as Fandom;
-    this.form.controls.fandomId.setValue(fandom.id);
-    // Al cambiar de fandom, el ship elegido deja de ser válido.
-    this.form.controls.shipId.setValue(null);
-    this.shipSearchCtrl.setValue(null);
+    this.selectedFandoms.update((list) =>
+      list.some((f) => f.id === fandom.id) ? list : [...list, fandom],
+    );
+    this.fandomSearchCtrl.setValue('');
   }
 
-  protected clearFandom(): void {
-    this.fandomSearchCtrl.setValue('');
-    this.form.controls.fandomId.setValue(null);
-    this.form.controls.shipId.setValue(null);
-    this.shipSearchCtrl.setValue(null);
+  protected removeFandom(fandom: Fandom): void {
+    this.selectedFandoms.update((list) => list.filter((f) => f.id !== fandom.id));
+    // Al quitar un fandom, los ships que pertenecían solo a él dejan de ser válidos.
+    this.selectedShips.update((list) => list.filter((s) => s.fandom.id !== fandom.id));
   }
 
   protected toggleQuickFandom(): void {
@@ -250,22 +259,23 @@ export class FanficFormModal implements OnInit {
     const value = this.quickFandomForm.getRawValue();
     const created = await this.fandomSrv.create({ name: value.name, origin: value.origin });
     this.fandoms.update((list) => [...list, created].sort((a, b) => a.name.localeCompare(b.name)));
-    this.fandomSearchCtrl.setValue(created);
-    this.form.controls.fandomId.setValue(created.id);
+    this.selectedFandoms.update((list) => [...list, created]);
     this.quickFandomForm.reset({ name: '', origin: '' });
     this.showQuickFandom.set(false);
   }
 
-  // ---------- Ship ----------
+  // ---------- Ships ----------
 
   protected onShipSelected(event: MatAutocompleteSelectedEvent): void {
     const ship = event.option.value as Ship;
-    this.form.controls.shipId.setValue(ship.id);
+    this.selectedShips.update((list) =>
+      list.some((s) => s.id === ship.id) ? list : [...list, ship],
+    );
+    this.shipSearchCtrl.setValue('');
   }
 
-  protected clearShip(): void {
-    this.shipSearchCtrl.setValue('');
-    this.form.controls.shipId.setValue(null);
+  protected removeShip(ship: Ship): void {
+    this.selectedShips.update((list) => list.filter((s) => s.id !== ship.id));
   }
 
   protected toggleQuickShip(): void {
@@ -273,27 +283,25 @@ export class FanficFormModal implements OnInit {
   }
 
   protected async createQuickShip(): Promise<void> {
-    const fandomId = this.form.controls.fandomId.value;
-    if (!fandomId || this.quickShipForm.invalid) {
+    if (this.quickShipForm.invalid) {
       this.quickShipForm.markAllAsTouched();
       return;
     }
     const value = this.quickShipForm.getRawValue();
     const created = await this.shipSrv.create({
       characters: toStringList(value.characters),
-      fandomId,
+      fandomId: value.fandomId!,
     });
     this.ships.update((list) => [...list, created]);
-    this.shipSearchCtrl.setValue(created);
-    this.form.controls.shipId.setValue(created.id);
-    this.quickShipForm.reset({ characters: '' });
+    this.selectedShips.update((list) => [...list, created]);
+    this.quickShipForm.reset({ characters: '', fandomId: null });
     this.showQuickShip.set(false);
   }
 
   // ---------- Guardar ----------
 
   protected async save(): Promise<void> {
-    if (this.form.invalid) {
+    if (!this.canSubmit()) {
       this.form.markAllAsTouched();
       return;
     }
@@ -302,8 +310,8 @@ export class FanficFormModal implements OnInit {
     const input: FanficInput = {
       title: raw.title!.trim(),
       authors: toStringList(raw.authors!),
-      fandomId: raw.fandomId!,
-      shipId: raw.shipId!,
+      fandomIds: this.selectedFandoms().map((f) => f.id),
+      shipIds: this.selectedShips().map((s) => s.id),
       rating: raw.rating!,
       words: raw.words!,
       chapters: raw.chapters!,
@@ -342,10 +350,4 @@ export class FanficFormModal implements OnInit {
   protected cancel(): void {
     this.dialogRef.close({ saved: false });
   }
-}
-
-function filterByName<T>(items: T[], query: NameableRef<T>, nameFn: (item: T) => string): T[] {
-  const search = (typeof query === 'string' ? query : query ? nameFn(query) : '').toLowerCase();
-  if (!search) return items.slice(0, 30);
-  return items.filter((item) => nameFn(item).toLowerCase().includes(search)).slice(0, 30);
 }
