@@ -131,7 +131,7 @@ export class FanficFormModal implements OnInit {
     chapters: [1, [Validators.required, Validators.min(1)]],
     pages: [null as number | null],
     readingStatus: [READING_STATUS.NOT_STARTED, Validators.required],
-    language: [LANGUAGE.ES, Validators.required],
+    language: [LANGUAGE.EN, Validators.required],
     triggerWarnings: [''],
     tags: [''],
     summary: [''],
