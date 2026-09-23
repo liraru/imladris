@@ -1,6 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +17,7 @@ import { EditorialService } from '../../../../services/editorial.service';
 import { Editorial } from '@shared/models';
 import { COUNTRY, COUNTRY_LABELS } from '../../../../shared/constants/countries.constant';
 import { FORM_MODE, FORM_MODE_LABELS } from '../../constants/management-form.constants';
+import { confirmDiscardChanges } from '../../../../shared/utils/confirm-discard.util';
 
 export interface EditorialFormModalData {
   mode: FORM_MODE;
@@ -41,6 +47,7 @@ export class EditorialFormModal implements OnInit {
   protected readonly data = inject<EditorialFormModalData>(MAT_DIALOG_DATA);
   private readonly _fb = inject(FormBuilder);
   private readonly _service = inject(EditorialService);
+  private readonly _dialog = inject(MatDialog);
 
   protected readonly FORM_MODE = FORM_MODE;
   protected readonly formModeLabels = FORM_MODE_LABELS;
@@ -103,7 +110,9 @@ export class EditorialFormModal implements OnInit {
     }
   }
 
-  protected cancel(): void {
-    this._dialogRef.close(false);
+  protected async cancel(): Promise<void> {
+    if (await confirmDiscardChanges(this._dialog, this.form)) {
+      this._dialogRef.close(false);
+    }
   }
 }

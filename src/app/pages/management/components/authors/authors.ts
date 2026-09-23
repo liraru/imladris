@@ -68,6 +68,7 @@ export class Authors implements OnInit {
     const ref = this._dialog.open(AuthorFormModal, {
       width: '480px',
       maxWidth: '95vw',
+      disableClose: true,
       data: { mode: FORM_MODE.ALTA } satisfies AuthorFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
@@ -78,6 +79,7 @@ export class Authors implements OnInit {
     const ref = this._dialog.open(AuthorFormModal, {
       width: '480px',
       maxWidth: '95vw',
+      disableClose: true,
       data: { mode: FORM_MODE.EDICION, author } satisfies AuthorFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());

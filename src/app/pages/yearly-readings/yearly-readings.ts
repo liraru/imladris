@@ -85,6 +85,7 @@ export class YearlyReadings implements OnInit {
 
     const ref = this._dialog.open(YearlyReadingsFormModal, {
       width: '560px',
+      disableClose: true,
       data: { year: this.selectedYear() } satisfies YearlyReadingsFormModalData,
     });
     const created = await firstValueFrom(ref.afterClosed());
@@ -99,6 +100,7 @@ export class YearlyReadings implements OnInit {
 
     const ref = this._dialog.open(YearlyReadingsFormModal, {
       width: '560px',
+      disableClose: true,
       data: { year: this.selectedYear(), reading } satisfies YearlyReadingsFormModalData,
     });
     const updated = await firstValueFrom(ref.afterClosed());

@@ -100,7 +100,10 @@
                     Leyendo
                   }
                 </p>
-                <p class="pages">{{ reading.pages | thousands }} pág.</p>
+                <p class="pages pages--count" matTooltip="Páginas">
+                  <mat-icon>auto_stories</mat-icon>
+                  {{ reading.pages | thousands }}
+                </p>
               </div>
               <p class="title">{{ reading.title }}</p>
               <p class="author">{{ reading.authors.join(', ') }}</p>
