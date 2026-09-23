@@ -5,7 +5,12 @@ import {
   MatAutocompleteSelectedEvent,
 } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -15,6 +20,7 @@ import { ReadingPlanService } from '../../../../services/reading-plan.service';
 import { BookService } from '../../../../services/book.service';
 import { MangaVolumeService } from '../../../../services/manga-volume.service';
 import { FanficService } from '../../../../services/fanfic.service';
+import { confirmDiscardChanges } from '../../../../shared/utils/confirm-discard.util';
 
 export interface ReadingPlanFormModalData {
   /** Posición que ocupará el nuevo elemento (último de la cola). Ignorado en edición. */
@@ -56,6 +62,7 @@ export class ReadingPlanFormModal implements OnInit {
   private readonly _bookService = inject(BookService);
   private readonly _mangaVolumeService = inject(MangaVolumeService);
   private readonly _fanficService = inject(FanficService);
+  private readonly _dialog = inject(MatDialog);
   protected readonly data = inject<ReadingPlanFormModalData>(MAT_DIALOG_DATA);
 
   protected readonly isEdit = !!this.data.item;
@@ -135,8 +142,10 @@ export class ReadingPlanFormModal implements OnInit {
     }
   }
 
-  protected cancel(): void {
-    this._dialogRef.close(false);
+  protected async cancel(): Promise<void> {
+    if (await confirmDiscardChanges(this._dialog, this.form)) {
+      this._dialogRef.close(false);
+    }
   }
 
   private async loadLibrarySuggestions(): Promise<void> {
