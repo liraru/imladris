@@ -47,6 +47,18 @@
   padding: 0 1.5rem 1.5rem;
 }
 
+/* Fila superior: badge de rating + kicker "Fanfic", ambos antes del título. */
+.fanfic-detail-modal__kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.15rem;
+}
+
+.fanfic-detail-modal__kicker-row .fanfic-detail-modal__kicker {
+  margin: 0;
+}
+
 .fanfic-detail-modal__kicker {
   margin: 0;
   text-transform: uppercase;

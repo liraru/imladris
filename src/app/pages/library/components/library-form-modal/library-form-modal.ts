@@ -15,7 +15,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -47,6 +47,7 @@ import {
 import { COUNTRY, COUNTRY_LABELS } from '../../../../shared/constants/countries.constant';
 import { FORM_MODE, FORM_MODE_LABELS } from '../../constants/library-form.constants';
 import { TYPE, TYPE_LABELS } from '../../constants/library.constants';
+import { confirmDiscardChanges } from '../../../../shared/utils/confirm-discard.util';
 
 export interface LibraryFormModalData {
   mode: FORM_MODE;
@@ -97,6 +98,7 @@ export class LibraryFormModal implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<LibraryFormModal, LibraryFormModalResult>);
   protected readonly data = inject<LibraryFormModalData>(MAT_DIALOG_DATA);
   private readonly fb = inject(FormBuilder);
+  private readonly _dialog = inject(MatDialog);
 
   private readonly authorSrv = inject(AuthorService);
   private readonly editorialSrv = inject(EditorialService);
@@ -551,7 +553,9 @@ export class LibraryFormModal implements OnInit {
     }
   }
 
-  protected cancel(): void {
-    this.dialogRef.close({ saved: false });
+  protected async cancel(): Promise<void> {
+    if (await confirmDiscardChanges(this._dialog, this.form)) {
+      this.dialogRef.close({ saved: false });
+    }
   }
 }

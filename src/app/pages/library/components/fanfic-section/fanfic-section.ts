@@ -88,7 +88,7 @@ export class FanficSection implements OnInit {
   private _openFormModal(data: FanficFormModalData): void {
     const ref = this._dialog.open<FanficFormModal, FanficFormModalData, FanficFormModalResult>(
       FanficFormModal,
-      { data, width: '760px', maxWidth: '95vw', autoFocus: false },
+      { data, width: '760px', maxWidth: '95vw', disableClose: true, autoFocus: false },
     );
     ref.afterClosed().subscribe((result) => {
       if (result?.saved) this._loadFanfics();

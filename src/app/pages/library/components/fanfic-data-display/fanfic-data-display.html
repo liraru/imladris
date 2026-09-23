@@ -44,9 +44,9 @@
           }
         </div>
         <div class="library-card__body">
+          <p class="library-card__fandom-tag">{{ fandomNames(item) }}</p>
           <h3 class="library-card__title" [matTooltip]="item.title">{{ item.title }}</h3>
-          <p class="library-card__author">{{ shipLabel(item) }}</p>
-          <p class="library-card__meta">{{ fandomNames(item) }}</p>
+          <p class="library-card__ship">{{ shipLabel(item) }}</p>
           <div class="library-card__footer">
             <p class="library-card__meta library-card__status">
               {{

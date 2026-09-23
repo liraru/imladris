@@ -184,9 +184,21 @@
 
 .book .pages {
   font-size: 0.85rem;
-  /* font-style: italic; */
   color: var(--text-muted);
   margin: 0;
+}
+
+/* Igual que .library-card__pages de las tarjetas de fanfic: icono + número, alineados en línea. */
+.pages--count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.pages--count mat-icon {
+  font-size: 0.9rem;
+  width: 0.9rem;
+  height: 0.9rem;
 }
 
 .book .end-date {

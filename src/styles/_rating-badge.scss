@@ -37,7 +37,7 @@
   cursor: default;
 }
 
-/* Ficha de detalle: debajo del título, antes de los autores */
+/* Ficha de detalle: ahora en línea con el kicker "Fanfic", delante del título (sin margen propio). */
 .fanfic-detail-modal__rating-badge {
-  margin: 0.15rem 0 0.65rem;
+  margin: 0;
 }

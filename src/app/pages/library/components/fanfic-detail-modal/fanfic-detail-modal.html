@@ -20,15 +20,17 @@
   </div>
 
   <div class="fanfic-detail-modal__body">
-    <p class="fanfic-detail-modal__kicker">Fanfic</p>
-    <h2 class="fanfic-detail-modal__title">{{ item.title }}</h2>
-    <div
-      class="rating-badge fanfic-detail-modal__rating-badge"
-      [style.--rating-color]="ratingColor"
-      [matTooltip]="ratingLabels[item.rating]"
-    >
-      {{ ratingShortLabel }}
+    <div class="fanfic-detail-modal__kicker-row">
+      <div
+        class="rating-badge fanfic-detail-modal__rating-badge"
+        [style.--rating-color]="ratingColor"
+        [matTooltip]="ratingLabels[item.rating]"
+      >
+        {{ ratingShortLabel }}
+      </div>
+      <p class="fanfic-detail-modal__kicker">Fanfic</p>
     </div>
+    <h2 class="fanfic-detail-modal__title">{{ item.title }}</h2>
     <p class="fanfic-detail-modal__author">{{ authorNames }}</p>
 
     <dl class="fanfic-detail-modal__facts">

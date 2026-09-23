@@ -16,7 +16,12 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -38,6 +43,7 @@ import {
 } from '@shared/constants';
 import { Fandom, Fanfic, Ship } from '@shared/models';
 import { FORM_MODE, FORM_MODE_LABELS } from '../../constants/library-form.constants';
+import { confirmDiscardChanges } from '../../../../shared/utils/confirm-discard.util';
 
 export interface FanficFormModalData {
   mode: FORM_MODE;
@@ -97,6 +103,7 @@ export class FanficFormModal implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<FanficFormModal, FanficFormModalResult>);
   protected readonly data = inject<FanficFormModalData>(MAT_DIALOG_DATA);
   private readonly fb = inject(FormBuilder);
+  private readonly _dialog = inject(MatDialog);
 
   private readonly fandomSrv = inject(FandomService);
   private readonly shipSrv = inject(ShipService);
@@ -393,7 +400,9 @@ export class FanficFormModal implements OnInit {
     }
   }
 
-  protected cancel(): void {
-    this.dialogRef.close({ saved: false });
+  protected async cancel(): Promise<void> {
+    if (await confirmDiscardChanges(this._dialog, this.form)) {
+      this.dialogRef.close({ saved: false });
+    }
   }
 }

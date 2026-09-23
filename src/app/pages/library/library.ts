@@ -206,6 +206,7 @@ export class Library implements OnInit {
         width: '760px',
         maxWidth: '95vw',
         autoFocus: false,
+        disableClose: true,
       },
     );
     ref.afterClosed().subscribe((result) => {

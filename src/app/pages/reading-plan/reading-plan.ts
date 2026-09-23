@@ -113,6 +113,7 @@ export class ReadingPlan implements OnInit {
     const ref = this._dialog.open(ReadingPlanFormModal, {
       width: '480px',
       maxWidth: '95vw',
+      disableClose: true,
       data: { nextOrder: this.items().length } satisfies ReadingPlanFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
@@ -123,6 +124,7 @@ export class ReadingPlan implements OnInit {
     const ref = this._dialog.open(ReadingPlanFormModal, {
       width: '480px',
       maxWidth: '95vw',
+      disableClose: true,
       data: { nextOrder: this.items().length, item } satisfies ReadingPlanFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
@@ -134,6 +136,7 @@ export class ReadingPlan implements OnInit {
     const ref = this._dialog.open(SendToYearlyReadingModal, {
       width: '420px',
       maxWidth: '95vw',
+      disableClose: true,
       data: { item } satisfies SendToYearlyReadingModalData,
     });
     const sent = await firstValueFrom(ref.afterClosed());

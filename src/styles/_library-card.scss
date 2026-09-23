@@ -132,6 +132,41 @@
   text-overflow: ellipsis;
 }
 
+/*
+ * Fanfic: fandom como etiqueta discreta encima del título; ship debajo del título,
+ * destacado en el color de acento y la misma familia itálica que el título (para que
+ * quede claro que es "la pareja" y no un dato secundario más). No se comparten con
+ * .library-card__author/.library-card__meta porque libro/manga siguen usando esas
+ * clases para autor real y metadatos genéricos.
+ */
+.library-card__fandom-tag {
+  align-self: flex-start;
+  max-width: 100%;
+  margin: 0 0 0.3rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.library-card__ship {
+  margin: 0 0 0.2rem;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--mat-sys-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Fila inferior de la tarjeta: estado de lectura (izquierda, se recorta si hace falta) + páginas (derecha, fija) */
 .library-card__footer {
   display: flex;
