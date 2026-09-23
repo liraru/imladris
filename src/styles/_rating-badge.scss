@@ -1,0 +1,43 @@
+// ============================================================
+// _rating-badge.scss
+// Badge de rating de fanfic, compartido entre la tarjeta de
+// galería (fanfic-data-display, dentro de .library-card) y la
+// ficha de detalle (fanfic-detail-modal). Vive en un partial
+// global (mismo motivo que _library-card.scss) para que ambos
+// puntos de uso queden sincronizados automáticamente.
+//
+// El color de acento llega por componente vía la variable CSS
+// `--rating-color` (fijada inline con [style.--rating-color]),
+// de verde (audiencia general) a rojo/vino (explícito) — ver
+// RATING_COLORS en rating.constant.ts.
+// ============================================================
+
+.rating-badge {
+  --rating-badge-bg: color-mix(
+    in srgb,
+    var(--rating-color, #6b6f78) 20%,
+    var(--mat-sys-surface-container)
+  );
+  --rating-badge-border: color-mix(in srgb, var(--rating-color, #6b6f78) 50%, transparent);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--rating-badge-bg);
+  border: 1px solid var(--rating-badge-border);
+  color: var(--rating-color, #6b6f78);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: default;
+}
+
+/* Ficha de detalle: debajo del título, antes de los autores */
+.fanfic-detail-modal__rating-badge {
+  margin: 0.15rem 0 0.65rem;
+}

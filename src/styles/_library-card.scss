@@ -56,6 +56,15 @@
   backdrop-filter: blur(2px);
 }
 
+/* Badge de rating: esquina opuesta al menú de opciones, superpuesto a la portada */
+.library-card__rating-badge {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  z-index: 1;
+  backdrop-filter: blur(2px);
+}
+
 /* Portada: tamaño de visualización fijo (2:3) y recorte, independiente del tamaño real de la imagen */
 .library-card__cover {
   width: 100%;
@@ -121,6 +130,35 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Fila inferior de la tarjeta: estado de lectura (izquierda, se recorta si hace falta) + páginas (derecha, fija) */
+.library-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+.library-card__footer .library-card__status {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.library-card__pages {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+}
+.library-card__pages mat-icon {
+  font-size: 0.9rem;
+  width: 0.9rem;
+  height: 0.9rem;
 }
 
 .library-menu-trigger {
