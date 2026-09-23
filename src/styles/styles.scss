@@ -1,3 +1,4 @@
+// src/styles/styles.scss
 @use '@angular/material' as mat;
 @use 'grid';
 @use 'library-card';
@@ -155,4 +156,50 @@ mat-card-title {
 
 *::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/* ============================================================
+ * Modales a pantalla completa en móvil.
+ * Cada dialog.open() fija su propio width/maxWidth (620px, 760px,
+ * 480px...), así que en móvil los sobreescribimos aquí en vez de
+ * tocar cada llamada. Se usa .mat-mdc-dialog-panel (clase que
+ * Angular Material añade automáticamente al overlay de CUALQUIER
+ * MatDialog) en vez de .cdk-overlay-pane a secas, para no afectar
+ * a selects, autocompletes ni menús, que comparten el mismo overlay.
+ * ============================================================ */
+@media (max-width: 767px) {
+  .cdk-overlay-pane.mat-mdc-dialog-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+  }
+
+  .mat-mdc-dialog-panel .mat-mdc-dialog-container {
+    height: 100%;
+  }
+
+  .mat-mdc-dialog-panel .mdc-dialog__surface {
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0 !important;
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mat-mdc-dialog-panel .mat-mdc-dialog-content {
+    flex: 1 1 auto;
+    max-height: none !important;
+  }
+
+  /* Excepciones puntuales: las fichas de detalle limitaban su alto
+     a 70vh pensando en una modal flotante; en pantalla completa
+     deben ocupar todo el alto disponible. */
+  .library-detail-modal,
+  .fanfic-detail-modal {
+    max-height: none !important;
+  }
 }
