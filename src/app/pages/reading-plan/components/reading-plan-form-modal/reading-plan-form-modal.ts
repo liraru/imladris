@@ -26,6 +26,11 @@ interface LibrarySuggestion {
   title: string;
   authors: string[];
   coverUrl?: string;
+  /**
+   * Solo disponible en sugerencias provenientes de fanfics: libros y tomos de manga no
+   * llevan un número de páginas propio en su ficha, así que para ellos queda `undefined`.
+   */
+  pages?: number;
 }
 
 @Component({
@@ -92,6 +97,9 @@ export class ReadingPlanFormModal implements OnInit {
       title: suggestion.title,
       authors: suggestion.authors.join(', '),
       coverUrl: suggestion.coverUrl ?? '',
+      // Los libros/manga no traen `pages` en la sugerencia (no la tienen en su ficha):
+      // en ese caso se conserva el valor que ya hubiera en el campo en vez de sobrescribirlo.
+      ...(suggestion.pages != null ? { pages: suggestion.pages } : {}),
     });
     this.librarySearchControl.setValue('', { emitEvent: false });
     this.filteredLibrarySuggestions.set(this._librarySuggestions());
@@ -154,6 +162,7 @@ export class ReadingPlanFormModal implements OnInit {
       title: f.title,
       authors: f.authors.map((a) => a),
       coverUrl: f.coverUrl,
+      pages: f.pages,
     }));
 
     const all = [...fromBooks, ...fromVolumes, ...fromFanfics];

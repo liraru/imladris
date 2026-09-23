@@ -102,7 +102,12 @@
 
 .fanfic-detail-modal__notes-text {
   margin: 0;
+  max-width: 100%;
   white-space: pre-wrap;
+  text-align: justify;
+  text-justify: inter-word;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .fanfic-detail-modal__links {

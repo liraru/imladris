@@ -3,6 +3,7 @@ import {
   Component,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -57,6 +58,16 @@ function toStringList(value: string): string[] {
     .split(',')
     .map((v) => v.trim())
     .filter(Boolean);
+}
+
+/**
+ * Páginas estimadas con la misma fórmula que usa la calculadora de Folio
+ * (`pages-calculator.component.ts`): (palabras ÷ 300) + (capítulos × 0.6).
+ */
+function calculatePages(words: number | null, chapters: number | null): number | null {
+  if (words == null || !Number.isFinite(words) || words < 0) return null;
+  if (chapters == null || !Number.isFinite(chapters) || chapters < 0) return null;
+  return Math.ceil(words / 300 + chapters * 0.6);
 }
 
 @Component({
@@ -132,7 +143,10 @@ export class FanficFormModal implements OnInit {
     rating: [RATING.NR, Validators.required],
     words: [0, [Validators.required, Validators.min(0)]],
     chapters: [1, [Validators.required, Validators.min(1)]],
-    pages: [null as number | null],
+    // Deshabilitado: las páginas ya no se introducen a mano, se calculan a partir de
+    // palabras y capítulos (ver `_syncCalculatedPages` más abajo). `disabled` hace que
+    // el usuario no pueda editarlo pero `getRawValue()` sigue incluyendo su valor al guardar.
+    pages: [{ value: null as number | null, disabled: true }],
     readingStatus: [READING_STATUS.NOT_STARTED, Validators.required],
     language: [LANGUAGE.EN, Validators.required],
     triggerWarnings: [''],
@@ -157,6 +171,25 @@ export class FanficFormModal implements OnInit {
    */
   private readonly formStatus = toSignal(this.form.statusChanges, {
     initialValue: this.form.status,
+  });
+
+  // ---------- Cálculo automático de páginas ----------
+
+  private readonly wordsValue = toSignal(this.form.controls.words.valueChanges, {
+    initialValue: this.form.controls.words.value,
+  });
+  private readonly chaptersValue = toSignal(this.form.controls.chapters.valueChanges, {
+    initialValue: this.form.controls.chapters.value,
+  });
+
+  /** Páginas estimadas a partir de `words`/`chapters` con la misma fórmula que la calculadora. */
+  protected readonly calculatedPages = computed(() =>
+    calculatePages(this.wordsValue(), this.chaptersValue()),
+  );
+
+  /** Mantiene el control (deshabilitado) `pages` sincronizado con `calculatedPages`. */
+  private readonly _syncCalculatedPages = effect(() => {
+    this.form.controls.pages.setValue(this.calculatedPages(), { emitEvent: false });
   });
 
   protected readonly fandomSearchCtrl = new FormControl('', { nonNullable: true });
@@ -223,7 +256,6 @@ export class FanficFormModal implements OnInit {
       rating: fanfic.rating,
       words: fanfic.words,
       chapters: fanfic.chapters,
-      pages: fanfic.pages ?? null,
       readingStatus: fanfic.readingStatus,
       language: fanfic.language,
       triggerWarnings: (fanfic.triggerWarnings ?? []).join(', '),
@@ -240,6 +272,9 @@ export class FanficFormModal implements OnInit {
     });
     this.selectedFandoms.set(fanfic.fandoms);
     this.selectedShips.set(fanfic.ships);
+    // No se incluye `pages` en el patchValue: el efecto `_syncCalculatedPages` lo recalcula
+    // automáticamente a partir de `words`/`chapters` en cuanto se aplican los cambios,
+    // sustituyendo cualquier valor de páginas guardado previamente.
   }
 
   // ---------- Fandoms ----------
