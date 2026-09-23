@@ -162,11 +162,19 @@ function applyFilters(items: Fanfic[], filters: FanficFilters): Fanfic[] {
   result = [...result].sort((a, b) => {
     const va = fieldValue(a, filters.sortBy);
     const vb = fieldValue(b, filters.sortBy);
-    if (va == null && vb == null) return 0;
-    if (va == null) return 1;
-    if (vb == null) return -1;
-    if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
-    return String(va).localeCompare(String(vb), 'es') * dir;
+
+    let primary = 0;
+    if (va == null && vb == null) primary = 0;
+    else if (va == null) primary = 1;
+    else if (vb == null) primary = -1;
+    else if (typeof va === 'number' && typeof vb === 'number') primary = va - vb;
+    else primary = String(va).localeCompare(String(vb), 'es');
+
+    if (primary !== 0) return primary * dir;
+
+    // Desempate estable: alfabético por título. Con el criterio de orden por defecto
+    // (fandom) esto produce el orden "fandom, título" pedido como orden base del listado.
+    return a.title.localeCompare(b.title, 'es');
   });
 
   return result;

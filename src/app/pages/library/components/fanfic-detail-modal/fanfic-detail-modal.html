@@ -36,8 +36,10 @@
 
       <dt>Palabras / Capítulos</dt>
       <dd>
-        {{ item.words | thousands }} / {{ item.chapters
-        }}{{ item.pages ? ' · ' + item.pages + ' pág.' : '' }}
+        {{ item.words | thousands }} / {{ item.chapters }}
+        @if (item.pages) {
+          · {{ item.pages | thousands }} pág.
+        }
       </dd>
 
       <dt>Idioma</dt>

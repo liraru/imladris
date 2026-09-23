@@ -22,5 +22,9 @@ export const FANFIC_SORT_FIELD_LABELS: Record<FANFIC_SORT_FIELD, string> = {
   [FANFIC_SORT_FIELD.ADQUISITION_DATE]: 'Fecha de adquisición',
 };
 
-export const DEFAULT_FANFIC_SORT: FANFIC_SORT_FIELD = FANFIC_SORT_FIELD.TITLE;
+/**
+ * Orden por defecto del listado: alfabético por fandom y, a igualdad de fandom, por título
+ * (el desempate por título se aplica en el comparador de `fanfic-section.ts`, no aquí).
+ */
+export const DEFAULT_FANFIC_SORT: FANFIC_SORT_FIELD = FANFIC_SORT_FIELD.FANDOM;
 export const DEFAULT_FANFIC_SORT_DIRECTION: 'asc' | 'desc' = 'asc';

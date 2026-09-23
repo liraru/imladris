@@ -177,8 +177,14 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="col-6 col-md-2">
-          <mat-label>Páginas (opcional)</mat-label>
-          <input matInput type="number" formControlName="pages" min="0" />
+          <mat-label>Páginas (calculado)</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="pages"
+            readonly
+            matTooltip="Se calcula automáticamente a partir de las palabras y los capítulos, con la misma fórmula que la calculadora"
+          />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="col-12 col-md-6">
