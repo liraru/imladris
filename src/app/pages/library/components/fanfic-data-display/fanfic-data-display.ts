@@ -5,7 +5,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RATING_LABELS, READING_STATUS, READING_STATUS_LABELS } from '@shared/constants';
+import {
+  RATING_COLORS,
+  RATING_LABELS,
+  RATING_SHORT_LABELS,
+  READING_STATUS,
+  READING_STATUS_LABELS,
+} from '@shared/constants';
 import { Fanfic } from '@shared/models';
 import { AuthService } from '../../../../services/auth.service';
 import { MODE } from '../../constants/library.constants';
@@ -72,6 +78,16 @@ export class FanficDataDisplay {
   /** Evita indexar `RATING_LABELS[item.rating]` directamente en la plantilla (falla el checker de Angular). */
   protected ratingLabel(item: Fanfic): string {
     return RATING_LABELS[item.rating];
+  }
+
+  /** Código corto (G/T/M/E/NR) mostrado en el badge de rating de la tarjeta de galería. */
+  protected ratingShortLabel(item: Fanfic): string {
+    return RATING_SHORT_LABELS[item.rating];
+  }
+
+  /** Color de acento del badge de rating: verde (audiencia general) → rojo (explícito). */
+  protected ratingColor(item: Fanfic): string {
+    return RATING_COLORS[item.rating];
   }
 
   /** Evita indexar `READING_STATUS_LABELS[item.readingStatus]` directamente en la plantilla. */
