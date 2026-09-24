@@ -1,7 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,6 +15,7 @@ import { ReadingPlanItem } from '@shared/models';
 import { YearlyReadingService } from '../../../../services/yearly-reading.service';
 import { ReadingPlanService } from '../../../../services/reading-plan.service';
 import { dateRangeValidator } from '../../../../shared/validators/date-range.validator';
+import { confirmDiscardChanges } from '../../../../shared/utils/confirm-discard.util';
 
 export interface SendToYearlyReadingModalData {
   item: ReadingPlanItem;
@@ -35,6 +41,7 @@ export class SendToYearlyReadingModal {
   private readonly _dialogRef = inject(MatDialogRef<SendToYearlyReadingModal>);
   private readonly _yearlyReadingService = inject(YearlyReadingService);
   private readonly _readingPlanService = inject(ReadingPlanService);
+  private readonly _dialog = inject(MatDialog);
   protected readonly data = inject<SendToYearlyReadingModalData>(MAT_DIALOG_DATA);
 
   protected readonly saving = signal(false);
@@ -75,8 +82,10 @@ export class SendToYearlyReadingModal {
     }
   }
 
-  protected cancel(): void {
-    this._dialogRef.close(false);
+  protected async cancel(): Promise<void> {
+    if (await confirmDiscardChanges(this._dialog, this.form)) {
+      this._dialogRef.close(false);
+    }
   }
 
   private _toDateString(date: Date | null): string | null {

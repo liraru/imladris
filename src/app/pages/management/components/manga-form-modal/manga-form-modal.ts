@@ -15,7 +15,12 @@ import {
 } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -32,6 +37,7 @@ import {
   GENRE_LABELS,
 } from '../../../../shared/constants/categories.constant';
 import { FORM_MODE, FORM_MODE_LABELS } from '../../constants/management-form.constants';
+import { confirmDiscardChanges } from '../../../../shared/utils/confirm-discard.util';
 
 export interface MangaFormModalData {
   mode: FORM_MODE;
@@ -68,6 +74,7 @@ export class MangaFormModal implements OnInit {
   private readonly _fb = inject(FormBuilder);
   private readonly _service = inject(MangaService);
   private readonly _authorSrv = inject(AuthorService);
+  private readonly _dialog = inject(MatDialog);
 
   protected readonly FORM_MODE = FORM_MODE;
   protected readonly formModeLabels = FORM_MODE_LABELS;
@@ -172,7 +179,9 @@ export class MangaFormModal implements OnInit {
     }
   }
 
-  protected cancel(): void {
-    this._dialogRef.close(false);
+  protected async cancel(): Promise<void> {
+    if (await confirmDiscardChanges(this._dialog, this.form)) {
+      this._dialogRef.close(false);
+    }
   }
 }
