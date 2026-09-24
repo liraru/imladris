@@ -77,6 +77,7 @@ export class Mangas implements OnInit {
     const ref = this._dialog.open(MangaFormModal, {
       width: '560px',
       maxWidth: '95vw',
+      disableClose: true,
       data: { mode: FORM_MODE.ALTA } satisfies MangaFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
@@ -87,6 +88,7 @@ export class Mangas implements OnInit {
     const ref = this._dialog.open(MangaFormModal, {
       width: '560px',
       maxWidth: '95vw',
+      disableClose: true,
       data: { mode: FORM_MODE.EDICION, manga } satisfies MangaFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
