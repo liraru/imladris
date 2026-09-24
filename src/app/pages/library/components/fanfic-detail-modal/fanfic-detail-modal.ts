@@ -52,6 +52,10 @@ export class FanficDetailModal {
   protected readonly ratingShortLabel = RATING_SHORT_LABELS[this.item.rating];
   protected readonly ratingColor = RATING_COLORS[this.item.rating];
 
+  constructor() {
+    console.log('pages: ', this.item.pages, typeof this.item.pages)
+  }
+
   protected get authorNames(): string {
     return this.item.authors.length ? this.item.authors.join(', ') : 'Autor desconocido';
   }

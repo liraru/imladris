@@ -43,12 +43,9 @@
       <dt>Rating</dt>
       <dd>{{ ratingLabels[item.rating] }}</dd>
 
-      <dt>Palabras / Capítulos</dt>
+      <dt>Páginas / Capítulos</dt>
       <dd>
-        {{ item.words | thousands }} / {{ item.chapters }}
-        @if (item.pages) {
-          · {{ item.pages | thousands }} pág.
-        }
+        {{ item.pages | thousands }} / {{ item.chapters }}
       </dd>
 
       <dt>Idioma</dt>
