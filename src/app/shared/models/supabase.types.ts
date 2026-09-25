@@ -4,12 +4,6 @@ import { COUNTRY } from '../constants/countries.constant';
 import { READING_STATUS } from '../constants/reading-status.constant';
 import { RATING } from '../constants/rating.constant';
 
-/**
- * Tipos "crudos" tal y como los devuelve/espera Supabase (columnas en snake_case).
- * Los servicios de src/app/shared/services se encargan de mapear estos tipos
- * a/desde las interfaces de dominio de src/app/shared/models.
- */
-
 export interface EditorialRow {
   id: number;
   name: string;
@@ -87,6 +81,15 @@ export interface YearlyReadingRow {
   start_date: string;
   end_date: string | null;
   cover_url: string | null;
+}
+
+export interface ReadingProgressRow {
+  id: number;
+  reading_id: number;
+  record_date: string;
+  page: number;
+  percentage: number;
+  pages_advanced: number;
 }
 
 export interface ReadingPlanRow {

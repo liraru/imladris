@@ -32,7 +32,6 @@ const DEFAULT_STATE: FolioState = {
 
 @Component({
   selector: 'app-pages-calculator',
-  standalone: true,
   imports: [
     FormsModule,
     MatButtonModule,

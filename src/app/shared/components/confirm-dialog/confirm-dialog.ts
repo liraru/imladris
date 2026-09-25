@@ -13,7 +13,6 @@ export interface ConfirmDialogData {
 
 @Component({
   selector: 'app-shared-confirm-dialog',
-  standalone: true,
   imports: [MatDialogModule, MatButtonModule],
   templateUrl: './confirm-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -32,6 +32,13 @@
     </a>
   </nav>
 
+  <section class="home__section">
+    <div class="home__section-header">
+      <h2>Actividad de lectura</h2>
+    </div>
+    <app-reading-heatmap />
+  </section>
+
   @if (loading()) {
     <div class="home__state">
       <mat-spinner diameter="36"></mat-spinner>
@@ -111,6 +118,10 @@
                   </div>
                 }
               </div>
+              <app-reading-progress-bar
+                class="home__card-progress"
+                [percentage]="progressByReadingId()[reading.id] ?? 0"
+              />
               <div class="home__card-body">
                 <h3 class="home__card-title" [matTooltip]="reading.title">{{ reading.title }}</h3>
                 <p class="home__card-author">
@@ -119,6 +130,17 @@
                 <p class="home__card-meta">
                   Empezado: {{ reading.startDate | date: 'dd/MM/yyyy' }}
                 </p>
+                @if (authService.isAdmin()) {
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="home__card-progress-btn"
+                    (click)="registerProgress(reading, $event)"
+                  >
+                    <mat-icon>edit_note</mat-icon>
+                    Registrar avance
+                  </button>
+                }
               </div>
             </article>
           }

@@ -1,0 +1,43 @@
+<div class="reading-heatmap">
+  <p class="reading-heatmap__title">
+    {{ totalPages() | number: '1.0-0' }} páginas leídas en el último año
+  </p>
+
+  @if (loading()) {
+    <div class="reading-heatmap__state">
+      <mat-spinner diameter="24"></mat-spinner>
+    </div>
+  } @else {
+    <div class="reading-heatmap__scroll">
+      <div class="reading-heatmap__months">
+        @for (m of monthLabels(); track m.weekIndex) {
+          <span class="reading-heatmap__month" [style.grid-column]="m.weekIndex + 1">{{
+            m.label
+          }}</span>
+        }
+      </div>
+      <div class="reading-heatmap__grid">
+        @for (week of weeks(); track $index) {
+          <div class="reading-heatmap__week">
+            @for (day of week; track day.date) {
+              <div
+                class="reading-heatmap__day"
+                [attr.data-level]="day.level"
+                [matTooltip]="dayTooltip(day) + ' · ' + (day.date | date: 'dd/MM/yyyy')"
+              ></div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+    <div class="reading-heatmap__legend">
+      <span>Menos</span>
+      <div class="reading-heatmap__day" data-level="0"></div>
+      <div class="reading-heatmap__day" data-level="1"></div>
+      <div class="reading-heatmap__day" data-level="2"></div>
+      <div class="reading-heatmap__day" data-level="3"></div>
+      <div class="reading-heatmap__day" data-level="4"></div>
+      <span>Más</span>
+    </div>
+  }
+</div>
