@@ -136,28 +136,31 @@ export class ReadingProgressService {
     throw new Error('Debe indicarse página o porcentaje.');
   }
 
-  /**
-   * Recalcula `pages_advanced` de todos los registros de una lectura tras un alta, edición
-   * o borrado, para que la cadena quede siempre consistente aunque el cambio afecte a un
-   * registro intermedio. Solo escribe las filas cuyo valor haya cambiado realmente.
-   */
   private async _recalculateChain(readingId: number): Promise<void> {
     const records = await this.getByReadingId(readingId);
-    const updates: Promise<unknown>[] = [];
+    const updates: Promise<void>[] = [];
     let previousPage = 0;
+
     for (const record of records) {
       const pagesAdvanced = record.page - previousPage;
+
       if (pagesAdvanced !== record.pagesAdvanced) {
         updates.push(
-          this.supabase
-            .from(this.table)
-            .update({ pages_advanced: pagesAdvanced })
-            .eq('id', record.id),
+          (async () => {
+            const { error } = await this.supabase
+              .from(this.table)
+              .update({ pages_advanced: pagesAdvanced })
+              .eq('id', record.id);
+
+            if (error) throw error;
+          })(),
         );
       }
+
       previousPage = record.page;
     }
-    if (updates.length) await Promise.all(updates);
+
+    await Promise.all(updates);
   }
 
   private async _getById(id: number): Promise<ReadingProgress | null> {
