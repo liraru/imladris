@@ -1,0 +1,122 @@
+.reading-detail-modal {
+  padding: 0;
+  max-height: 75vh;
+}
+.reading-detail-modal__close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  background: color-mix(in srgb, var(--mat-sys-surface) 70%, transparent);
+}
+.reading-detail-modal__cover {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  max-height: 260px;
+  overflow: hidden;
+  border-radius: var(--mat-sys-corner-medium, 10px);
+  background: var(--mat-sys-surface-container-high);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.reading-detail-modal__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.reading-detail-modal__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+.reading-detail-modal__placeholder mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+}
+.reading-detail-modal__body {
+  padding: 0 1.5rem 1.5rem;
+}
+.reading-detail-modal__kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  color: var(--mat-sys-primary);
+}
+.reading-detail-modal__title {
+  margin: 0.15rem 0 0.25rem;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+.reading-detail-modal__author {
+  margin: 0 0 1rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+.reading-detail-modal__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
+}
+.reading-detail-modal__facts dt {
+  color: var(--mat-sys-primary);
+  font-size: 0.85rem;
+}
+.reading-detail-modal__facts dd {
+  margin: 0;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.reading-detail-modal__progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
+}
+.reading-detail-modal__notes-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--mat-sys-primary);
+}
+.reading-detail-modal__empty {
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+.reading-detail-modal__state {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+.reading-detail-modal__table-wrap {
+  overflow-x: auto;
+}
+.reading-detail-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.reading-detail-modal__table th {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 500;
+  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
+}
+.reading-detail-modal__table td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 6%, transparent);
+}
+.reading-detail-modal__row-actions {
+  white-space: nowrap;
+  text-align: right;
+}

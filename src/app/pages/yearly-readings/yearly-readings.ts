@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
@@ -20,10 +21,20 @@ import {
   YearlyReadingsFormModal,
   YearlyReadingsFormModalData,
 } from './components/yearly-readings-form-modal/yearly-readings-form-modal';
+import {
+  ReadingDetailModal,
+  ReadingDetailModalData,
+} from './components/reading-detail-modal/reading-detail-modal';
 import { AuthService } from '../../services/auth.service';
 import { YearlyReadingService } from '../../services/yearly-reading.service';
+import { ReadingProgressService } from '../../services/reading-progress.service';
 import { YearlyReading } from '@shared/models';
 import { ThousandsPipe } from '../../shared/pipes/thousands.pipe';
+import { ReadingProgressBar } from '../../shared/components/reading-progress-bar/reading-progress-bar';
+import {
+  ReadingProgressFormModal,
+  ReadingProgressFormModalData,
+} from '../../shared/components/reading-progress-form-modal/reading-progress-form-modal';
 
 @Component({
   imports: [
@@ -31,9 +42,11 @@ import { ThousandsPipe } from '../../shared/pipes/thousands.pipe';
     DatePipe,
     MatIconModule,
     MatButtonModule,
+    MatMenuModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
     ThousandsPipe,
+    ReadingProgressBar,
   ],
   selector: 'app-yearly-readings',
   styleUrl: './yearly-readings.css',
@@ -42,6 +55,7 @@ import { ThousandsPipe } from '../../shared/pipes/thousands.pipe';
 })
 export class YearlyReadings implements OnInit {
   private readonly _service = inject(YearlyReadingService);
+  private readonly _readingProgressSrv = inject(ReadingProgressService);
   private readonly _dialog = inject(MatDialog);
 
   protected readonly authService = inject(AuthService);
@@ -50,6 +64,9 @@ export class YearlyReadings implements OnInit {
   protected readonly readings = signal<YearlyReading[]>([]);
   protected readonly availableYears = signal<number[]>([]);
   protected readonly loading = signal<boolean>(true);
+
+  /** Último porcentaje de avance registrado para cada lectura del año visible, por id. */
+  protected readonly progressByReadingId = signal<Record<number, number>>({});
 
   /** Referencia al bloque (título + estantería) que se captura como imagen. */
   protected readonly captureArea = viewChild<ElementRef<HTMLElement>>('captureArea');
@@ -107,6 +124,29 @@ export class YearlyReadings implements OnInit {
     if (updated) await this.loadReadings(this.selectedYear());
   }
 
+  /** "Ver detalle" e "Histórico de avances" del menú contextual abren la misma modal. */
+  protected openDetailModal(reading: YearlyReading, event: Event): void {
+    event.stopPropagation();
+    this._dialog.open(ReadingDetailModal, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: { reading } satisfies ReadingDetailModalData,
+    });
+  }
+
+  protected async registerProgress(reading: YearlyReading, event: Event): Promise<void> {
+    event.stopPropagation();
+    if (!this.authService.isAdmin()) return;
+
+    const ref = this._dialog.open(ReadingProgressFormModal, {
+      width: '480px',
+      disableClose: true,
+      data: { reading } satisfies ReadingProgressFormModalData,
+    });
+    const saved = await firstValueFrom(ref.afterClosed());
+    if (saved) await this._loadProgress();
+  }
+
   protected async deleteReading(reading: YearlyReading, event: Event): Promise<void> {
     event.stopPropagation();
     if (!this.authService.isAdmin()) return;
@@ -133,7 +173,6 @@ export class YearlyReadings implements OnInit {
     this.showCaptureHeader.set(true);
 
     try {
-      // Espera a que Angular pinte la cabecera de captura y el ancho ampliado antes de fotografiarlos.
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       const { default: html2canvas } = await import('html2canvas');
@@ -167,6 +206,7 @@ export class YearlyReadings implements OnInit {
     this.loading.set(true);
     try {
       this.readings.set(await this._service.getByYear(year));
+      await this._loadProgress();
     } finally {
       this.loading.set(false);
     }
@@ -181,5 +221,13 @@ export class YearlyReadings implements OnInit {
     } else {
       this.availableYears.set([this.selectedYear()]);
     }
+  }
+
+  /** Último porcentaje de avance de cada lectura del año visible, para la barra de progreso. */
+  private async _loadProgress(): Promise<void> {
+    const ids = this.readings().map((r) => r.id);
+    this.progressByReadingId.set(
+      ids.length ? await this._readingProgressSrv.getLatestPercentages(ids) : {},
+    );
   }
 }

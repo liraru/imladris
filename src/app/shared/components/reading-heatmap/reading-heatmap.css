@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+.reading-heatmap__title {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+.reading-heatmap__state {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+.reading-heatmap__scroll {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+.reading-heatmap__months,
+.reading-heatmap__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 12px;
+  gap: 3px;
+  min-width: max-content;
+}
+.reading-heatmap__months {
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+.reading-heatmap__week {
+  display: grid;
+  grid-template-rows: repeat(7, 12px);
+  gap: 3px;
+}
+.reading-heatmap__day {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
+}
+.reading-heatmap__day[data-level='1'] {
+  background: color-mix(in srgb, var(--mat-sys-primary) 30%, transparent);
+}
+.reading-heatmap__day[data-level='2'] {
+  background: color-mix(in srgb, var(--mat-sys-primary) 55%, transparent);
+}
+.reading-heatmap__day[data-level='3'] {
+  background: color-mix(in srgb, var(--mat-sys-primary) 75%, transparent);
+}
+.reading-heatmap__day[data-level='4'] {
+  background: var(--mat-sys-primary);
+}
+.reading-heatmap__legend {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+.reading-heatmap__legend .reading-heatmap__day {
+  width: 10px;
+  height: 10px;
+}

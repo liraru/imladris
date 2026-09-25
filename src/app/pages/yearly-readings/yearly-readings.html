@@ -1,3 +1,4 @@
+<!-- src/app/pages/yearly-readings/yearly-readings.html -->
 <section class="yearly-readings container">
   <header class="page-header">
     <div class="heading">
@@ -68,6 +69,44 @@
               @if (!reading.endDate) {
                 <span class="reading-badge">Leyendo</span>
               }
+
+              <button
+                mat-icon-button
+                class="menu-btn"
+                (click)="$event.stopPropagation()"
+                [matMenuTriggerFor]="readingMenu"
+                aria-label="Opciones"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #readingMenu="matMenu">
+                <button mat-menu-item type="button" (click)="openDetailModal(reading, $event)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Ver detalle</span>
+                </button>
+                @if (authService.isAdmin()) {
+                  <button mat-menu-item type="button" (click)="registerProgress(reading, $event)">
+                    <mat-icon>edit_note</mat-icon>
+                    <span>Registrar avance</span>
+                  </button>
+                }
+                <button mat-menu-item type="button" (click)="openDetailModal(reading, $event)">
+                  <mat-icon>history</mat-icon>
+                  <span>Histórico de avances</span>
+                </button>
+              </mat-menu>
+
+              @if (authService.isAdmin()) {
+                <button
+                  mat-icon-button
+                  class="delete-btn"
+                  (click)="deleteReading(reading, $event)"
+                  aria-label="Eliminar lectura"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+
               @if (reading.coverUrl) {
                 <img
                   [src]="reading.coverUrl"
@@ -80,17 +119,11 @@
                   <mat-icon>menu_book</mat-icon>
                 </div>
               }
-              @if (authService.isAdmin()) {
-                <button
-                  mat-icon-button
-                  class="delete-btn"
-                  (click)="deleteReading(reading, $event)"
-                  aria-label="Eliminar lectura"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              }
             </div>
+            <app-reading-progress-bar
+              class="book__progress"
+              [percentage]="progressByReadingId()[reading.id] ?? 0"
+            />
             <div class="caption">
               <div class="pages-row">
                 <p class="pages">

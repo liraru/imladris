@@ -1,0 +1,106 @@
+<button
+  mat-icon-button
+  type="button"
+  class="reading-detail-modal__close"
+  aria-label="Cerrar"
+  (click)="close()"
+>
+  <mat-icon>close</mat-icon>
+</button>
+
+<mat-dialog-content class="reading-detail-modal">
+  <div class="reading-detail-modal__cover">
+    @if (reading.coverUrl) {
+      <img [src]="reading.coverUrl" [alt]="'Portada de ' + reading.title" />
+    } @else {
+      <div class="reading-detail-modal__placeholder">
+        <mat-icon>auto_stories</mat-icon>
+      </div>
+    }
+  </div>
+
+  <div class="reading-detail-modal__body">
+    <p class="reading-detail-modal__kicker">Lectura {{ reading.year }}</p>
+    <h2 class="reading-detail-modal__title">{{ reading.title }}</h2>
+    <p class="reading-detail-modal__author">
+      {{ reading.authors.join(', ') || 'Autor desconocido' }}
+    </p>
+
+    <dl class="reading-detail-modal__facts">
+      <dt>Páginas</dt>
+      <dd>{{ reading.pages | thousands }}</dd>
+
+      <dt>Inicio</dt>
+      <dd>{{ reading.startDate | date: 'dd/MM/yyyy' }}</dd>
+
+      <dt>Fin</dt>
+      <dd>{{ reading.endDate ? (reading.endDate | date: 'dd/MM/yyyy') : 'Leyendo' }}</dd>
+    </dl>
+
+    <div class="reading-detail-modal__progress-header">
+      <p class="reading-detail-modal__notes-label">Histórico de avances</p>
+      @if (authService.isAdmin()) {
+        <button mat-stroked-button type="button" (click)="registerProgress()">
+          <mat-icon>add</mat-icon>
+          Registrar avance
+        </button>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="reading-detail-modal__state">
+        <mat-spinner diameter="28"></mat-spinner>
+      </div>
+    } @else if (records().length === 0) {
+      <p class="reading-detail-modal__empty">Todavía no hay avances registrados.</p>
+    } @else {
+      <div class="reading-detail-modal__table-wrap">
+        <table class="reading-detail-modal__table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Página</th>
+              <th>%</th>
+              <th>Avance</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (record of records(); track record.id) {
+              <tr>
+                <td>{{ record.recordDate | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ record.page | thousands }}</td>
+                <td>{{ record.percentage }}%</td>
+                <td>+{{ record.pagesAdvanced | thousands }}</td>
+                <td class="reading-detail-modal__row-actions">
+                  @if (authService.isAdmin()) {
+                    <button
+                      mat-icon-button
+                      type="button"
+                      matTooltip="Editar"
+                      (click)="editRecord(record)"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      matTooltip="Eliminar"
+                      (click)="deleteRecord(record, $event)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Cerrar</button>
+</mat-dialog-actions>

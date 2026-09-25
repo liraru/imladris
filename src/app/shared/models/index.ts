@@ -9,3 +9,4 @@ export * from './reading-plan.interface';
 export * from './fandom.interface';
 export * from './ship.interface';
 export * from './fanfic.interface';
+export * from './reading-progress.interface';

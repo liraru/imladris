@@ -261,3 +261,20 @@
     justify-content: center;
   }
 }
+
+/* src/app/pages/home/home.css — añadir al final */
+.home__card-progress {
+  padding: 0 0.75rem;
+  margin-top: 0.375rem;
+}
+.home__card-progress-btn {
+  margin-top: 0.375rem;
+  align-self: flex-start;
+  font-size: 0.72rem;
+}
+.home__card-progress-btn mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.2rem;
+}

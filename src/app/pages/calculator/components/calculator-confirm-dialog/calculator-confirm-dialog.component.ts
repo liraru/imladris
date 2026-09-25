@@ -13,7 +13,6 @@ export interface CalculatorConfirmDialogData {
 
 @Component({
   selector: 'app-confirm-dialog',
-  standalone: true,
   imports: [MatDialogModule, MatButtonModule],
   templateUrl: './calculator-confirm-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

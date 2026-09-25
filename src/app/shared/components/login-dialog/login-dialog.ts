@@ -10,7 +10,6 @@ import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login-dialog',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     MatButtonModule,

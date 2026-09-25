@@ -1,0 +1,65 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar avance' : 'Registrar avance' }}</h2>
+
+<mat-dialog-content>
+  <p class="reading-progress-form-modal__subtitle">{{ data.reading.title }}</p>
+
+  @if (error()) {
+    <p class="reading-progress-form-modal__error">{{ error() }}</p>
+  }
+
+  <form [formGroup]="form" class="reading-progress-form-modal__form">
+    <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+      <mat-label>Fecha</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="recordDate" />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+      <mat-label>Página</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="page"
+        min="0"
+        [max]="data.reading.pages"
+        (input)="onPageInput()"
+      />
+      <span matSuffix>/ {{ data.reading.pages }}</span>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+      <mat-label>Porcentaje</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="percentage"
+        min="0"
+        max="100"
+        (input)="onPercentageInput()"
+      />
+      <span matSuffix>%</span>
+    </mat-form-field>
+
+    <p class="reading-progress-form-modal__hint">
+      Introduce página o porcentaje: el otro valor se calcula automáticamente.
+    </p>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button
+    mat-flat-button
+    type="button"
+    color="primary"
+    [disabled]="form.invalid || saving()"
+    (click)="save()"
+  >
+    @if (saving()) {
+      <mat-spinner diameter="18"></mat-spinner>
+    } @else {
+      Guardar
+    }
+  </button>
+</mat-dialog-actions>

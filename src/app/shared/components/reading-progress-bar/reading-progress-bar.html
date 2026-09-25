@@ -1,0 +1,9 @@
+<div
+  class="reading-progress-bar"
+  role="progressbar"
+  [attr.aria-valuenow]="clamped"
+  aria-valuemin="0"
+  aria-valuemax="100"
+>
+  <div class="reading-progress-bar__fill" [style.width.%]="clamped"></div>
+</div>
