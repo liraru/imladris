@@ -6,6 +6,9 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,7 +22,10 @@ import { MangaVolumeService } from '../../services/manga-volume.service';
 import { YearlyReadingService } from '../../services/yearly-reading.service';
 import { fromBook, fromMangaVolume, HOME_ITEM_TYPE, HomeItem } from './models/home-item.model';
 
-const RECENT_COUNT = 5;
+/** Nº máximo de entradas por sección en escritorio. */
+const DESKTOP_RECENT_COUNT = 5;
+/** Nº máximo de entradas por sección en móvil. */
+const MOBILE_RECENT_COUNT = 4;
 
 @Component({
   selector: 'app-home',
@@ -46,10 +52,33 @@ export class Home implements OnInit {
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
-  /** Últimas lecturas finalizadas, provienen de Lecturas anuales, ya ordenadas por el servicio. */
+  /** true por debajo de 768px, igual que el resto de la app (navbar, gestión, etc.). */
+  protected readonly isMobile = toSignal(
+    inject(BreakpointObserver)
+      .observe('(max-width: 767px)')
+      .pipe(map((result) => result.matches)),
+    { initialValue: false },
+  );
+
+  /** Nº de entradas a mostrar por sección según el tamaño de pantalla actual. */
+  protected readonly recentCount = computed(() =>
+    this.isMobile() ? MOBILE_RECENT_COUNT : DESKTOP_RECENT_COUNT,
+  );
+
+  /**
+   * Últimas lecturas finalizadas (hasta DESKTOP_RECENT_COUNT), provienen de Lecturas
+   * anuales, ya ordenadas por el servicio. Se piden siempre al máximo de escritorio
+   * para no volver a llamar al servicio al cambiar de breakpoint; el recorte a mostrar
+   * se hace en `lastReadingsToShow`.
+   */
   protected readonly lastReadings = signal<YearlyReading[]>([]);
 
-  /** Lecturas actualmente en curso (sin fecha de fin), más recientes primero. */
+  /** Últimas lecturas recortadas al nº de entradas correspondiente al breakpoint actual. */
+  protected readonly lastReadingsToShow = computed(() =>
+    this.lastReadings().slice(0, this.recentCount()),
+  );
+
+  /** Lecturas actualmente en curso (sin fecha de fin), más recientes primero. Sin límite. */
   protected readonly readingNow = signal<YearlyReading[]>([]);
 
   private readonly _additions = signal<HomeItem[]>([]);
@@ -59,7 +88,7 @@ export class Home implements OnInit {
     [...this._additions()]
       .filter((item) => !!item.adquisitionDate)
       .sort((a, b) => (b.adquisitionDate ?? '').localeCompare(a.adquisitionDate ?? ''))
-      .slice(0, RECENT_COUNT),
+      .slice(0, this.recentCount()),
   );
 
   ngOnInit(): void {
@@ -75,7 +104,7 @@ export class Home implements OnInit {
     this.error.set(null);
     try {
       const [readings, readingNow, books, mangaVolumes] = await Promise.all([
-        this._yearlyReadingSrv.getRecent(RECENT_COUNT),
+        this._yearlyReadingSrv.getRecent(DESKTOP_RECENT_COUNT),
         this._yearlyReadingSrv.getInProgress(),
         this._bookSrv.getAll(),
         this._mangaVolumeSrv.getAll(),

@@ -50,11 +50,11 @@
         >
       </div>
 
-      @if (lastReadings().length === 0) {
+      @if (lastReadingsToShow().length === 0) {
         <p class="home__empty">Todavía no has marcado ninguna lectura como finalizada.</p>
       } @else {
         <div class="home__card-grid">
-          @for (reading of lastReadings(); track reading.id) {
+          @for (reading of lastReadingsToShow(); track reading.id) {
             <article class="home__card">
               <div class="home__card-cover">
                 @if (reading.coverUrl) {
