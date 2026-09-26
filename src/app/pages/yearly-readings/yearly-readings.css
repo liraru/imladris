@@ -45,14 +45,6 @@
   padding: 1rem 0;
 }
 
-/*
- * Solo activa mientras se genera la imagen (downloadYearImage). El contenedor
- * crece a lo ancho (width: max-content) para alojar 7 columnas fijas del mismo
- * ancho que en la vista normal (220px), en vez de encoger las carátulas para
- * que quepan en el ancho disponible del contenedor (limitado por .container).
- * windowWidth en downloadYearImage() se calcula a partir de este ancho ya
- * renderizado para que html2canvas no recorte el resultado.
- */
 .capture-area--capturing {
   width: max-content;
   padding: 3rem;
@@ -92,6 +84,7 @@
 }
 
 .book {
+  position: relative;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -142,41 +135,6 @@
     0 0 24px -4px var(--gold-glow);
 }
 
-.delete-btn {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  background: rgba(13, 13, 18, 0.6);
-  color: var(--text-muted);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.menu-btn {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  z-index: 1;
-  background: rgba(13, 13, 18, 0.6);
-  color: var(--text-muted);
-}
-
-.delete-btn {
-  right: 2.25rem;
-}
-
-.book__progress {
-  margin-top: 0.5rem;
-}
-
-.book:hover .delete-btn {
-  opacity: 1;
-}
-
-.delete-btn:hover {
-  color: #ff8a80;
-}
-
 .book .caption {
   margin-top: 0.9rem;
   text-align: left;
@@ -205,7 +163,6 @@
   margin: 0;
 }
 
-/* Igual que .library-card__pages de las tarjetas de fanfic: icono + número, alineados en línea. */
 .pages--count {
   display: inline-flex;
   align-items: center;
@@ -245,10 +202,6 @@
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1.75rem 1rem;
   }
-}
-
-.book--readonly {
-  cursor: default;
 }
 
 .pages-row {

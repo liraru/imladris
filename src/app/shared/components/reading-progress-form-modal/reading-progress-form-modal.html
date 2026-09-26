@@ -1,45 +1,63 @@
 <h2 mat-dialog-title>{{ isEdit ? 'Editar avance' : 'Registrar avance' }}</h2>
 
-<mat-dialog-content>
-  <p class="reading-progress-form-modal__subtitle">{{ data.reading.title }}</p>
+<mat-dialog-content class="reading-progress-form-modal">
+  <p class="reading-progress-form-modal__subtitle" [matTooltip]="data.reading.title">
+    {{ data.reading.title }}
+  </p>
 
   @if (error()) {
     <p class="reading-progress-form-modal__error">{{ error() }}</p>
   }
 
   <form [formGroup]="form" class="reading-progress-form-modal__form">
-    <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+    <mat-form-field
+      appearance="outline"
+      class="reading-progress-form-modal__field reading-progress-form-modal__field--date"
+    >
       <mat-label>Fecha</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="recordDate" />
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="recordDate"
+        [min]="minDate"
+        [max]="maxDate"
+      />
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
+      @if (form.controls.recordDate.hasError('beforeStart')) {
+        <mat-error>No puede ser anterior al inicio de la lectura.</mat-error>
+      } @else if (form.controls.recordDate.hasError('afterEnd')) {
+        <mat-error>No puede ser posterior al fin de la lectura.</mat-error>
+      }
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
-      <mat-label>Página</mat-label>
-      <input
-        matInput
-        type="number"
-        formControlName="page"
-        min="0"
-        [max]="data.reading.pages"
-        (input)="onPageInput()"
-      />
-      <span matSuffix>/ {{ data.reading.pages }}</span>
-    </mat-form-field>
+    <div class="reading-progress-form-modal__row">
+      <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+        <mat-label>Página</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="page"
+          min="0"
+          [max]="data.reading.pages"
+          (input)="onPageInput()"
+        />
+        <span matSuffix>/ {{ data.reading.pages }}</span>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
-      <mat-label>Porcentaje</mat-label>
-      <input
-        matInput
-        type="number"
-        formControlName="percentage"
-        min="0"
-        max="100"
-        (input)="onPercentageInput()"
-      />
-      <span matSuffix>%</span>
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+        <mat-label>Porcentaje</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="percentage"
+          min="0"
+          max="100"
+          (input)="onPercentageInput()"
+        />
+        <span matSuffix>%</span>
+      </mat-form-field>
+    </div>
 
     <p class="reading-progress-form-modal__hint">
       Introduce página o porcentaje: el otro valor se calcula automáticamente.

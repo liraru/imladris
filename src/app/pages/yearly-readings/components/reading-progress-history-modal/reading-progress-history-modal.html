@@ -1,0 +1,77 @@
+<h2 mat-dialog-title>Histórico de avances</h2>
+
+<mat-dialog-content class="reading-progress-history-modal">
+  <p class="reading-progress-history-modal__subtitle" [matTooltip]="reading.title">
+    {{ reading.title }}
+  </p>
+
+  @if (authService.isAdmin()) {
+    <button
+      mat-stroked-button
+      type="button"
+      class="reading-progress-history-modal__add-btn"
+      (click)="registerProgress()"
+    >
+      <mat-icon>add</mat-icon>
+      Registrar avance
+    </button>
+  }
+
+  @if (loading()) {
+    <div class="reading-progress-history-modal__state">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else if (records().length === 0) {
+    <p class="reading-progress-history-modal__empty">Todavía no hay avances registrados.</p>
+  } @else {
+    <div class="reading-progress-history-modal__table-wrap">
+      <table class="reading-progress-history-modal__table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Página</th>
+            <th>%</th>
+            <th>Avance</th>
+            @if (authService.isAdmin()) {
+              <th></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (record of records(); track record.id) {
+            <tr>
+              <td>{{ record.recordDate | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ record.page | thousands }}</td>
+              <td>{{ record.percentage }}%</td>
+              <td>+{{ record.pagesAdvanced | thousands }}</td>
+              @if (authService.isAdmin()) {
+                <td class="reading-progress-history-modal__row-actions">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    matTooltip="Editar"
+                    (click)="editRecord(record)"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    matTooltip="Eliminar"
+                    (click)="deleteRecord(record)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Cerrar</button>
+</mat-dialog-actions>

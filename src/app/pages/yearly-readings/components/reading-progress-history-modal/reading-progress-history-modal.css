@@ -1,0 +1,46 @@
+.reading-progress-history-modal {
+  max-height: 70vh;
+}
+.reading-progress-history-modal__subtitle {
+  margin: 0 0 1rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reading-progress-history-modal__add-btn {
+  margin-bottom: 1rem;
+}
+.reading-progress-history-modal__state {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+.reading-progress-history-modal__empty {
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+.reading-progress-history-modal__table-wrap {
+  overflow-x: auto;
+}
+.reading-progress-history-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.reading-progress-history-modal__table th {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 500;
+  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
+}
+.reading-progress-history-modal__table td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 6%, transparent);
+}
+.reading-progress-history-modal__row-actions {
+  white-space: nowrap;
+  text-align: right;
+}
