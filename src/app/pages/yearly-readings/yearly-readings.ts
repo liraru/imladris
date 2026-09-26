@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -24,7 +25,12 @@ import {
 import {
   ReadingDetailModal,
   ReadingDetailModalData,
+  ReadingDetailModalResult,
 } from './components/reading-detail-modal/reading-detail-modal';
+import {
+  ReadingProgressHistoryModal,
+  ReadingProgressHistoryModalData,
+} from './components/reading-progress-history-modal/reading-progress-history-modal';
 import { AuthService } from '../../services/auth.service';
 import { YearlyReadingService } from '../../services/yearly-reading.service';
 import { ReadingProgressService } from '../../services/reading-progress.service';
@@ -42,6 +48,7 @@ import {
     DatePipe,
     MatIconModule,
     MatButtonModule,
+    MatDividerModule,
     MatMenuModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
@@ -68,18 +75,8 @@ export class YearlyReadings implements OnInit {
   /** Último porcentaje de avance registrado para cada lectura del año visible, por id. */
   protected readonly progressByReadingId = signal<Record<number, number>>({});
 
-  /** Referencia al bloque (título + estantería) que se captura como imagen. */
   protected readonly captureArea = viewChild<ElementRef<HTMLElement>>('captureArea');
-
-  /** Evita clics repetidos mientras se genera la imagen. */
   protected readonly capturing = signal<boolean>(false);
-
-  /**
-   * Controla si la cabecera de texto (título + resumen) dentro del área de captura
-   * está visible. Permanece oculta en la página normal (display:none) y solo se
-   * muestra durante la ventana de tiempo en la que se genera el canvas, porque
-   * html2canvas no captura elementos con display:none.
-   */
   protected readonly showCaptureHeader = signal<boolean>(false);
 
   protected readonly totalPages = computed(() =>
@@ -124,18 +121,26 @@ export class YearlyReadings implements OnInit {
     if (updated) await this.loadReadings(this.selectedYear());
   }
 
-  /** "Ver detalle" e "Histórico de avances" del menú contextual abren la misma modal. */
-  protected openDetailModal(reading: YearlyReading, event: Event): void {
-    event.stopPropagation();
-    this._dialog.open(ReadingDetailModal, {
+  /** Se abre al clicar la tarjeta o desde "Ver detalle" del menú; "Editar" dentro de la ficha reenvía a la edición. */
+  protected async openDetailModal(reading: YearlyReading): Promise<void> {
+    const ref = this._dialog.open<
+      ReadingDetailModal,
+      ReadingDetailModalData,
+      ReadingDetailModalResult
+    >(ReadingDetailModal, { width: '640px', maxWidth: '95vw', data: { reading } });
+    const result = await firstValueFrom(ref.afterClosed());
+    if (result?.edit) await this.openEditModal(reading);
+  }
+
+  protected openHistoryModal(reading: YearlyReading): void {
+    this._dialog.open(ReadingProgressHistoryModal, {
       width: '640px',
       maxWidth: '95vw',
-      data: { reading } satisfies ReadingDetailModalData,
+      data: { reading } satisfies ReadingProgressHistoryModalData,
     });
   }
 
-  protected async registerProgress(reading: YearlyReading, event: Event): Promise<void> {
-    event.stopPropagation();
+  protected async registerProgress(reading: YearlyReading): Promise<void> {
     if (!this.authService.isAdmin()) return;
 
     const ref = this._dialog.open(ReadingProgressFormModal, {
@@ -147,22 +152,13 @@ export class YearlyReadings implements OnInit {
     if (saved) await this._loadProgress();
   }
 
-  protected async deleteReading(reading: YearlyReading, event: Event): Promise<void> {
-    event.stopPropagation();
+  protected async deleteReading(reading: YearlyReading): Promise<void> {
     if (!this.authService.isAdmin()) return;
     if (!confirm(`¿Eliminar "${reading.title}" del historial?`)) return;
     await this._service.remove(reading.id);
     await this.loadReadings(this.selectedYear());
   }
 
-  /**
-   * Genera una imagen PNG del año seleccionado (título + portadas) y la descarga.
-   * Solo disponible para el usuario administrador logeado. Durante la captura, el
-   * contenedor crece a lo ancho (ver `.capture-area--capturing` en el CSS) para
-   * alojar 7 carátulas al mismo tamaño que en la vista normal, en vez de encogerlas
-   * para caber en el ancho de pantalla. `windowWidth` se calcula a partir del ancho
-   * ya renderizado para que html2canvas no recorte el resultado.
-   */
   protected async downloadYearImage(): Promise<void> {
     if (!this.authService.isAdmin() || this.capturing()) return;
 

@@ -1,17 +1,45 @@
+:host {
+  display: block;
+}
+
 .reading-progress-form-modal__subtitle {
-  margin: -0.5rem 0 1rem;
+  margin: 0 0 1rem;
   color: var(--mat-sys-on-surface-variant);
   font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.reading-progress-form-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reading-progress-form-modal__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 .reading-progress-form-modal__field {
   width: 100%;
 }
+
 .reading-progress-form-modal__hint {
   margin: -0.5rem 0 0.5rem;
   font-size: 0.8rem;
   color: var(--mat-sys-on-surface-variant);
 }
+
 .reading-progress-form-modal__error {
   color: var(--mat-sys-error, #e08585);
   margin-bottom: 0.5rem;
+}
+
+@media (max-width: 575px) {
+  .reading-progress-form-modal__row {
+    grid-template-columns: 1fr;
+  }
 }

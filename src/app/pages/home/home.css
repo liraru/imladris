@@ -6,8 +6,6 @@
   padding-block: 1.5rem 3rem;
 }
 
-/* ---------- Hero ---------- */
-
 .home__hero {
   display: flex;
   flex-direction: column;
@@ -45,8 +43,6 @@
   margin-right: 0.25rem;
 }
 
-/* ---------- Accesos rápidos ---------- */
-
 .home__quick-links {
   display: flex;
   flex-wrap: wrap;
@@ -81,8 +77,6 @@
   border-color: color-mix(in srgb, var(--mat-sys-primary) 45%, transparent);
   background: var(--mat-sys-surface-container-high);
 }
-
-/* ---------- Secciones ---------- */
 
 .home__section {
   margin-bottom: 3rem;
@@ -133,15 +127,6 @@
   color: #e08585;
 }
 
-/* ---------- Tarjetas: mismo tamaño/estilo para lecturas e incorporaciones ----------
-   Se usa flex en lugar de grid para que, cuando la última fila no se llene, el hueco
-   quede centrado en vez de pegado a la izquierda.
-   El breakpoint de escritorio calcula 5 columnas porque en escritorio se muestran hasta
-   DESKTOP_RECENT_COUNT = 5 entradas (home.ts): así, cuando hay 5 elementos, la fila
-   ocupa el mismo ancho que la cabecera de la sección y título/enlace quedan alineados
-   con las esquinas de las portadas. En móvil se muestran hasta MOBILE_RECENT_COUNT = 4,
-   pero el grid ya es fluido (flex-wrap) y no necesita un breakpoint dedicado para eso. */
-
 .home__card-grid {
   display: flex;
   flex-wrap: wrap;
@@ -150,6 +135,7 @@
 }
 
 .home__card {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 0 0 calc(50% - 0.5rem);
@@ -187,6 +173,7 @@
 }
 
 .home__card-cover {
+  position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
@@ -247,8 +234,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* ---------- Responsive ---------- */
 
 @media (max-width: 575px) {
   .home__quick-links {

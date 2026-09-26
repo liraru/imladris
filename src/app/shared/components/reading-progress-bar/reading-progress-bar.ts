@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-reading-progress-bar',
+  imports: [],
   templateUrl: './reading-progress-bar.html',
   styleUrl: './reading-progress-bar.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
