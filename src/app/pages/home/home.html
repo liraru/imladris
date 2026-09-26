@@ -32,8 +32,8 @@
     </a>
   </nav>
 
-  <section class="home__section">
-    <div class="home__section-header">
+  <section class="home__section home__section--centered">
+    <div class="home__section-header home__section-header--centered">
       <h2>Actividad de lectura</h2>
     </div>
     <app-reading-heatmap />
@@ -63,18 +63,18 @@
         <div class="home__card-grid">
           @for (reading of readingNow(); track reading.id) {
             <article class="home__card">
-              @if (authService.isAdmin()) {
-                <button
-                  mat-icon-button
-                  class="library-card__menu-trigger library-menu-trigger"
-                  type="button"
-                  matTooltip="Registrar avance"
-                  (click)="registerProgress(reading, $event)"
-                >
-                  <mat-icon>edit_note</mat-icon>
-                </button>
-              }
               <div class="home__card-cover">
+                @if (authService.isAdmin()) {
+                  <button
+                    mat-icon-button
+                    class="library-card__menu-trigger library-menu-trigger"
+                    type="button"
+                    matTooltip="Registrar avance"
+                    (click)="registerProgress(reading, $event)"
+                  >
+                    <mat-icon>edit_note</mat-icon>
+                  </button>
+                }
                 @if (reading.coverUrl) {
                   <img
                     [src]="reading.coverUrl"

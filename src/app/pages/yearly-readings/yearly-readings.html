@@ -61,49 +61,49 @@
       <div class="shelf">
         @for (reading of readings(); track reading.id) {
           <article class="book" (click)="openDetailModal(reading)">
-            @if (!reading.endDate) {
-              <span class="reading-badge">Leyendo</span>
-            }
-
-            <button
-              mat-icon-button
-              class="library-card__menu-trigger library-menu-trigger"
-              type="button"
-              (click)="$event.stopPropagation()"
-              [matMenuTriggerFor]="readingMenu"
-              aria-label="Opciones"
-            >
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #readingMenu="matMenu">
-              <button mat-menu-item type="button" (click)="openDetailModal(reading)">
-                <mat-icon>visibility</mat-icon>
-                <span>Ver detalle</span>
-              </button>
-              @if (authService.isAdmin()) {
-                <button mat-menu-item type="button" (click)="openEditModal(reading)">
-                  <mat-icon>edit</mat-icon>
-                  <span>Editar</span>
-                </button>
-                <button mat-menu-item type="button" (click)="registerProgress(reading)">
-                  <mat-icon>edit_note</mat-icon>
-                  <span>Registrar avance</span>
-                </button>
-              }
-              <button mat-menu-item type="button" (click)="openHistoryModal(reading)">
-                <mat-icon>history</mat-icon>
-                <span>Histórico de avances</span>
-              </button>
-              @if (authService.isAdmin()) {
-                <mat-divider></mat-divider>
-                <button mat-menu-item type="button" (click)="deleteReading(reading)">
-                  <mat-icon>delete</mat-icon>
-                  <span>Eliminar</span>
-                </button>
-              }
-            </mat-menu>
-
             <div class="cover">
+              @if (!reading.endDate) {
+                <span class="reading-badge">Leyendo</span>
+              }
+
+              <button
+                mat-icon-button
+                class="library-card__menu-trigger library-menu-trigger"
+                type="button"
+                (click)="$event.stopPropagation()"
+                [matMenuTriggerFor]="readingMenu"
+                aria-label="Opciones"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #readingMenu="matMenu">
+                <button mat-menu-item type="button" (click)="openDetailModal(reading)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Ver detalle</span>
+                </button>
+                @if (authService.isAdmin()) {
+                  <button mat-menu-item type="button" (click)="openEditModal(reading)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Editar</span>
+                  </button>
+                  <button mat-menu-item type="button" (click)="registerProgress(reading)">
+                    <mat-icon>edit_note</mat-icon>
+                    <span>Registrar avance</span>
+                  </button>
+                }
+                <button mat-menu-item type="button" (click)="openHistoryModal(reading)">
+                  <mat-icon>history</mat-icon>
+                  <span>Histórico de avances</span>
+                </button>
+                @if (authService.isAdmin()) {
+                  <mat-divider></mat-divider>
+                  <button mat-menu-item type="button" (click)="deleteReading(reading)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Eliminar</span>
+                  </button>
+                }
+              </mat-menu>
+
               @if (reading.coverUrl) {
                 <img
                   [src]="reading.coverUrl"
@@ -121,10 +121,6 @@
                 [percentage]="reading.endDate ? 100 : (progressByReadingId()[reading.id] ?? 0)"
               />
             </div>
-            <app-reading-progress-bar
-              class="book__progress"
-              [percentage]="progressByReadingId()[reading.id] ?? 0"
-            />
             <div class="caption">
               <div class="pages-row">
                 <p class="pages">
