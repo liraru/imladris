@@ -1,3 +1,4 @@
+<!-- src/app/pages/yearly-readings/yearly-readings.html -->
 <section class="yearly-readings container">
   <header class="page-header">
     <div class="heading">
@@ -120,6 +121,10 @@
                 [percentage]="reading.endDate ? 100 : (progressByReadingId()[reading.id] ?? 0)"
               />
             </div>
+            <app-reading-progress-bar
+              class="book__progress"
+              [percentage]="progressByReadingId()[reading.id] ?? 0"
+            />
             <div class="caption">
               <div class="pages-row">
                 <p class="pages">

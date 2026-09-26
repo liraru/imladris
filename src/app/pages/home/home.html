@@ -131,6 +131,10 @@
                 }
                 <app-reading-progress-bar [percentage]="100" />
               </div>
+              <app-reading-progress-bar
+                class="home__card-progress"
+                [percentage]="progressByReadingId()[reading.id] ?? 0"
+              />
               <div class="home__card-body">
                 <h3 class="home__card-title" [matTooltip]="reading.title">{{ reading.title }}</h3>
                 <p class="home__card-author">
@@ -139,6 +143,17 @@
                 <p class="home__card-meta">
                   Finalizado: {{ reading.endDate | date: 'dd/MM/yyyy' }}
                 </p>
+                @if (authService.isAdmin()) {
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="home__card-progress-btn"
+                    (click)="registerProgress(reading, $event)"
+                  >
+                    <mat-icon>edit_note</mat-icon>
+                    Registrar avance
+                  </button>
+                }
               </div>
             </article>
           }
