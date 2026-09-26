@@ -47,11 +47,29 @@
   border-color: color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
 }
 
+/*
+ * Botón de opciones (3 puntos) / "Registrar avance": esquina superior derecha,
+ * superpuesto a la portada. Única definición para toda la app (Biblioteca,
+ * Fanfic, Lecturas anuales y Home).
+ *
+ * IMPORTANTE: el botón es siempre un <button mat-icon-button>, y Angular
+ * Material define sus propios estilos combinando DOS clases a la vez
+ * (algo como `.mat-mdc-icon-button.mdc-icon-button { position: relative; }`).
+ * Esa combinación de dos clases tiene más especificidad CSS que un selector
+ * de una sola clase como `.library-card__menu-trigger`, así que sin
+ * !important Material gana la partida y el botón deja de estar en
+ * position:absolute: se cuela en el flujo normal, empuja la portada hacia
+ * abajo (la franja oscura) y aparece pegado a la izquierda (invadiendo el
+ * hueco del badge "Leyendo"). Los !important de aquí abajo son necesarios
+ * por eso — no quitarlos al tocar este bloque.
+ */
 .library-card__menu-trigger {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
+  position: absolute !important;
+  top: 0.25rem !important;
+  right: 0.25rem !important;
+  left: auto !important;
   z-index: 1;
+  border: none;
   background: color-mix(in srgb, var(--mat-sys-surface) 65%, transparent);
   backdrop-filter: blur(2px);
 }
@@ -215,12 +233,4 @@
 .library-menu-trigger:hover,
 .library-menu-trigger:focus-visible {
   background: color-mix(in srgb, var(--mat-sys-on-surface) 14%, transparent) !important;
-}
-
-.library-card__menu-trigger {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  z-index: 1;
-  border: none;
 }
