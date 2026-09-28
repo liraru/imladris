@@ -205,6 +205,13 @@ mat-card-title {
   }
 }
 
-.reading-progress-form-modal .mat-mdc-form-field-text-suffix {
-  padding-right: 0.75rem;
+.reading-progress-form-modal .mat-mdc-form-field .mat-mdc-form-field-infix {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+}
+
+.reading-heatmap-tooltip,
+.reading-heatmap-tooltip .mdc-tooltip__surface {
+  white-space: pre-line;
 }

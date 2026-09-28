@@ -1,28 +1,55 @@
 :host {
   --gold: var(--mat-sys-primary);
   --text-muted: var(--mat-sys-on-surface-variant);
+  --panel-bg: var(--mat-sys-surface-container);
+  --panel-border: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+  --radius: var(--mat-sys-corner-medium, 10px);
 
   display: block;
   padding-block: 1.5rem 3rem;
+  /* El resplandor del hero es más ancho que algunos viewports: se recorta sin crear scroll horizontal. */
+  overflow-x: clip;
 }
 
+/* ───────────── Hero (logo) con fondo degradado ───────────── */
+
 .home__hero {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  margin-bottom: 2rem;
+}
+
+.home__hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -2rem;
+  left: 50%;
+  width: min(100vw, 1100px);
+  height: 26rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 45% 55% at 50% 35%,
+      color-mix(in srgb, var(--mat-sys-primary) 16%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 70% 70% at 50% 40%,
+      color-mix(in srgb, var(--mat-sys-primary) 6%, transparent),
+      transparent 75%
+    );
 }
 
 .home__hero .heading {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.home__tagline {
-  margin: 0.5rem auto 0;
-  max-width: 42rem;
-  color: var(--text-muted);
 }
 
 .home__logo {
@@ -39,47 +66,236 @@
   }
 }
 
-.page-header__actions mat-icon {
-  margin-right: 0.25rem;
+/* ───────────── Paneles: actividad + cifras ───────────── */
+
+.home__overview {
+  display: grid;
+  gap: 1.25rem;
 }
 
-.home__quick-links {
+@media (min-width: 1100px) {
+  .home__overview {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+.home__panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  min-width: 0;
+}
+
+.home__panel-header {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1.75rem 0 2.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.home__quick-link {
+.home__panel-title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.home__panel-note {
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+/* El mapa de calor se centra verticalmente cuando la columna de cifras lo hace más alto. */
+.home__activity {
+  display: flex;
+  flex-direction: column;
+}
+
+.home__activity app-reading-heatmap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.home__stats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.home__stat {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: var(--mat-sys-corner-medium, 10px);
-  background: var(--mat-sys-surface-container);
-  border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);
-  color: var(--mat-sys-on-surface);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
+  gap: 0.65rem;
+  padding: 0.35rem 0;
+  min-width: 0;
 }
 
-.home__quick-link mat-icon {
+.home__stat + .home__stat {
+  border-top: 1px solid var(--panel-border);
+}
+
+.home__stat-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
   color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
 }
 
-.home__quick-link:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--mat-sys-primary) 45%, transparent);
-  background: var(--mat-sys-surface-container-high);
+.home__stat-icon mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
 }
 
-.home__section {
-  margin-bottom: 3rem;
+.home__stat-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.home__stat-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home__stat-detail {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home__stat-value {
+  flex: 0 1 auto;
+  max-width: 55%;
+  min-width: 0;
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  line-height: 1.15;
+  text-align: right;
+  color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tablet: las cinco cifras en una fila de tarjetas bajo el mapa de calor (icono, valor y etiqueta apilados). */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .home__stats-list {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .home__stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+  }
+
+  .home__stat + .home__stat {
+    border-top: 0;
+  }
+
+  .home__stat-icon {
+    order: 0;
+  }
+
+  .home__stat-value {
+    order: 1;
+    max-width: 100%;
+    font-size: 1.35rem;
+    text-align: left;
+  }
+
+  .home__stat-text {
+    order: 2;
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .home__stat-label,
+  .home__stat-detail {
+    white-space: normal;
+  }
+}
+
+/* ───────────── Separador ───────────── */
+
+.home__divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-block: 2.25rem;
+}
+
+.home__divider::before,
+.home__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+}
+
+.home__divider::before {
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--gold) 45%, transparent)
+  );
+}
+
+.home__divider::after {
+  background: linear-gradient(
+    to left,
+    transparent,
+    color-mix(in srgb, var(--gold) 45%, transparent)
+  );
+}
+
+.home__divider-mark {
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--gold) 55%, transparent);
+}
+
+/* ───────────── Columnas: principal + barra lateral ───────────── */
+
+.home__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+}
+
+@media (min-width: 1100px) {
+  .home__columns {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+}
+
+.home__main {
+  min-width: 0;
+}
+
+.home__aside {
+  min-width: 0;
 }
 
 .home__section-header {
@@ -108,18 +324,6 @@
   text-decoration: underline;
 }
 
-/* Sección centrada (usada por "Actividad de lectura"): centra su cabecera y su contenido */
-.home__section--centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.home__section-header--centered {
-  justify-content: center;
-  text-align: center;
-}
-
 .home__empty {
   color: var(--text-muted);
   margin: 0;
@@ -139,44 +343,211 @@
   color: #e08585;
 }
 
-.home__card-grid {
+/* ───────────── Leyendo: tarjeta destacada ───────────── */
+
+.home__reading-list {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   gap: 1rem;
+}
+
+.reading-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 1.25rem;
+  background: var(--panel-bg);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 22%, transparent);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* Portada ampliada y desenfocada como fondo de la tarjeta. */
+.reading-hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(32px) saturate(1.3);
+  transform: scale(1.4);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.reading-hero__cover {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--mat-sys-surface-container-high);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+}
+
+.reading-hero__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.reading-hero__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.reading-hero__kicker {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.reading-hero__title {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  line-height: 1.2;
+  color: var(--mat-sys-on-surface);
+}
+
+.reading-hero__author {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.reading-hero__progress {
+  margin-top: 0.85rem;
+}
+
+.reading-hero__progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.reading-hero__percentage {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--mat-sys-on-surface);
+}
+
+.reading-hero__bar {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, black 40%, transparent);
+  overflow: hidden;
+}
+
+.reading-hero__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--gold) 70%, transparent),
+    var(--gold)
+  );
+  transition: width 0.3s ease;
+}
+
+.reading-hero__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0.9rem 0 0;
+}
+
+.reading-hero__facts dt {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.reading-hero__facts dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface);
+}
+
+@media (max-width: 575px) {
+  .reading-hero {
+    grid-template-columns: 6.25rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .reading-hero__title {
+    font-size: 1.1rem;
+  }
+
+  .reading-hero__percentage {
+    font-size: 1.25rem;
+  }
+
+  .reading-hero__facts {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+
+  .reading-hero__facts > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .reading-hero__facts dd {
+    margin: 0;
+  }
+}
+
+/* ───────────── Tarjetas de portada (Últimas lecturas) ───────────── */
+
+.home__card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 576px) {
+  .home__card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .home__card-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
 }
 
 .home__card {
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 0 0 calc(50% - 0.5rem);
-  background: var(--mat-sys-surface-container);
-  border-radius: var(--mat-sys-corner-medium, 10px);
+  background: var(--panel-bg);
+  border-radius: var(--radius);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+  border: 1px solid var(--panel-border);
   transition:
     transform 0.15s ease,
     border-color 0.15s ease;
-}
-
-@media (min-width: 576px) {
-  .home__card {
-    flex-basis: calc(33.333% - 0.667rem);
-  }
-}
-@media (min-width: 768px) {
-  .home__card-grid {
-    gap: 1.25rem;
-  }
-  .home__card {
-    flex-basis: calc(25% - 0.9375rem);
-  }
-}
-@media (min-width: 1024px) {
-  .home__card {
-    flex-basis: calc(20% - 1rem);
-  }
 }
 
 .home__card:hover {
@@ -247,14 +618,104 @@
   text-overflow: ellipsis;
 }
 
-@media (max-width: 575px) {
-  .home__quick-links {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    margin: 1.5rem 0 2.25rem;
-  }
+/* ───────────── Últimas incorporaciones: lista compacta ───────────── */
 
-  .home__quick-link {
-    justify-content: center;
+.home__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 576px) and (max-width: 1099px) {
+  .home__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+.home__list-item {
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.6rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  min-width: 0;
+  transition: border-color 0.15s ease;
+}
+
+.home__list-item:hover {
+  border-color: color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
+}
+
+.home__list-cover {
+  flex: 0 0 3.5rem;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--mat-sys-surface-container-high);
+}
+
+.home__list-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.home__list-cover .home__card-placeholder mat-icon {
+  font-size: 1.4rem;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.home__list-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+.home__list-title {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.25;
+  color: var(--mat-sys-on-surface);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.home__list-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.5rem;
+  margin-top: 0.15rem;
+}
+
+.home__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.05rem 0.5rem 0.05rem 0.3rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+}
+
+.home__badge mat-icon {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
 }

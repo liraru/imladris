@@ -42,7 +42,9 @@
           [max]="data.reading.pages"
           (input)="onPageInput()"
         />
-        <span matSuffix>/ {{ data.reading.pages }}</span>
+        <span matSuffix class="reading-progress-form-modal__suffix"
+          >/ {{ data.reading.pages }}</span
+        >
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
@@ -55,7 +57,7 @@
           max="100"
           (input)="onPercentageInput()"
         />
-        <span matSuffix>%</span>
+        <span matSuffix class="reading-progress-form-modal__suffix">%</span>
       </mat-form-field>
     </div>
 

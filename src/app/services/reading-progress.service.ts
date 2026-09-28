@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { ReadingProgressRow } from '../shared/models/supabase.types';
 import { ReadingProgress } from '@shared/models';
@@ -26,6 +26,14 @@ export interface ReadingProgressInput {
 export class ReadingProgressService {
   private readonly supabase = inject(SupabaseService).client;
   private readonly table = 'reading_progress';
+
+  /**
+   * Señal que se incrementa tras cada alta/edición/borrado de un avance, desde
+   * cualquier punto de la app (Home, Lecturas anuales, histórico). El mapa de calor
+   * de la home la observa para recargarse automáticamente sin acoplarse a quién hizo
+   * el cambio.
+   */
+  readonly progressChanged = signal(0);
 
   async getByReadingId(readingId: number): Promise<ReadingProgress[]> {
     const { data, error } = await this.supabase
@@ -92,7 +100,9 @@ export class ReadingProgressService {
     if (error) throw error;
 
     await this._recalculateChain(input.readingId);
-    return (await this._getById((data as ReadingProgressRow).id))!;
+    const created = (await this._getById((data as ReadingProgressRow).id))!;
+    this.progressChanged.update((n) => n + 1);
+    return created;
   }
 
   async update(
@@ -108,7 +118,9 @@ export class ReadingProgressService {
     if (error) throw error;
 
     await this._recalculateChain(input.readingId);
-    return (await this._getById(id))!;
+    const updated = (await this._getById(id))!;
+    this.progressChanged.update((n) => n + 1);
+    return updated;
   }
 
   async remove(id: number): Promise<void> {
@@ -117,6 +129,7 @@ export class ReadingProgressService {
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
     if (error) throw error;
     await this._recalculateChain(existing.readingId);
+    this.progressChanged.update((n) => n + 1);
   }
 
   private _resolvePageAndPercentage(

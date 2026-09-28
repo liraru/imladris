@@ -1,7 +1,9 @@
 <div class="reading-heatmap">
-  <p class="reading-heatmap__title">
-    {{ totalPages() | number: '1.0-0' }} páginas leídas en el último año
-  </p>
+  @if (showTitle()) {
+    <p class="reading-heatmap__title">
+      {{ totalPages() | number: '1.0-0' }} páginas leídas {{ rangeLabel() }}
+    </p>
+  }
 
   @if (loading()) {
     <div class="reading-heatmap__state">
@@ -10,22 +12,21 @@
   } @else {
     <div class="reading-heatmap__scroll">
       <div class="reading-heatmap__body">
-        <div class="reading-heatmap__months">
-          @for (m of monthLabels(); track m.weekIndex) {
-            <span class="reading-heatmap__month" [style.grid-column]="m.weekIndex + 1">{{
-              m.label
-            }}</span>
-          }
-        </div>
         <div class="reading-heatmap__grid">
           @for (week of weeks(); track $index) {
             <div class="reading-heatmap__week">
-              @for (day of week; track day.date) {
-                <div
-                  class="reading-heatmap__day"
-                  [attr.data-level]="day.level"
-                  [matTooltip]="dayTooltip(day) + ' · ' + (day.date | date: 'dd/MM/yyyy')"
-                ></div>
+              <span class="reading-heatmap__month">{{ monthLabelByWeek()[$index] ?? '' }}</span>
+              @for (day of week; track $index) {
+                @if (day.empty) {
+                  <div class="reading-heatmap__day reading-heatmap__day--empty"></div>
+                } @else {
+                  <div
+                    class="reading-heatmap__day"
+                    [attr.data-level]="day.level"
+                    [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
+                    matTooltipClass="reading-heatmap-tooltip"
+                  ></div>
+                }
               }
             </div>
           }
