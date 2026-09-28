@@ -3,39 +3,10 @@
     <div class="heading">
       <img src="imladris-logo.png" alt="Imladris" class="home__logo" />
       <p class="kicker">Biblioteca nocturna</p>
-      <h1>Bienvenida a Imladris</h1>
-      <p class="home__tagline">
-        Un rincón para llevar la cuenta de cada libro y cada tomo que pasa por tus manos.
-      </p>
-    </div>
-
-    <div class="page-header__actions">
-      <a mat-flat-button color="primary" routerLink="/{{ ROUTES.LIBRARY }}">
-        <mat-icon>menu_book</mat-icon>
-        Ir a la biblioteca
-      </a>
     </div>
   </header>
 
-  <nav class="home__quick-links">
-    <a class="home__quick-link" routerLink="/{{ ROUTES.LIBRARY }}">
-      <mat-icon>auto_stories</mat-icon>
-      <span>Biblioteca</span>
-    </a>
-    <a class="home__quick-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}">
-      <mat-icon>calendar_month</mat-icon>
-      <span>Lecturas anuales</span>
-    </a>
-    <a class="home__quick-link" routerLink="/{{ ROUTES.CALCULATOR }}">
-      <mat-icon>calculate</mat-icon>
-      <span>Calculadora</span>
-    </a>
-  </nav>
-
   <section class="home__section">
-    <div class="home__section-header">
-      <h2>Actividad de lectura</h2>
-    </div>
     <app-reading-heatmap />
   </section>
 

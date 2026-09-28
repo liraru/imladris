@@ -1,6 +1,6 @@
 <div class="reading-heatmap">
   <p class="reading-heatmap__title">
-    {{ totalPages() | number: '1.0-0' }} páginas leídas en el último año
+    {{ totalPages() | number: '1.0-0' }} páginas leídas {{ rangeLabel() }}
   </p>
 
   @if (loading()) {
@@ -20,12 +20,16 @@
         <div class="reading-heatmap__grid">
           @for (week of weeks(); track $index) {
             <div class="reading-heatmap__week">
-              @for (day of week; track day.date) {
-                <div
-                  class="reading-heatmap__day"
-                  [attr.data-level]="day.level"
-                  [matTooltip]="dayTooltip(day) + ' · ' + (day.date | date: 'dd/MM/yyyy')"
-                ></div>
+              @for (day of week; track $index) {
+                @if (day.empty) {
+                  <div class="reading-heatmap__day reading-heatmap__day--empty"></div>
+                } @else {
+                  <div
+                    class="reading-heatmap__day"
+                    [attr.data-level]="day.level"
+                    [matTooltip]="dayTooltip(day) + ' · ' + (day.date | date: 'dd/MM/yyyy')"
+                  ></div>
+                }
               }
             </div>
           }

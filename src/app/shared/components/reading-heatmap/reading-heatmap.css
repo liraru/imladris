@@ -61,6 +61,11 @@
   background: color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
 }
 
+/* Relleno previo al primer día del rango: ocupa su hueco pero no se ve. */
+.reading-heatmap__day--empty {
+  background: transparent;
+}
+
 .reading-heatmap__day[data-level='1'] {
   background: color-mix(in srgb, var(--mat-sys-primary) 30%, transparent);
 }

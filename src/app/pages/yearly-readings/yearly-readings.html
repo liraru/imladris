@@ -117,9 +117,9 @@
                 </div>
               }
 
-              <app-reading-progress-bar
-                [percentage]="reading.endDate ? 100 : (progressByReadingId()[reading.id] ?? 0)"
-              />
+              @if (!reading.endDate) {
+                <app-reading-progress-bar [percentage]="progressByReadingId()[reading.id] ?? 0" />
+              }
             </div>
             <div class="caption">
               <div class="pages-row">
