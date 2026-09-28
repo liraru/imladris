@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -40,6 +41,9 @@ const MIN_DAYS_FOR_FIRST_MONTH_LABEL = 15;
 export class ReadingHeatmap {
   private readonly _service = inject(ReadingProgressService);
 
+  /** Muestra la línea "N páginas leídas en …" sobre el mapa. La home la oculta y la muestra en sus cifras. */
+  readonly showTitle = input(true);
+
   /** true por debajo de 768px, igual que el resto de la app (navbar, gestión, home, etc.). */
   protected readonly isMobile = toSignal(
     inject(BreakpointObserver)
@@ -52,6 +56,15 @@ export class ReadingHeatmap {
   protected readonly weeks = signal<HeatmapDay[][]>([]);
   protected readonly monthLabels = signal<{ label: string; weekIndex: number }[]>([]);
   protected readonly totalPages = signal(0);
+
+  /** Etiqueta de mes por índice de semana. Cada semana pinta la suya en su primera fila, así las celdas y las etiquetas nunca se desalinean. */
+  protected readonly monthLabelByWeek = computed<Record<number, string>>(() => {
+    const byWeek: Record<number, string> = {};
+    for (const m of this.monthLabels()) {
+      byWeek[m.weekIndex] = m.label;
+    }
+    return byWeek;
+  });
 
   /** Texto del periodo mostrado, acorde al rango real cargado (recortado a 4 meses en móvil). */
   protected readonly rangeLabel = computed(() =>

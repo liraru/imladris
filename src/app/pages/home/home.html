@@ -6,9 +6,37 @@
     </div>
   </header>
 
-  <section class="home__section">
-    <app-reading-heatmap />
-  </section>
+  <div class="home__overview">
+    <section class="home__panel home__activity">
+      <div class="home__panel-header">
+        <h2 class="home__panel-title">Actividad de lectura</h2>
+        <span class="home__panel-note">{{ isMobile() ? 'Últimos 4 meses' : 'Último año' }}</span>
+      </div>
+      <app-reading-heatmap [showTitle]="false" />
+    </section>
+
+    <section class="home__panel home__stats">
+      <div class="home__panel-header">
+        <h2 class="home__panel-title">En cifras</h2>
+      </div>
+      <ul class="home__stats-list">
+        @for (stat of stats(); track stat.label) {
+          <li class="home__stat">
+            <span class="home__stat-icon" aria-hidden="true">
+              <mat-icon>{{ stat.icon }}</mat-icon>
+            </span>
+            <div class="home__stat-text">
+              <span class="home__stat-label">{{ stat.label }}</span>
+              @if (stat.detail) {
+                <span class="home__stat-detail">{{ stat.detail }}</span>
+              }
+            </div>
+            <span class="home__stat-value" [matTooltip]="stat.tooltip">{{ stat.value }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
 
   @if (loading()) {
     <div class="home__state">
@@ -20,140 +48,217 @@
       <p>{{ error() }}</p>
     </div>
   } @else {
-    <section class="home__section">
-      <div class="home__section-header">
-        <h2>Leyendo</h2>
-        <a class="home__section-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}"
-          >Ver lecturas anuales</a
-        >
+    <div class="home__divider" aria-hidden="true">
+      <span class="home__divider-mark"></span>
+    </div>
+
+    <div class="home__columns">
+      <div class="home__main">
+        <section class="home__section">
+          <div class="home__section-header">
+            <h2>Leyendo</h2>
+            <a class="home__section-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}"
+              >Ver lecturas anuales</a
+            >
+          </div>
+
+          @if (readingNowView().length === 0) {
+            <p class="home__empty">No estás leyendo nada ahora mismo.</p>
+          } @else {
+            <div class="home__reading-list">
+              @for (item of readingNowView(); track item.reading.id) {
+                <article class="reading-hero">
+                  @if (item.reading.coverUrl) {
+                    <img
+                      class="reading-hero__backdrop"
+                      [src]="item.reading.coverUrl"
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  }
+
+                  <div class="reading-hero__cover">
+                    @if (authService.isAdmin()) {
+                      <button
+                        mat-icon-button
+                        class="library-card__menu-trigger library-menu-trigger"
+                        type="button"
+                        matTooltip="Registrar avance"
+                        (click)="registerProgress(item.reading, $event)"
+                      >
+                        <mat-icon>edit_note</mat-icon>
+                      </button>
+                    }
+                    @if (item.reading.coverUrl) {
+                      <img
+                        [src]="item.reading.coverUrl"
+                        [alt]="'Portada de ' + item.reading.title"
+                        loading="lazy"
+                      />
+                    } @else {
+                      <div class="home__card-placeholder">
+                        <mat-icon>menu_book</mat-icon>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="reading-hero__body">
+                    <p class="reading-hero__kicker">Leyendo ahora</p>
+                    <h3 class="reading-hero__title">{{ item.reading.title }}</h3>
+                    <p class="reading-hero__author">
+                      {{ item.reading.authors.join(', ') || 'Autor desconocido' }}
+                    </p>
+
+                    <div class="reading-hero__progress">
+                      <div class="reading-hero__progress-head">
+                        <span class="reading-hero__percentage"
+                          >{{ item.percentage | number: '1.0-0' }}%</span
+                        >
+                        @if (item.totalPages > 0) {
+                          <span
+                            >{{ item.pagesRead | number: '1.0-0' }} de
+                            {{ item.totalPages | number: '1.0-0' }} páginas</span
+                          >
+                        }
+                      </div>
+                      <div
+                        class="reading-hero__bar"
+                        role="progressbar"
+                        [attr.aria-valuenow]="item.percentage"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >
+                        <div class="reading-hero__bar-fill" [style.width.%]="item.percentage"></div>
+                      </div>
+                    </div>
+
+                    <dl class="reading-hero__facts">
+                      <div>
+                        <dt>Empezado</dt>
+                        <dd>{{ item.reading.startDate | date: 'dd/MM/yyyy' }}</dd>
+                      </div>
+                      <div>
+                        <dt>Días leyendo</dt>
+                        <dd>{{ item.daysReading }}</dd>
+                      </div>
+                      <div>
+                        <dt>Fin estimado</dt>
+                        <dd matTooltip="Estimación según tu ritmo medio desde que empezaste">
+                          @if (item.estimatedEnd) {
+                            {{ item.estimatedEnd | date: 'dd/MM/yyyy' }}
+                          } @else {
+                            —
+                          }
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </section>
+
+        <div class="home__divider" aria-hidden="true">
+          <span class="home__divider-mark"></span>
+        </div>
+
+        <section class="home__section">
+          <div class="home__section-header">
+            <h2>Últimas lecturas</h2>
+            <a class="home__section-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}"
+              >Ver lecturas anuales</a
+            >
+          </div>
+
+          @if (lastReadingsToShow().length === 0) {
+            <p class="home__empty">Todavía no has marcado ninguna lectura como finalizada.</p>
+          } @else {
+            <div class="home__card-grid">
+              @for (reading of lastReadingsToShow(); track reading.id) {
+                <article class="home__card">
+                  <div class="home__card-cover">
+                    @if (reading.coverUrl) {
+                      <img
+                        [src]="reading.coverUrl"
+                        [alt]="'Portada de ' + reading.title"
+                        loading="lazy"
+                      />
+                    } @else {
+                      <div class="home__card-placeholder">
+                        <mat-icon>menu_book</mat-icon>
+                      </div>
+                    }
+                  </div>
+                  <div class="home__card-body">
+                    <h3 class="home__card-title" [matTooltip]="reading.title">
+                      {{ reading.title }}
+                    </h3>
+                    <p class="home__card-author">
+                      {{ reading.authors.join(', ') || 'Autor desconocido' }}
+                    </p>
+                    <p class="home__card-meta">
+                      Finalizado: {{ reading.endDate | date: 'dd/MM/yyyy' }}
+                    </p>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </section>
       </div>
 
-      @if (readingNow().length === 0) {
-        <p class="home__empty">No estás leyendo nada ahora mismo.</p>
-      } @else {
-        <div class="home__card-grid">
-          @for (reading of readingNow(); track reading.id) {
-            <article class="home__card">
-              <div class="home__card-cover">
-                @if (authService.isAdmin()) {
-                  <button
-                    mat-icon-button
-                    class="library-card__menu-trigger library-menu-trigger"
-                    type="button"
-                    matTooltip="Registrar avance"
-                    (click)="registerProgress(reading, $event)"
-                  >
-                    <mat-icon>edit_note</mat-icon>
-                  </button>
-                }
-                @if (reading.coverUrl) {
-                  <img
-                    [src]="reading.coverUrl"
-                    [alt]="'Portada de ' + reading.title"
-                    loading="lazy"
-                  />
-                } @else {
-                  <div class="home__card-placeholder">
-                    <mat-icon>menu_book</mat-icon>
+      <aside class="home__aside">
+        <section class="home__section">
+          <div class="home__section-header">
+            <h2>Últimas incorporaciones</h2>
+            <a class="home__section-link" routerLink="/{{ ROUTES.LIBRARY }}"
+              >Ver biblioteca completa</a
+            >
+          </div>
+
+          @if (lastAdditions().length === 0) {
+            <p class="home__empty">Todavía no hay incorporaciones registradas.</p>
+          } @else {
+            <ul class="home__list">
+              @for (item of lastAdditions(); track item.type + '-' + item.id) {
+                <li class="home__list-item">
+                  <div class="home__list-cover">
+                    @if (item.coverImageUrl) {
+                      <img
+                        [src]="item.coverImageUrl"
+                        [alt]="'Portada de ' + item.title"
+                        loading="lazy"
+                      />
+                    } @else {
+                      <div class="home__card-placeholder">
+                        <mat-icon>{{
+                          item.type === HOME_ITEM_TYPE.MANGA ? 'auto_stories' : 'menu_book'
+                        }}</mat-icon>
+                      </div>
+                    }
                   </div>
-                }
-                <app-reading-progress-bar [percentage]="progressByReadingId()[reading.id] ?? 0" />
-              </div>
-              <div class="home__card-body">
-                <h3 class="home__card-title" [matTooltip]="reading.title">{{ reading.title }}</h3>
-                <p class="home__card-author">
-                  {{ reading.authors.join(', ') || 'Autor desconocido' }}
-                </p>
-                <p class="home__card-meta">
-                  Empezado: {{ reading.startDate | date: 'dd/MM/yyyy' }}
-                </p>
-              </div>
-            </article>
-          }
-        </div>
-      }
-    </section>
-
-    <section class="home__section">
-      <div class="home__section-header">
-        <h2>Últimas lecturas</h2>
-        <a class="home__section-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}"
-          >Ver lecturas anuales</a
-        >
-      </div>
-
-      @if (lastReadingsToShow().length === 0) {
-        <p class="home__empty">Todavía no has marcado ninguna lectura como finalizada.</p>
-      } @else {
-        <div class="home__card-grid">
-          @for (reading of lastReadingsToShow(); track reading.id) {
-            <article class="home__card">
-              <div class="home__card-cover">
-                @if (reading.coverUrl) {
-                  <img
-                    [src]="reading.coverUrl"
-                    [alt]="'Portada de ' + reading.title"
-                    loading="lazy"
-                  />
-                } @else {
-                  <div class="home__card-placeholder">
-                    <mat-icon>menu_book</mat-icon>
+                  <div class="home__list-info">
+                    <h3 class="home__list-title" [matTooltip]="item.title">{{ item.title }}</h3>
+                    <p class="home__card-author">{{ authorNames(item) }}</p>
+                    <div class="home__list-foot">
+                      <span class="home__card-meta"
+                        >Adquirido: {{ item.adquisitionDate | date: 'dd/MM/yyyy' }}</span
+                      >
+                      @if (isRead(item)) {
+                        <span class="home__badge" matTooltip="Ya lo has leído">
+                          <mat-icon>check</mat-icon>
+                          Leído
+                        </span>
+                      }
+                    </div>
                   </div>
-                }
-              </div>
-              <div class="home__card-body">
-                <h3 class="home__card-title" [matTooltip]="reading.title">{{ reading.title }}</h3>
-                <p class="home__card-author">
-                  {{ reading.authors.join(', ') || 'Autor desconocido' }}
-                </p>
-                <p class="home__card-meta">
-                  Finalizado: {{ reading.endDate | date: 'dd/MM/yyyy' }}
-                </p>
-              </div>
-            </article>
+                </li>
+              }
+            </ul>
           }
-        </div>
-      }
-    </section>
-
-    <section class="home__section">
-      <div class="home__section-header">
-        <h2>Últimas incorporaciones</h2>
-        <a class="home__section-link" routerLink="/{{ ROUTES.LIBRARY }}">Ver biblioteca completa</a>
-      </div>
-
-      @if (lastAdditions().length === 0) {
-        <p class="home__empty">Todavía no hay incorporaciones registradas.</p>
-      } @else {
-        <div class="home__card-grid">
-          @for (item of lastAdditions(); track item.id) {
-            <article class="home__card">
-              <div class="home__card-cover">
-                @if (item.coverImageUrl) {
-                  <img
-                    [src]="item.coverImageUrl"
-                    [alt]="'Portada de ' + item.title"
-                    loading="lazy"
-                  />
-                } @else {
-                  <div class="home__card-placeholder">
-                    <mat-icon>{{
-                      item.type === HOME_ITEM_TYPE.MANGA ? 'auto_stories' : 'menu_book'
-                    }}</mat-icon>
-                  </div>
-                }
-              </div>
-              <div class="home__card-body">
-                <h3 class="home__card-title" [matTooltip]="item.title">{{ item.title }}</h3>
-                <p class="home__card-author">{{ authorNames(item) }}</p>
-                <p class="home__card-meta">
-                  Adquirido: {{ item.adquisitionDate | date: 'dd/MM/yyyy' }}
-                </p>
-              </div>
-            </article>
-          }
-        </div>
-      }
-    </section>
+        </section>
+      </aside>
+    </div>
   }
 </section>
