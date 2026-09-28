@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 
 import { YearlyReading } from '@shared/models';
+import { AuthService } from '../../../../services/auth.service';
 import { ThousandsPipe } from '../../../../shared/pipes/thousands.pipe';
 
 export interface ReadingDetailModalData {
@@ -27,6 +28,7 @@ export class ReadingDetailModal {
   private readonly _dialogRef = inject(MatDialogRef<ReadingDetailModal, ReadingDetailModalResult>);
   protected readonly data = inject<ReadingDetailModalData>(MAT_DIALOG_DATA);
 
+  protected readonly authService = inject(AuthService);
   protected readonly reading = this.data.reading;
 
   protected close(): void {
@@ -34,6 +36,7 @@ export class ReadingDetailModal {
   }
 
   protected edit(): void {
+    if (!this.authService.isAdmin()) return;
     this._dialogRef.close({ edit: true });
   }
 }
