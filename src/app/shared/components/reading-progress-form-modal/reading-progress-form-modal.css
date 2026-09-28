@@ -17,14 +17,27 @@
   gap: 0.25rem;
 }
 
+/* minmax(0, 1fr): las dos columnas se reparten el ancho a partes iguales sin desbordar. */
 .reading-progress-form-modal__row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
 .reading-progress-form-modal__field {
   width: 100%;
+}
+
+/* Que el número escrito nunca llegue a tocar el sufijo. */
+.reading-progress-form-modal__row .reading-progress-form-modal__field input {
+  padding-right: 0.5rem;
+}
+
+/* Sufijo ("/ total" y "%"): separación respecto al número y al borde derecho del campo. */
+.reading-progress-form-modal__suffix {
+  display: inline-block;
+  padding: 0 1rem 0 0.5rem;
+  white-space: nowrap;
 }
 
 .reading-progress-form-modal__hint {

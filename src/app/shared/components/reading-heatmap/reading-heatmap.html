@@ -27,7 +27,8 @@
                   <div
                     class="reading-heatmap__day"
                     [attr.data-level]="day.level"
-                    [matTooltip]="dayTooltip(day) + ' · ' + (day.date | date: 'dd/MM/yyyy')"
+                    [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
+                    matTooltipClass="reading-heatmap-tooltip"
                   ></div>
                 }
               }
