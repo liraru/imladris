@@ -45,6 +45,8 @@
   grid-auto-columns: minmax(9px, 16px);
   gap: 3px;
   justify-content: start;
+  /* Evita que la semana actual (incompleta) se estire hasta la altura de las demás. */
+  align-items: start;
 }
 
 .reading-heatmap__week {
@@ -53,6 +55,8 @@
   /* Primera fila: etiqueta del mes; después, los 7 días. */
   grid-template-rows: 1.1rem;
   grid-auto-rows: auto;
+  /* Las filas no reparten el espacio sobrante: los días van siempre seguidos, de arriba abajo. */
+  align-content: start;
   gap: 3px;
   min-width: 0;
 }
