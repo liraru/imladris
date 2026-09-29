@@ -29,6 +29,20 @@
             <span class="management__menu-item-label">{{ entry.label }}</span>
           </button>
         }
+
+        @if (canInstall()) {
+          <div class="management__menu-divider" role="separator"></div>
+          <button
+            type="button"
+            class="management__menu-item"
+            [matTooltip]="collapsed() && !isMobile() ? 'Instalar aplicación' : ''"
+            matTooltipPosition="right"
+            (click)="installApp()"
+          >
+            <mat-icon>get_app</mat-icon>
+            <span class="management__menu-item-label">Instalar aplicación</span>
+          </button>
+        }
       </nav>
     </mat-sidenav>
 

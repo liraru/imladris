@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { PwaInstallService } from '../../services/pwa-install.service';
 import { Authors } from './components/authors/authors';
 import { Editorials } from './components/editorials/editorials';
 import { BookSeries } from './components/book-series/book-series';
@@ -34,8 +35,13 @@ import { MANAGEMENT_MASTER, MANAGEMENT_MENU_ENTRIES } from './constants/manageme
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Management {
+  private readonly _pwaInstall = inject(PwaInstallService);
+
   protected readonly MANAGEMENT_MASTER = MANAGEMENT_MASTER;
   protected readonly menuEntries = MANAGEMENT_MENU_ENTRIES;
+
+  /** `true` si el navegador permite instalar la app y aún no está instalada. */
+  protected readonly canInstall = this._pwaInstall.canInstall;
 
   protected readonly isMobile = toSignal(
     inject(BreakpointObserver)
@@ -71,5 +77,11 @@ export class Management {
 
   protected onSidenavOpenedChange(opened: boolean): void {
     if (!opened) this.mobileMenuOpen.set(false);
+  }
+
+  /** Lanza el diálogo nativo de instalación de la PWA. */
+  protected installApp(): void {
+    if (this.isMobile()) this.mobileMenuOpen.set(false);
+    void this._pwaInstall.install();
   }
 }
