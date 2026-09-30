@@ -1,0 +1,119 @@
+{
+  "configVersion": 1,
+  "timestamp": 1790667766862,
+  "index": "/imladris/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/imladris/chunk-B26dkhCa.js",
+        "/imladris/chunk-B6LxGt7e.js",
+        "/imladris/chunk-BfDkD8kc.js",
+        "/imladris/chunk-BjVZOdN_.js",
+        "/imladris/chunk-BtHuuEwA.js",
+        "/imladris/chunk-CZCos9ij.js",
+        "/imladris/chunk-CdKHNwtJ.js",
+        "/imladris/chunk-CgVzRWYq.js",
+        "/imladris/chunk-Cx9co7tx.js",
+        "/imladris/chunk-DHt8gz8m.js",
+        "/imladris/chunk-DLRn-jQY.js",
+        "/imladris/chunk-Dl0Yvav1.js",
+        "/imladris/chunk-DoixZiUe.js",
+        "/imladris/chunk-DvDgY5TE.js",
+        "/imladris/chunk-DvK6UBHv.js",
+        "/imladris/chunk-F_umVNHK.js",
+        "/imladris/chunk-T72wMp3E.js",
+        "/imladris/chunk-USgBHqPl.js",
+        "/imladris/chunk-Wdv2hVHm.js",
+        "/imladris/chunk-bhadtIiT.js",
+        "/imladris/favicon.ico",
+        "/imladris/index.html",
+        "/imladris/main-MATDT4A4.js",
+        "/imladris/manifest.webmanifest",
+        "/imladris/styles-TMEWEWM3.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/imladris/_favicon-32.png",
+        "/imladris/favicon-16x16.png",
+        "/imladris/favicon-32x32.png",
+        "/imladris/icons/icon-192x192.png",
+        "/imladris/icons/icon-512x512.png",
+        "/imladris/icons/icon-maskable-512x512.png",
+        "/imladris/imladris-favicon-bg-512.png",
+        "/imladris/imladris-logo+subheader.png",
+        "/imladris/imladris-logo.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/imladris/_favicon-32.png": "e4278b8fd1d49dfe15dbf09d46b295ebe9c5c342",
+    "/imladris/chunk-B26dkhCa.js": "059d2ee1cb25ed963614eca53bcaddf5a57a4499",
+    "/imladris/chunk-B6LxGt7e.js": "70316b63b548fd79d9ad38b19b0e9b9d6f9c91a4",
+    "/imladris/chunk-BfDkD8kc.js": "8b07ac4b5d249ce51b6e432a09c138ee551d6f49",
+    "/imladris/chunk-BjVZOdN_.js": "77cbdb607c34d1fc902d9f1b0a963cc82e146329",
+    "/imladris/chunk-BtHuuEwA.js": "03d2fcbfc7dbb22b2788871c3114fcbf6015caeb",
+    "/imladris/chunk-CZCos9ij.js": "115262aaa519e57a6abb8a081216d265a2e29f14",
+    "/imladris/chunk-CdKHNwtJ.js": "1d70921b2216f93e0e1214362d6839d2a17c46e6",
+    "/imladris/chunk-CgVzRWYq.js": "ae4ae81a4a78ed0ecf37671d39e8203e5bacd3a5",
+    "/imladris/chunk-Cx9co7tx.js": "05801a18551e4ae43216937206c21fa5596cc222",
+    "/imladris/chunk-DHt8gz8m.js": "69802587f85d761d80277298a2e4d4a697fd3855",
+    "/imladris/chunk-DLRn-jQY.js": "4569f0da6a5e359aca5e0e877c36cd08d746f6b8",
+    "/imladris/chunk-Dl0Yvav1.js": "a61f9dbd9f2826ed7a3486bb39a110bb8c59badf",
+    "/imladris/chunk-DoixZiUe.js": "de7cc720d7bc6cff2c9f7533b8f142716e42c459",
+    "/imladris/chunk-DvDgY5TE.js": "6e05bb29792b69f9f94b5c75b2f14a0a23540ec5",
+    "/imladris/chunk-DvK6UBHv.js": "0ab00d1378cb8bde7c4e03f8dcd22a0db3956530",
+    "/imladris/chunk-F_umVNHK.js": "2edf754a2b9765eb7e2046a2860c03e5560bac0d",
+    "/imladris/chunk-T72wMp3E.js": "18bbacb4779a224c0fef3340b540a1c3091d381d",
+    "/imladris/chunk-USgBHqPl.js": "0b3404339ef15aec675bd456621a266c192bcf49",
+    "/imladris/chunk-Wdv2hVHm.js": "9fc1aeeab9854b743ad5f93b09baf9940b1a1c07",
+    "/imladris/chunk-bhadtIiT.js": "d8644d9fee8a3f65df71297c2ba787749aee638a",
+    "/imladris/favicon-16x16.png": "e84fe26a88f462bb7068fa4d92a7c5803d3c0740",
+    "/imladris/favicon-32x32.png": "ccae6b8cbc8affb423fadd9750b863a0353676b6",
+    "/imladris/favicon.ico": "551579b3aac3d726c8047dd61050a22e0377bcf2",
+    "/imladris/icons/icon-192x192.png": "f854f8d6c17db0ede5ad748532662188ac6f7ea1",
+    "/imladris/icons/icon-512x512.png": "c57931fc496867464671db0ffd4cd553449c61a4",
+    "/imladris/icons/icon-maskable-512x512.png": "fe1565b0e599c30626e6eb5db56ab878c562c1d4",
+    "/imladris/imladris-favicon-bg-512.png": "fe1565b0e599c30626e6eb5db56ab878c562c1d4",
+    "/imladris/imladris-logo+subheader.png": "c46a8b6ae96896a273d91031c5712318823a68fd",
+    "/imladris/imladris-logo.png": "3686e0c1fa77012c5296f7d1b02ccbda2ef5ebe3",
+    "/imladris/index.html": "a9d8facda0befadbcdfc66012a1546252aee9028",
+    "/imladris/main-MATDT4A4.js": "29d278ec597bb8bd8896bfbfa7f54fc9a26ddba3",
+    "/imladris/manifest.webmanifest": "50637f11b48472261cb27321f153db4119507baf",
+    "/imladris/styles-TMEWEWM3.css": "3e73e725243df5eaf4bc84f427ec42ff2cc9eb9b"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}

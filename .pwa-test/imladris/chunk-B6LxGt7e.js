@@ -1,0 +1,1 @@
+function i(e=`startDate`,r=`endDate`){return n=>{let t=n.get(e)?.value,a=n.get(r)?.value;if(!t||!a)return null;let o=t instanceof Date?t:new Date(t);return(a instanceof Date?a:new Date(a))<o?{dateRangeInvalid:!0}:null}}export{i as t};
