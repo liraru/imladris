@@ -25,6 +25,7 @@ import { BookService } from '../../services/book.service';
 import { MangaVolumeService } from '../../services/manga-volume.service';
 import { YearlyReadingService } from '../../services/yearly-reading.service';
 import { ReadingProgressService } from '../../services/reading-progress.service';
+import { ReadingDailyChart } from '../../shared/components/reading-daily-chart/reading-daily-chart';
 import { ReadingHeatmap } from '../../shared/components/reading-heatmap/reading-heatmap';
 import {
   ReadingProgressFormModal,
@@ -119,6 +120,7 @@ function currentStreak(pagesByDay: Record<string, number>, today: Date): number 
     MatIconModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    ReadingDailyChart,
     ReadingHeatmap,
   ],
   templateUrl: './home.html',
@@ -329,7 +331,9 @@ export class Home implements OnInit {
       data: { reading } satisfies ReadingProgressFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
-    if (saved) await this._loadProgress();
+    // Se recargan las lecturas (y no solo el avance): si se ha marcado como completada,
+    // la lectura pasa de "Leyendo" a "Últimas lecturas".
+    if (saved) await this._refreshReadings();
   }
 
   private _format(value: number): string {
@@ -353,6 +357,16 @@ export class Home implements OnInit {
       console.error(err);
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  /** Recarga las lecturas y su avance sin pasar por el estado de carga (sin spinner). */
+  private async _refreshReadings(): Promise<void> {
+    try {
+      this._readings.set(await this._yearlyReadingSrv.getAll());
+      await this._loadProgress();
+    } catch (err) {
+      console.error(err);
     }
   }
 

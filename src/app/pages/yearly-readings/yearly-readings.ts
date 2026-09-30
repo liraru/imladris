@@ -132,12 +132,15 @@ export class YearlyReadings implements OnInit {
     if (result?.edit) await this.openEditModal(reading);
   }
 
-  protected openHistoryModal(reading: YearlyReading): void {
-    this._dialog.open(ReadingProgressHistoryModal, {
+  protected async openHistoryModal(reading: YearlyReading): Promise<void> {
+    const ref = this._dialog.open(ReadingProgressHistoryModal, {
       width: '640px',
       maxWidth: '95vw',
       data: { reading } satisfies ReadingProgressHistoryModalData,
     });
+    await firstValueFrom(ref.afterClosed());
+    // Desde el histórico se puede registrar un avance y marcar la lectura como completada.
+    await this._refreshReadings();
   }
 
   protected async registerProgress(reading: YearlyReading): Promise<void> {
@@ -149,7 +152,8 @@ export class YearlyReadings implements OnInit {
       data: { reading } satisfies ReadingProgressFormModalData,
     });
     const saved = await firstValueFrom(ref.afterClosed());
-    if (saved) await this._loadProgress();
+    // Se recargan las lecturas (y no solo el avance): al marcar como completada cambia su fecha de fin.
+    if (saved) await this._refreshReadings();
   }
 
   protected async deleteReading(reading: YearlyReading): Promise<void> {
@@ -205,6 +209,16 @@ export class YearlyReadings implements OnInit {
       await this._loadProgress();
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  /** Recarga las lecturas del año visible y su avance sin pasar por el estado de carga (sin spinner). */
+  private async _refreshReadings(): Promise<void> {
+    try {
+      this.readings.set(await this._service.getByYear(this.selectedYear()));
+      await this._loadProgress();
+    } catch (err) {
+      console.error(err);
     }
   }
 
