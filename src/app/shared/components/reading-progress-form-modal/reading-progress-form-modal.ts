@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   MAT_DIALOG_DATA,
@@ -22,6 +23,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ReadingProgress, YearlyReading } from '@shared/models';
 import { ReadingProgressService } from '../../../services/reading-progress.service';
+import { YearlyReadingService } from '../../../services/yearly-reading.service';
 import { confirmDiscardChanges } from '../../utils/confirm-discard.util';
 
 export interface ReadingProgressFormModalData {
@@ -35,6 +37,7 @@ export interface ReadingProgressFormModalData {
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -52,11 +55,15 @@ export class ReadingProgressFormModal implements OnInit {
   private readonly _dialogRef = inject(MatDialogRef<ReadingProgressFormModal>);
   private readonly _dialog = inject(MatDialog);
   private readonly _service = inject(ReadingProgressService);
+  private readonly _yearlyReadingSrv = inject(YearlyReadingService);
   protected readonly data = inject<ReadingProgressFormModalData>(MAT_DIALOG_DATA);
 
   protected readonly isEdit = !!this.data.progress;
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  /** "Marcar como completado" solo tiene sentido mientras la lectura sigue en curso (sin fecha de fin). */
+  protected readonly canComplete = !this.data.reading.endDate;
 
   protected readonly minDate = this._parseDate(this.data.reading.startDate);
   protected readonly maxDate = this.data.reading.endDate
@@ -65,6 +72,13 @@ export class ReadingProgressFormModal implements OnInit {
 
   /** Cuál de los dos campos ha editado el usuario por última vez: determina cuál se envía como origen al guardar. */
   private _lastEdited: 'page' | 'percentage' | null = null;
+
+  /** Valores de página/porcentaje previos a marcar "completado", para restaurarlos al desmarcarlo. */
+  private _beforeCompleted: {
+    page: number | null;
+    percentage: number | null;
+    lastEdited: 'page' | 'percentage' | null;
+  } | null = null;
 
   protected readonly form = this._fb.nonNullable.group({
     recordDate: [new Date(), [Validators.required, this._dateInRangeValidator()]],
@@ -76,6 +90,7 @@ export class ReadingProgressFormModal implements OnInit {
       this.data.progress?.percentage ?? (null as number | null),
       [Validators.min(0), Validators.max(100)],
     ],
+    completed: [false],
   });
 
   ngOnInit(): void {
@@ -103,13 +118,46 @@ export class ReadingProgressFormModal implements OnInit {
     this.form.controls.page.setValue(this._percentageToPage(percentage), { emitEvent: false });
   }
 
+  /**
+   * Al marcar "completado": página = total de la lectura, porcentaje = 100 y ambos campos
+   * deshabilitados. Al desmarcarlo se rehabilitan y se recuperan los valores anteriores.
+   */
+  protected onCompletedChange(): void {
+    const { page, percentage, completed } = this.form.controls;
+
+    if (completed.value) {
+      this._beforeCompleted = {
+        page: page.value,
+        percentage: percentage.value,
+        lastEdited: this._lastEdited,
+      };
+      page.setValue(this.data.reading.pages, { emitEvent: false });
+      percentage.setValue(100, { emitEvent: false });
+      page.disable({ emitEvent: false });
+      percentage.disable({ emitEvent: false });
+      this._lastEdited = 'page';
+    } else {
+      page.enable({ emitEvent: false });
+      percentage.enable({ emitEvent: false });
+      if (this._beforeCompleted) {
+        page.setValue(this._beforeCompleted.page, { emitEvent: false });
+        percentage.setValue(this._beforeCompleted.percentage, { emitEvent: false });
+        this._lastEdited = this._beforeCompleted.lastEdited;
+        this._beforeCompleted = null;
+      }
+    }
+  }
+
   protected async save(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    // getRawValue incluye también los campos deshabilitados (página y porcentaje al completar).
     const raw = this.form.getRawValue();
-    if (raw.page == null && raw.percentage == null) {
+    const completed = this.canComplete && raw.completed;
+
+    if (!completed && raw.page == null && raw.percentage == null) {
       this.error.set('Indica una página o un porcentaje.');
       return;
     }
@@ -117,11 +165,19 @@ export class ReadingProgressFormModal implements OnInit {
     this.saving.set(true);
     this.error.set(null);
     try {
-      const source = this._lastEdited ?? (raw.page != null ? 'page' : 'percentage');
+      const recordDate = this._toDateString(raw.recordDate);
+      const source = completed
+        ? 'page'
+        : (this._lastEdited ?? (raw.page != null ? 'page' : 'percentage'));
       const input = {
         readingId: this.data.reading.id,
-        recordDate: this._toDateString(raw.recordDate),
-        page: source === 'page' ? (raw.page ?? undefined) : undefined,
+        recordDate,
+        page:
+          source === 'page'
+            ? completed
+              ? this.data.reading.pages
+              : (raw.page ?? undefined)
+            : undefined,
         percentage: source === 'percentage' ? (raw.percentage ?? undefined) : undefined,
       };
 
@@ -129,6 +185,10 @@ export class ReadingProgressFormModal implements OnInit {
         await this._service.update(this.data.progress!.id, this.data.reading.pages, input);
       } else {
         await this._service.create(this.data.reading.pages, input);
+      }
+
+      if (completed) {
+        await this._yearlyReadingSrv.update(this.data.reading.id, { endDate: recordDate });
       }
       this._dialogRef.close(true);
     } catch (e) {

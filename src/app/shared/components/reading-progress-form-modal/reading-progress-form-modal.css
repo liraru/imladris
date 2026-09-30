@@ -46,6 +46,17 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+/* "Marcar como completado": alineado con el borde izquierdo de los campos. */
+.reading-progress-form-modal__completed {
+  align-self: flex-start;
+  margin-left: -0.5rem;
+}
+
+.reading-progress-form-modal__hint--completed {
+  margin: 0.25rem 0 0.5rem;
+  color: var(--gold);
+}
+
 .reading-progress-form-modal__error {
   color: var(--mat-sys-error, #e08585);
   margin-bottom: 0.5rem;

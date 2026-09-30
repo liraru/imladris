@@ -1,0 +1,43 @@
+<div class="reading-daily-chart">
+  <div class="reading-daily-chart__header">
+    <span class="reading-daily-chart__title">Páginas por día</span>
+    @if (days().length > 0) {
+      <span class="reading-daily-chart__summary">
+        {{ totalPages() | number: '1.0-0' }} págs. en {{ days().length }}
+        {{ days().length === 1 ? 'día' : 'días' }} · máx. {{ maxPages() | number: '1.0-0' }}
+      </span>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="reading-daily-chart__state">
+      <mat-spinner diameter="20"></mat-spinner>
+    </div>
+  } @else if (days().length === 0) {
+    <p class="reading-daily-chart__empty">Todavía no hay avances registrados.</p>
+  } @else {
+    <div class="reading-daily-chart__scroll" #scroller>
+      <div class="reading-daily-chart__inner">
+        <div class="reading-daily-chart__bars">
+          @for (day of days(); track day.date) {
+            <div
+              class="reading-daily-chart__col"
+              [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
+              matTooltipClass="reading-heatmap-tooltip"
+            >
+              <div
+                class="reading-daily-chart__bar"
+                [class.reading-daily-chart__bar--empty]="day.pages === 0"
+                [style.height.%]="day.pages > 0 ? day.heightPct : null"
+              ></div>
+            </div>
+          }
+        </div>
+        <div class="reading-daily-chart__axis">
+          <span>{{ firstDate() | date: 'dd/MM/yyyy' }}</span>
+          <span>Hoy</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>
