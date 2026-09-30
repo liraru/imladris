@@ -108,6 +108,11 @@
   color: var(--gold-soft);
 }
 
+/* Envoltorio transparente en escritorio (el botón se comporta como hijo directo de .app-auth). */
+.app-auth__session {
+  display: contents;
+}
+
 .app-menu-toggle {
   display: none;
 }
@@ -139,6 +144,11 @@
 
   .app-auth {
     margin-left: auto;
+  }
+
+  /* En móvil el botón de sesión sale de la barra: vive dentro del menú hamburguesa. */
+  .app-auth__session {
+    display: none;
   }
 
   .app-menu-toggle {
@@ -178,6 +188,31 @@
     color: var(--gold);
     border-left-color: var(--gold);
     background: rgba(92, 26, 38, 0.18);
+  }
+
+  .app-mobile-nav__divider {
+    height: 1px;
+    margin: 0.5rem 1.25rem;
+    background: rgba(201, 162, 39, 0.18);
+  }
+
+  /* El botón de sesión reutiliza el estilo de los enlaces; aquí solo se neutraliza el aspecto de <button>. */
+  .app-mobile-nav__session {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-left: 3px solid transparent;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .app-mobile-nav__session mat-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 1.25rem;
   }
 }
 

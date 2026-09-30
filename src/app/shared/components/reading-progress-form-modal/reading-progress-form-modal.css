@@ -2,6 +2,16 @@
   display: block;
 }
 
+/*
+ * Sin scroll: se anula el límite de alto (65vh) y el overflow automático que Angular Material
+ * aplica a mat-dialog-content, de modo que la modal crece lo necesario para mostrar todo el
+ * formulario. Además evita que la etiqueta flotante del primer campo quede recortada.
+ */
+.reading-progress-form-modal {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 .reading-progress-form-modal__subtitle {
   margin: 0 0 1rem;
   color: var(--mat-sys-on-surface-variant);
