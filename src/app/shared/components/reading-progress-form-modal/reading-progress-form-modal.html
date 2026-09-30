@@ -64,6 +64,22 @@
     <p class="reading-progress-form-modal__hint">
       Introduce página o porcentaje: el otro valor se calcula automáticamente.
     </p>
+
+    @if (canComplete) {
+      <mat-checkbox
+        class="reading-progress-form-modal__completed"
+        formControlName="completed"
+        (change)="onCompletedChange()"
+      >
+        Marcar como completado
+      </mat-checkbox>
+
+      @if (form.controls.completed.value) {
+        <p class="reading-progress-form-modal__hint reading-progress-form-modal__hint--completed">
+          Al guardar, la lectura se marcará como finalizada en la fecha indicada.
+        </p>
+      }
+    }
   </form>
 </mat-dialog-content>
 
