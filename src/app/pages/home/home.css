@@ -106,7 +106,9 @@
   color: var(--text-muted);
 }
 
-/* El mapa de calor se centra verticalmente cuando la columna de cifras lo hace más alto. */
+/*
+ * El mapa de calor se centra verticalmente cuando la columna de cifras lo hace más alto.
+ */
 .home__activity {
   display: flex;
   flex-direction: column;
@@ -194,7 +196,10 @@
   text-overflow: ellipsis;
 }
 
-/* Tablet: las cinco cifras en una fila de tarjetas bajo el mapa de calor (icono, valor y etiqueta apilados). */
+/*
+ * Tablet: las cinco cifras en una fila de tarjetas bajo el mapa de calor
+ * (icono, valor y etiqueta apilados).
+ */
 @media (min-width: 768px) and (max-width: 1099px) {
   .home__stats-list {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -364,7 +369,24 @@
   overflow: hidden;
 }
 
-/* Portada ampliada y desenfocada como fondo de la tarjeta. */
+/*
+ * Escritorio/tablet: portada grande a la izquierda ocupando las dos filas; la columna
+ * derecha lleva en la fila 1 el cuerpo (texto, progreso, estadísticas) y en la fila 2 el
+ * gráfico diario. La fila 2 es 1fr: absorbe el alto sobrante de la portada.
+ * Tablet pequeña (576-767px) y móvil conservan su propia disposición.
+ */
+@media (min-width: 768px) {
+  .reading-hero {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 2rem;
+    row-gap: 1rem;
+  }
+}
+
+/*
+ * Portada ampliada y desenfocada como fondo de la tarjeta.
+ */
 .reading-hero__backdrop {
   position: absolute;
   inset: 0;
@@ -485,15 +507,90 @@
   color: var(--mat-sys-on-surface);
 }
 
+/*
+ * Escritorio/tablet — colocación de los elementos en la rejilla de la tarjeta:
+ *   · Portada: columna 1, filas 1-2, pegada arriba.
+ *   · Cuerpo (kicker, título, autor, progreso, estadísticas): columna 2, fila 1, empezando
+ *     a la altura del borde superior de la portada.
+ *   · Gráfico diario: columna 2, fila 2, pegado abajo, de modo que su borde inferior
+ *     coincide con el borde inferior de la portada.
+ * Va DESPUÉS de las reglas base de .reading-hero__* para que no las pisen. El selector del
+ * gráfico (.reading-hero app-reading-daily-chart) tiene más especificidad que el :host del
+ * propio componente, que por defecto lo extiende a todo el ancho (grid-column: 1 / -1).
+ */
+@media (min-width: 768px) {
+  .reading-hero__cover {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+  }
+
+  .reading-hero__body {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-start;
+  }
+
+  .reading-hero app-reading-daily-chart {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+  }
+}
+
+/*
+ * Móvil: el cuerpo se "disuelve" (display: contents) para colocar sus hijos directamente
+ * en la rejilla de la tarjeta:
+ *   · Columna izquierda: la portada ocupa las filas 1-4.
+ *   · Columna derecha: kicker, título y autor arrancan a la altura del borde superior de la
+ *     portada (filas 1-3; la 3ª es 1fr y absorbe el alto sobrante) y el bloque de
+ *     porcentaje + barra ocupa la fila 4, pegado abajo, de modo que el borde inferior de la
+ *     barra coincide con el borde inferior de la portada.
+ *   · Debajo, a todo el ancho: estadísticas y gráfico diario.
+ * Solo afecta a la vista móvil; escritorio y tablet no cambian.
+ */
 @media (max-width: 575px) {
   .reading-hero {
     grid-template-columns: 6.25rem minmax(0, 1fr);
-    gap: 1rem;
+    grid-template-rows: auto auto 1fr auto;
+    column-gap: 1rem;
+    row-gap: 0;
     padding: 1rem;
   }
 
+  .reading-hero__body {
+    display: contents;
+  }
+
+  .reading-hero__cover {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    align-self: start;
+  }
+
+  .reading-hero__kicker {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .reading-hero__title {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0.35rem 0;
     font-size: 1.1rem;
+  }
+
+  .reading-hero__author {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: start;
+  }
+
+  .reading-hero__progress {
+    grid-column: 2;
+    grid-row: 4;
+    align-self: end;
+    margin-top: 0.5rem;
   }
 
   .reading-hero__percentage {
@@ -501,18 +598,16 @@
   }
 
   .reading-hero__facts {
-    grid-template-columns: 1fr;
-    gap: 0.3rem;
+    grid-column: 1 / -1;
+    grid-row: 5;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
   }
 
-  .reading-hero__facts > div {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-
-  .reading-hero__facts dd {
-    margin: 0;
+  .reading-hero app-reading-daily-chart {
+    grid-row: 6;
+    margin-top: 1rem;
   }
 }
 
