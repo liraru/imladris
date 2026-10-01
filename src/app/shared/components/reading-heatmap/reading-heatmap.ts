@@ -24,6 +24,20 @@ interface HeatmapDay {
   empty: boolean;
 }
 
+/** Resumen del periodo mostrado (mismo rango que la cuadrícula). */
+interface HeatmapSummary {
+  /** Días del rango con al menos una página leída. */
+  readingDays: number;
+  /** Días totales del rango. */
+  totalDays: number;
+  /** Mayor nº de días consecutivos leyendo dentro del rango. */
+  longestStreak: number;
+  /** Mes con más páginas leídas; `date` es el día 1 de ese mes (yyyy-MM-dd). */
+  bestMonth: { date: string; pages: number } | null;
+  /** Media de páginas por día con lectura (0 si no hay ninguno). */
+  pagesPerReadingDay: number;
+}
+
 /** Meses hacia atrás del rango en escritorio (1 año) y en móvil. */
 const DESKTOP_MONTHS_BACK = 12;
 const MOBILE_MONTHS_BACK = 4;
@@ -44,6 +58,9 @@ export class ReadingHeatmap {
   /** Muestra la línea "N páginas leídas en …" sobre el mapa. La home la oculta y la muestra en sus cifras. */
   readonly showTitle = input(true);
 
+  /** Muestra bajo el mapa un resumen del periodo (días con lectura, racha más larga, mejor mes, media). Solo en escritorio. */
+  readonly showSummary = input(false);
+
   /** true por debajo de 768px, igual que el resto de la app (navbar, gestión, home, etc.). */
   protected readonly isMobile = toSignal(
     inject(BreakpointObserver)
@@ -56,6 +73,12 @@ export class ReadingHeatmap {
   protected readonly weeks = signal<HeatmapDay[][]>([]);
   protected readonly monthLabels = signal<{ label: string; weekIndex: number }[]>([]);
   protected readonly totalPages = signal(0);
+  protected readonly summary = signal<HeatmapSummary | null>(null);
+
+  /** Resumen visible: solo si se ha pedido y no es móvil (en móvil los paneles van apilados y no sobra espacio). */
+  protected readonly visibleSummary = computed(() =>
+    this.showSummary() && !this.isMobile() ? this.summary() : null,
+  );
 
   /** Etiqueta de mes por índice de semana. Cada semana pinta la suya en su primera fila, así las celdas y las etiquetas nunca se desalinean. */
   protected readonly monthLabelByWeek = computed<Record<number, string>>(() => {
@@ -159,7 +182,46 @@ export class ReadingHeatmap {
     this.weeks.set(weeks);
     this.monthLabels.set(monthLabels);
     this.totalPages.set(Object.values(pagesByDay).reduce((s, n) => s + n, 0));
+    this.summary.set(this._buildSummary(days));
     this.loading.set(false);
+  }
+
+  /** Días con lectura, racha más larga, mes con más páginas y media por día, a partir de los días reales del rango. */
+  private _buildSummary(days: HeatmapDay[]): HeatmapSummary {
+    let readingDays = 0;
+    let totalDays = 0;
+    let longestStreak = 0;
+    let run = 0;
+    let pagesOnReadingDays = 0;
+    const pagesByMonth = new Map<string, number>();
+
+    for (const day of days) {
+      if (day.empty) continue;
+      totalDays++;
+
+      if (day.count > 0) {
+        readingDays++;
+        run++;
+        longestStreak = Math.max(longestStreak, run);
+        pagesOnReadingDays += day.count;
+
+        const monthKey = day.date.slice(0, 7); // yyyy-MM
+        pagesByMonth.set(monthKey, (pagesByMonth.get(monthKey) ?? 0) + day.count);
+      } else {
+        run = 0;
+      }
+    }
+
+    let bestMonth: HeatmapSummary['bestMonth'] = null;
+    for (const [monthKey, pages] of pagesByMonth) {
+      if (!bestMonth || pages > bestMonth.pages) {
+        bestMonth = { date: `${monthKey}-01`, pages };
+      }
+    }
+
+    const pagesPerReadingDay = readingDays > 0 ? pagesOnReadingDays / readingDays : 0;
+
+    return { readingDays, totalDays, longestStreak, bestMonth, pagesPerReadingDay };
   }
 
   /** Retrocede `months` meses conservando el día, ajustándolo si el mes destino es más corto. */

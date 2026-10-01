@@ -12,7 +12,7 @@
         <h2 class="home__panel-title">Actividad de lectura</h2>
         <span class="home__panel-note">{{ isMobile() ? 'Últimos 4 meses' : 'Último año' }}</span>
       </div>
-      <app-reading-heatmap [showTitle]="false" />
+      <app-reading-heatmap [showTitle]="false" [showSummary]="true" />
     </section>
 
     <section class="home__panel home__stats">

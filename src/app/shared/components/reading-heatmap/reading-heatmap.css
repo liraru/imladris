@@ -3,7 +3,13 @@
   width: 100%;
 }
 
+/*
+ * flex: 1 → cuando el host se estira (p. ej. en el panel de la home, que iguala su altura a la
+ * de "En cifras"), el contenido ocupa todo el alto y el resumen se queda abajo.
+ * Fuera de un contenedor flex no tiene efecto.
+ */
 .reading-heatmap {
+  flex: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -21,10 +27,15 @@
   padding: 1rem;
 }
 
+/*
+ * margin-block: auto → si sobra altura, la cuadrícula se centra entre la cabecera del panel
+ * y el resumen en vez de quedarse pegada arriba. Sin altura sobrante no añade nada.
+ */
 .reading-heatmap__scroll {
   width: 100%;
   overflow-x: auto;
   padding-bottom: 0.25rem;
+  margin-block: auto;
 }
 
 .reading-heatmap__body {
@@ -111,4 +122,53 @@
   width: 12px;
   height: 12px;
   aspect-ratio: auto;
+}
+
+/* ───────────── Resumen del periodo (opcional, solo escritorio) ───────────── */
+
+.reading-heatmap__summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid
+    var(--panel-border, color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent));
+}
+
+.reading-heatmap__summary-item {
+  min-width: 0;
+}
+
+.reading-heatmap__summary-item dt {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.reading-heatmap__summary-item dd {
+  margin: 0.25rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.reading-heatmap__summary-value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  line-height: 1.15;
+  color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reading-heatmap__summary-value--capitalize {
+  text-transform: capitalize;
+}
+
+.reading-heatmap__summary-detail {
+  font-size: 0.72rem;
+  color: var(--mat-sys-on-surface-variant);
 }

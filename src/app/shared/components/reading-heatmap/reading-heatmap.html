@@ -42,5 +42,64 @@
         </div>
       </div>
     </div>
+
+    @if (visibleSummary(); as s) {
+      <dl class="reading-heatmap__summary">
+        <div class="reading-heatmap__summary-item">
+          <dt>Días con lectura</dt>
+          <dd>
+            <span class="reading-heatmap__summary-value">{{
+              s.readingDays | number: '1.0-0'
+            }}</span>
+            <span class="reading-heatmap__summary-detail">
+              de {{ s.totalDays | number: '1.0-0' }} días
+            </span>
+          </dd>
+        </div>
+
+        <div class="reading-heatmap__summary-item">
+          <dt>Racha más larga</dt>
+          <dd>
+            <span class="reading-heatmap__summary-value">
+              {{ s.longestStreak | number: '1.0-0' }}
+              {{ s.longestStreak === 1 ? 'día' : 'días' }}
+            </span>
+            <span class="reading-heatmap__summary-detail">consecutivos</span>
+          </dd>
+        </div>
+
+        <div class="reading-heatmap__summary-item">
+          <dt>Mes con más páginas</dt>
+          <dd>
+            @if (s.bestMonth; as best) {
+              <span
+                class="reading-heatmap__summary-value reading-heatmap__summary-value--capitalize"
+              >
+                {{ best.date | date: 'MMMM' }}
+              </span>
+              <span class="reading-heatmap__summary-detail">
+                {{ best.pages | number: '1.0-0' }} págs. · {{ best.date | date: 'y' }}
+              </span>
+            } @else {
+              <span class="reading-heatmap__summary-value">—</span>
+            }
+          </dd>
+        </div>
+
+        <div class="reading-heatmap__summary-item">
+          <dt>Media por día</dt>
+          <dd>
+            @if (s.readingDays > 0) {
+              <span class="reading-heatmap__summary-value">
+                {{ s.pagesPerReadingDay | number: '1.0-0' }} págs.
+              </span>
+              <span class="reading-heatmap__summary-detail">en días con lectura</span>
+            } @else {
+              <span class="reading-heatmap__summary-value">—</span>
+            }
+          </dd>
+        </div>
+      </dl>
+    }
   }
 </div>

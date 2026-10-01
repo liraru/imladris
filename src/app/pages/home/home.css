@@ -128,6 +128,24 @@
   display: grid;
 }
 
+/*
+ * Escritorio (paneles lado a lado): el panel de cifras se estira a la altura del mapa de
+ * calor (la rejilla de .home__overview ya los iguala) y sus filas se reparten ese alto a
+ * partes iguales (grid-auto-rows: 1fr), con el contenido centrado en cada una. Así no queda
+ * hueco debajo y los separadores quedan espaciados. En tablet y móvil no se aplica.
+ */
+@media (min-width: 1100px) {
+  .home__stats {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home__stats-list {
+    flex: 1;
+    grid-auto-rows: 1fr;
+  }
+}
+
 .home__stat {
   display: flex;
   align-items: center;
