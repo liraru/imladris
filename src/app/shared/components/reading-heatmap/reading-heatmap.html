@@ -15,7 +15,10 @@
         <div class="reading-heatmap__grid">
           @for (week of weeks(); track $index) {
             <div class="reading-heatmap__week">
-              <span class="reading-heatmap__month">{{ monthLabelByWeek()[$index] ?? '' }}</span>
+              @let month = monthLabelByWeek()[$index];
+              <span class="reading-heatmap__month" [class.reading-heatmap__month--end]="month?.alignEnd">{{
+                month?.label ?? ''
+              }}</span>
               @for (day of week; track $index) {
                 @if (day.empty) {
                   <div class="reading-heatmap__day reading-heatmap__day--empty"></div>
@@ -33,11 +36,14 @@
         </div>
         <div class="reading-heatmap__legend">
           <span>Menos</span>
-          <div class="reading-heatmap__day" data-level="0"></div>
-          <div class="reading-heatmap__day" data-level="1"></div>
-          <div class="reading-heatmap__day" data-level="2"></div>
-          <div class="reading-heatmap__day" data-level="3"></div>
-          <div class="reading-heatmap__day" data-level="4"></div>
+          @for (item of legendLevels; track item.level) {
+            <div
+              class="reading-heatmap__day"
+              [attr.data-level]="item.level"
+              [matTooltip]="item.tooltip"
+              matTooltipClass="reading-heatmap-tooltip"
+            ></div>
+          }
           <span>Más</span>
         </div>
       </div>
