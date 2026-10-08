@@ -16,6 +16,7 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ROUTES } from '@shared/constants';
@@ -31,6 +32,10 @@ import {
   ReadingProgressFormModal,
   ReadingProgressFormModalData,
 } from '../../shared/components/reading-progress-form-modal/reading-progress-form-modal';
+import {
+  ReadingProgressHistoryModal,
+  ReadingProgressHistoryModalData,
+} from '../yearly-readings/components/reading-progress-history-modal/reading-progress-history-modal';
 import { fromBook, fromMangaVolume, HOME_ITEM_TYPE, HomeItem } from './models/home-item.model';
 
 /** Nº máximo de entradas por sección en escritorio. */
@@ -118,6 +123,7 @@ function currentStreak(pagesByDay: Record<string, number>, today: Date): number 
     DecimalPipe,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
     ReadingDailyChart,
@@ -320,9 +326,8 @@ export class Home implements OnInit {
     return this._readTitles().has(normalizeTitle(item.title));
   }
 
-  /** Abre la modal de registro de avance para una lectura en curso de la sección "Leyendo". */
-  protected async registerProgress(reading: YearlyReading, event: Event): Promise<void> {
-    event.stopPropagation();
+  /** Opción "Añadir" del menú de la tarjeta: abre la modal de registro de avance de la lectura. */
+  protected async registerProgress(reading: YearlyReading): Promise<void> {
     if (!this.authService.isAdmin()) return;
 
     const ref = this._dialog.open(ReadingProgressFormModal, {
@@ -334,6 +339,21 @@ export class Home implements OnInit {
     // Se recargan las lecturas (y no solo el avance): si se ha marcado como completada,
     // la lectura pasa de "Leyendo" a "Últimas lecturas".
     if (saved) await this._refreshReadings();
+  }
+
+  /** Opción "Historial" del menú de la tarjeta: abre el histórico de avances de la lectura. */
+  protected async openHistory(reading: YearlyReading): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
+    const ref = this._dialog.open(ReadingProgressHistoryModal, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: { reading } satisfies ReadingProgressHistoryModalData,
+    });
+    await firstValueFrom(ref.afterClosed());
+    // Desde el histórico se pueden registrar, editar o borrar avances y marcar la lectura como
+    // completada, así que al cerrarlo se refrescan las lecturas y su porcentaje.
+    await this._refreshReadings();
   }
 
   private _format(value: number): string {
