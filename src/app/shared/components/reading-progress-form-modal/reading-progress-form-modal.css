@@ -56,6 +56,121 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+/* Fila "pista + botón de calculadora": el texto ocupa el espacio libre y el botón queda a la derecha. */
+.reading-progress-form-modal__helper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.reading-progress-form-modal__helper .reading-progress-form-modal__hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Botón activo (panel abierto): icono dorado y fondo suave. */
+.reading-progress-form-modal__calc-toggle {
+  flex: 0 0 auto;
+  --mat-icon-button-icon-color: var(--mat-sys-on-surface-variant);
+  --mdc-icon-button-icon-color: var(--mat-sys-on-surface-variant);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.reading-progress-form-modal__calc-toggle.is-active {
+  --mat-icon-button-icon-color: var(--gold);
+  --mdc-icon-button-icon-color: var(--gold);
+  background-color: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+/*
+ * Panel desplegable. Se anima la altura con la técnica grid 0fr → 1fr (no hace falta conocer
+ * el alto del contenido). Cerrado, el atributo `inert` (puesto desde la plantilla) saca sus
+ * campos del orden de tabulación y de los lectores de pantalla.
+ */
+.reading-progress-form-modal__calc {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.reading-progress-form-modal__calc.is-open {
+  grid-template-rows: 1fr;
+}
+
+.reading-progress-form-modal__calc-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.reading-progress-form-modal__calc-box {
+  margin: 0.5rem 0 0.75rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+  background: color-mix(in srgb, var(--mat-sys-surface-container-high) 70%, transparent);
+}
+
+.reading-progress-form-modal__calc-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* Dos columnas también en móvil (los campos son cortos); una sola en pantallas muy estrechas. */
+.reading-progress-form-modal__calc-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.reading-progress-form-modal__calc-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--mat-sys-corner-medium, 10px);
+  background: var(--mat-sys-surface-container-high);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 25%, transparent);
+}
+
+.reading-progress-form-modal__calc-page {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+}
+
+.reading-progress-form-modal__calc-page strong {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.reading-progress-form-modal__calc-page span {
+  margin-left: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.reading-progress-form-modal__calc-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.reading-progress-form-modal__calc-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--mat-sys-error, #e08585);
+}
+
 /* "Marcar como completado": alineado con el borde izquierdo de los campos. */
 .reading-progress-form-modal__completed {
   align-self: flex-start;
@@ -72,8 +187,36 @@
   margin-bottom: 0.5rem;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress-form-modal__calc,
+  .reading-progress-form-modal__calc-toggle {
+    transition: none;
+  }
+}
+
 @media (max-width: 575px) {
   .reading-progress-form-modal__row {
+    grid-template-columns: 1fr;
+  }
+
+  .reading-progress-form-modal__calc-box {
+    padding: 0.75rem;
+  }
+
+  /* Resultado apilado y botón a todo el ancho, más cómodo de pulsar con el pulgar. */
+  .reading-progress-form-modal__calc-result {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .reading-progress-form-modal__calc-apply {
+    width: 100%;
+  }
+}
+
+@media (max-width: 359px) {
+  .reading-progress-form-modal__calc-row {
     grid-template-columns: 1fr;
   }
 }
