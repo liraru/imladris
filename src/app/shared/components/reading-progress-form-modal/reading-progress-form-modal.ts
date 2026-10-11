@@ -1,7 +1,16 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
+  FormControl,
   ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn,
@@ -24,7 +33,42 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ReadingProgress, YearlyReading } from '@shared/models';
 import { ReadingProgressService } from '../../../services/reading-progress.service';
 import { YearlyReadingService } from '../../../services/yearly-reading.service';
+import { ThousandsPipe } from '../../pipes/thousands.pipe';
 import { confirmDiscardChanges } from '../../utils/confirm-discard.util';
+
+/**
+ * Misma clave de `localStorage` que usa la calculadora de Folio
+ * (`pages-calculator.component.ts`): la posición total se comparte entre ambas.
+ */
+const KINDLE_STORAGE_KEY = 'folio:kindle-data';
+
+/** Lee el estado completo de la calculadora para no pisar el resto de sus campos (páginas, historial) al guardar. */
+function readKindleState(): Record<string, unknown> {
+  try {
+    const raw = localStorage.getItem(KINDLE_STORAGE_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
+  } catch (e) {
+    console.warn('No se pudo leer el almacenamiento local:', e);
+    return {};
+  }
+}
+
+function loadStoredTotalPosition(): number | null {
+  const value = readKindleState()['totalPosition'];
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function saveStoredTotalPosition(value: number | null): void {
+  try {
+    localStorage.setItem(
+      KINDLE_STORAGE_KEY,
+      JSON.stringify({ ...readKindleState(), totalPosition: value }),
+    );
+  } catch (e) {
+    console.error('No se pudo guardar la posición total:', e);
+  }
+}
 
 export interface ReadingProgressFormModalData {
   reading: YearlyReading;
@@ -45,6 +89,7 @@ export interface ReadingProgressFormModalData {
     MatInputModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    ThousandsPipe,
   ],
   templateUrl: './reading-progress-form-modal.html',
   styleUrl: './reading-progress-form-modal.css',
@@ -93,6 +138,56 @@ export class ReadingProgressFormModal implements OnInit {
     completed: [false],
   });
 
+  // ---------- Calculadora de página (posición Kindle → página) ----------
+
+  /** Panel desplegable de la calculadora: oculto por defecto. */
+  protected readonly calcOpen = signal(false);
+
+  /**
+   * Controles fuera del `form` principal a propósito: así no ensucian el formulario
+   * ni se envían al guardar, y no afectan a la pregunta "¿Deseas irte sin guardar?".
+   */
+  protected readonly calcCurrentPosition = new FormControl<number | null>(null);
+  protected readonly calcTotalPosition = new FormControl<number | null>(loadStoredTotalPosition());
+
+  private readonly _calcCurrent = toSignal(this.calcCurrentPosition.valueChanges, {
+    initialValue: this.calcCurrentPosition.value,
+  });
+  private readonly _calcTotal = toSignal(this.calcTotalPosition.valueChanges, {
+    initialValue: this.calcTotalPosition.value,
+  });
+
+  /**
+   * Misma fórmula que la calculadora de Folio:
+   * `Math.round(posicionActual / (posicionTotal / paginasTotales))`,
+   * con las páginas totales tomadas de la propia lectura.
+   */
+  private readonly _calc = computed<{ page: number | null; error: string | null } | null>(() => {
+    const current = this._calcCurrent();
+    const total = this._calcTotal();
+    const pages = this.data.reading.pages;
+
+    if (current == null) return null;
+
+    if (!Number.isFinite(current) || current < 0) {
+      return { page: null, error: 'Introduce una posición actual válida.' };
+    }
+    if (total == null || !Number.isFinite(total) || total <= 0) {
+      return { page: null, error: 'Indica la posición total del libro.' };
+    }
+    if (!Number.isFinite(pages) || pages <= 0) {
+      return { page: null, error: 'La lectura no tiene páginas totales definidas.' };
+    }
+    if (current > total) {
+      return { page: null, error: 'La posición actual no puede superar la posición total.' };
+    }
+
+    return { page: Math.round(current / (total / pages)), error: null };
+  });
+
+  protected readonly calcPage = computed(() => this._calc()?.page ?? null);
+  protected readonly calcError = computed(() => this._calc()?.error ?? null);
+
   ngOnInit(): void {
     if (this.data.progress) {
       this.form.patchValue(
@@ -100,6 +195,33 @@ export class ReadingProgressFormModal implements OnInit {
         { emitEvent: false },
       );
     }
+  }
+
+  protected toggleCalc(): void {
+    this.calcOpen.update((open) => !open);
+  }
+
+  /** Guarda la posición total al confirmarla (blur/enter), igual que en la calculadora. */
+  protected onCalcTotalPositionChange(): void {
+    saveStoredTotalPosition(this.calcTotalPosition.value);
+  }
+
+  /** Vuelca la página calculada en el campo "Página", recalcula el porcentaje y oculta el panel. */
+  protected applyCalculatedPage(): void {
+    const page = this.calcPage();
+    if (page == null || this.calcError()) return;
+
+    saveStoredTotalPosition(this.calcTotalPosition.value);
+
+    const { page: pageControl, percentage } = this.form.controls;
+    pageControl.setValue(page);
+    pageControl.markAsDirty();
+    pageControl.markAsTouched();
+    percentage.markAsDirty();
+    // Fija el origen en "página" y recalcula el porcentaje, como si se hubiera escrito a mano.
+    this.onPageInput();
+
+    this.calcOpen.set(false);
   }
 
   /** Recalcula el porcentaje en caliente al escribir la página, sin esperar a guardar. */

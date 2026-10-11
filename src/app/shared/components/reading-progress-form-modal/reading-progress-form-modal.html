@@ -1,6 +1,8 @@
 <h2 mat-dialog-title>{{ isEdit ? 'Editar avance' : 'Registrar avance' }}</h2>
 
 <mat-dialog-content class="reading-progress-form-modal">
+  @let calcVisible = calcOpen() && !form.controls.completed.value;
+
   <p class="reading-progress-form-modal__subtitle" [matTooltip]="data.reading.title">
     {{ data.reading.title }}
   </p>
@@ -61,9 +63,92 @@
       </mat-form-field>
     </div>
 
-    <p class="reading-progress-form-modal__hint">
-      Introduce página o porcentaje: el otro valor se calcula automáticamente.
-    </p>
+    <div class="reading-progress-form-modal__helper">
+      <p class="reading-progress-form-modal__hint">
+        Introduce página o porcentaje: el otro valor se calcula automáticamente.
+      </p>
+      <button
+        mat-icon-button
+        type="button"
+        class="reading-progress-form-modal__calc-toggle"
+        [class.is-active]="calcVisible"
+        matTooltip="Mostrar/ocultar calculadora"
+        aria-label="Mostrar u ocultar la calculadora de página"
+        aria-controls="reading-progress-calc"
+        [attr.aria-expanded]="calcVisible"
+        [disabled]="form.controls.completed.value"
+        (click)="toggleCalc()"
+      >
+        <mat-icon>calculate</mat-icon>
+      </button>
+    </div>
+
+    <!-- Panel desplegable: calcula la página según la posición del Kindle. -->
+    <div
+      id="reading-progress-calc"
+      class="reading-progress-form-modal__calc"
+      [class.is-open]="calcVisible"
+      [attr.inert]="calcVisible ? null : ''"
+    >
+      <div class="reading-progress-form-modal__calc-inner">
+        <div class="reading-progress-form-modal__calc-box">
+          <p class="reading-progress-form-modal__calc-title">Calculadora de página</p>
+
+          <div class="reading-progress-form-modal__calc-row">
+            <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+              <mat-label>Posición actual</mat-label>
+              <input
+                matInput
+                type="number"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                placeholder="ej. 3120"
+                [formControl]="calcCurrentPosition"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+              <mat-label>Posición total</mat-label>
+              <input
+                matInput
+                type="number"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                placeholder="ej. 6840"
+                [formControl]="calcTotalPosition"
+                (change)="onCalcTotalPositionChange()"
+              />
+              <mat-hint>Guardado</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <div class="reading-progress-form-modal__calc-result" aria-live="polite">
+            @if (calcError(); as calcErrorMessage) {
+              <p class="reading-progress-form-modal__calc-error">{{ calcErrorMessage }}</p>
+            } @else if (calcPage() !== null) {
+              <p class="reading-progress-form-modal__calc-page">
+                Página <strong>{{ calcPage() | thousands }}</strong>
+                <span>de {{ data.reading.pages | thousands }}</span>
+              </p>
+              <button
+                mat-stroked-button
+                type="button"
+                class="reading-progress-form-modal__calc-apply"
+                (click)="applyCalculatedPage()"
+              >
+                Usar esta página
+              </button>
+            } @else {
+              <p class="reading-progress-form-modal__calc-empty">
+                Introduce tu posición actual para calcular la página.
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
 
     @if (canComplete) {
       <mat-checkbox
