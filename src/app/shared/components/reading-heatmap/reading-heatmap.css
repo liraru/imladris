@@ -33,7 +33,7 @@
  */
 .reading-heatmap__scroll {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden;
   padding-bottom: 0.25rem;
   margin-block: auto;
 }
@@ -45,15 +45,15 @@
 }
 
 /*
- * Cuadrícula fluida: cada columna (semana) mide entre 9px y 16px y reparte el espacio
- * disponible a partes iguales. Las celdas usan aspect-ratio 1/1, así que al crecer el
- * ancho crecen también en alto y siguen siendo cuadradas. Si ni con 9px caben todas las
- * semanas, el contenedor hace scroll horizontal.
+ * Cuadrícula fluida: cada columna (semana) mide como máximo 16px y se encoge sin límite
+ * mínimo para que quepan todas las semanas del rango en el ancho disponible. Las celdas usan
+ * aspect-ratio 1/1, así que al cambiar el ancho cambian también en alto y siguen siendo
+ * cuadradas. Por eso nunca hace falta scroll horizontal.
  */
 .reading-heatmap__grid {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(9px, 16px);
+  grid-auto-columns: minmax(0, 16px);
   gap: 3px;
   justify-content: start;
   /* Evita que la semana actual (incompleta) se estire hasta la altura de las demás. */
@@ -79,6 +79,15 @@
   color: var(--mat-sys-on-surface-variant);
   /* La etiqueta es más ancha que su columna: desborda hacia la derecha sobre las semanas vacías. */
   overflow: visible;
+}
+
+/*
+ * Etiqueta de un mes que empieza en las últimas columnas: no cabe hacia la derecha, así que se
+ * alinea por su borde derecho (direction: rtl) y desborda hacia la izquierda. El desborde por la
+ * izquierda no genera scroll y el mes queda indicado sin que parezca que el anterior se alarga.
+ */
+.reading-heatmap__month--end {
+  direction: rtl;
 }
 
 .reading-heatmap__day {

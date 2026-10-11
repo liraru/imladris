@@ -38,12 +38,52 @@ interface HeatmapSummary {
   pagesPerReadingDay: number;
 }
 
+/** Una intensidad de la leyenda con el texto de su tooltip. */
+interface HeatmapLegendLevel {
+  level: 0 | 1 | 2 | 3 | 4;
+  tooltip: string;
+}
+
+/** Etiqueta de mes sobre la cuadrícula. */
+interface HeatmapMonthLabel {
+  label: string;
+  weekIndex: number;
+  /** true si no cabe hacia la derecha: se alinea por su borde derecho y crece hacia la izquierda. */
+  alignEnd: boolean;
+}
+
 /** Meses hacia atrás del rango en escritorio (1 año) y en móvil. */
 const DESKTOP_MONTHS_BACK = 12;
 const MOBILE_MONTHS_BACK = 4;
 
+/**
+ * Si desde la columna de un mes hasta el final quedan menos columnas que estas, su etiqueta no
+ * cabe hacia la derecha: se alinea por su borde derecho y se desplaza hacia la izquierda, para
+ * que no se salga del contenedor (ni provoque scroll) y el mes siga indicado.
+ */
+const MIN_WEEKS_FOR_UNSHIFTED_LABEL = 3;
+
 /** Si al primer mes del rango le quedan menos días que estos, no se muestra su etiqueta. */
 const MIN_DAYS_FOR_FIRST_MONTH_LABEL = 15;
+
+/**
+ * Páginas mínimas de cada intensidad (niveles 1 a 4). Única fuente de verdad: la usan tanto
+ * el cálculo del nivel de cada día como los tooltips de la leyenda.
+ * Nivel 1: 1–14 · Nivel 2: 15–29 · Nivel 3: 30–59 · Nivel 4: 60 o más.
+ */
+const LEVEL_MIN_PAGES = [1, 15, 30, 60] as const;
+
+/** Genera el texto del rango de páginas de un nivel (1 a 4). */
+function levelRangeLabel(level: 1 | 2 | 3 | 4): string {
+  const min = LEVEL_MIN_PAGES[level - 1];
+  // `.at()` devuelve `number | undefined`: para el nivel 4 no hay umbral siguiente.
+  const next = LEVEL_MIN_PAGES.at(level);
+  if (next === undefined) {
+    return `${min} páginas o más`;
+  }
+  const max = next - 1;
+  return min === max ? `${min} página` : `${min}–${max} páginas`;
+}
 
 @Component({
   selector: 'app-reading-heatmap',
@@ -71,9 +111,18 @@ export class ReadingHeatmap {
 
   protected readonly loading = signal(true);
   protected readonly weeks = signal<HeatmapDay[][]>([]);
-  protected readonly monthLabels = signal<{ label: string; weekIndex: number }[]>([]);
+  protected readonly monthLabels = signal<HeatmapMonthLabel[]>([]);
   protected readonly totalPages = signal(0);
   protected readonly summary = signal<HeatmapSummary | null>(null);
+
+  /** Intensidades de la leyenda (de menos a más) con el rango de páginas de cada una como tooltip. */
+  protected readonly legendLevels: readonly HeatmapLegendLevel[] = [
+    { level: 0, tooltip: 'Sin páginas leídas' },
+    { level: 1, tooltip: levelRangeLabel(1) },
+    { level: 2, tooltip: levelRangeLabel(2) },
+    { level: 3, tooltip: levelRangeLabel(3) },
+    { level: 4, tooltip: levelRangeLabel(4) },
+  ];
 
   /** Resumen visible: solo si se ha pedido y no es móvil (en móvil los paneles van apilados y no sobra espacio). */
   protected readonly visibleSummary = computed(() =>
@@ -81,10 +130,10 @@ export class ReadingHeatmap {
   );
 
   /** Etiqueta de mes por índice de semana. Cada semana pinta la suya en su primera fila, así las celdas y las etiquetas nunca se desalinean. */
-  protected readonly monthLabelByWeek = computed<Record<number, string>>(() => {
-    const byWeek: Record<number, string> = {};
+  protected readonly monthLabelByWeek = computed<Record<number, HeatmapMonthLabel>>(() => {
+    const byWeek: Record<number, HeatmapMonthLabel> = {};
     for (const m of this.monthLabels()) {
-      byWeek[m.weekIndex] = m.label;
+      byWeek[m.weekIndex] = m;
     }
     return byWeek;
   });
@@ -164,7 +213,7 @@ export class ReadingHeatmap {
     const daysInFirstMonth =
       new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate() - start.getDate() + 1;
 
-    const monthLabels: { label: string; weekIndex: number }[] = [];
+    const monthLabels: HeatmapMonthLabel[] = [];
     let lastMonth = -1;
     weeks.forEach((week, weekIndex) => {
       const firstRealDay = week.find((d) => !d.empty);
@@ -176,7 +225,13 @@ export class ReadingHeatmap {
       // Con pocos días, la etiqueta del primer mes montaría sobre la del mes siguiente.
       if (weekIndex === 0 && daysInFirstMonth < MIN_DAYS_FOR_FIRST_MONTH_LABEL) return;
 
-      monthLabels.push({ label: this._monthNames[month], weekIndex });
+      // Con pocas columnas hasta el final, la etiqueta no cabe a la derecha: se alinea al borde
+      // derecho y crece hacia la izquierda.
+      monthLabels.push({
+        label: this._monthNames[month],
+        weekIndex,
+        alignEnd: weeks.length - weekIndex < MIN_WEEKS_FOR_UNSHIFTED_LABEL,
+      });
     });
 
     this.weeks.set(weeks);
@@ -233,10 +288,10 @@ export class ReadingHeatmap {
   }
 
   private _level(count: number): 0 | 1 | 2 | 3 | 4 {
-    if (count <= 0) return 0;
-    if (count < 15) return 1;
-    if (count < 30) return 2;
-    if (count < 60) return 3;
+    if (count < LEVEL_MIN_PAGES[0]) return 0;
+    if (count < LEVEL_MIN_PAGES[1]) return 1;
+    if (count < LEVEL_MIN_PAGES[2]) return 2;
+    if (count < LEVEL_MIN_PAGES[3]) return 3;
     return 4;
   }
 

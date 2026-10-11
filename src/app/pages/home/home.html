@@ -83,11 +83,26 @@
                         mat-icon-button
                         class="library-card__menu-trigger library-menu-trigger"
                         type="button"
-                        matTooltip="Registrar avance"
-                        (click)="registerProgress(item.reading, $event)"
+                        [matMenuTriggerFor]="readingMenu"
+                        (click)="$event.stopPropagation()"
+                        aria-label="Opciones"
                       >
-                        <mat-icon>edit_note</mat-icon>
+                        <mat-icon>more_vert</mat-icon>
                       </button>
+                      <mat-menu #readingMenu="matMenu">
+                        <button
+                          mat-menu-item
+                          type="button"
+                          (click)="registerProgress(item.reading)"
+                        >
+                          <mat-icon>add</mat-icon>
+                          <span>Añadir</span>
+                        </button>
+                        <button mat-menu-item type="button" (click)="openHistory(item.reading)">
+                          <mat-icon>history</mat-icon>
+                          <span>Historial</span>
+                        </button>
+                      </mat-menu>
                     }
                     @if (item.reading.coverUrl) {
                       <img
