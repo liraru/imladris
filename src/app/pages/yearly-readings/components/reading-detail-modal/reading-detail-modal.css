@@ -74,3 +74,7 @@
   font-weight: 500;
   font-size: 0.95rem;
 }
+.reading-detail-modal__chart {
+  margin-top: 1rem;
+  min-width: 0;
+}

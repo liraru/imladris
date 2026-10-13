@@ -86,10 +86,12 @@
                     <mat-icon>edit</mat-icon>
                     <span>Editar</span>
                   </button>
-                  <button mat-menu-item type="button" (click)="registerProgress(reading)">
-                    <mat-icon>edit_note</mat-icon>
-                    <span>Registrar avance</span>
-                  </button>
+                  @if (!reading.endDate) {
+                    <button mat-menu-item type="button" (click)="registerProgress(reading)">
+                      <mat-icon>edit_note</mat-icon>
+                      <span>Registrar avance</span>
+                    </button>
+                  }
                 }
                 <button mat-menu-item type="button" (click)="openHistoryModal(reading)">
                   <mat-icon>history</mat-icon>
