@@ -1,5 +1,13 @@
 /* Ocupa las dos columnas del grid de la tarjeta "Leyendo" (portada + cuerpo). */
 :host {
+  /*
+   * Variables propias: las modales se renderizan en el overlay, fuera del :host de la home
+   * donde se definen estas mismas, así que el gráfico las declara para verse igual en ambos sitios.
+   */
+  --gold: var(--mat-sys-primary);
+  --text-muted: var(--mat-sys-on-surface-variant);
+  --panel-border: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+
   display: block;
   grid-column: 1 / -1;
   position: relative;

@@ -1,11 +1,11 @@
 <h2 mat-dialog-title>Histórico de avances</h2>
 
 <mat-dialog-content class="reading-progress-history-modal">
-  <p class="reading-progress-history-modal__subtitle" [matTooltip]="reading.title">
-    {{ reading.title }}
+  <p class="reading-progress-history-modal__subtitle" [matTooltip]="reading().title">
+    {{ reading().title }}
   </p>
 
-  @if (authService.isAdmin()) {
+  @if (canWrite()) {
     <button
       mat-stroked-button
       type="button"
@@ -32,7 +32,7 @@
             <th>Página</th>
             <th>%</th>
             <th>Avance</th>
-            @if (authService.isAdmin()) {
+            @if (canWrite()) {
               <th></th>
             }
           </tr>
@@ -44,7 +44,7 @@
               <td>{{ record.page | thousands }}</td>
               <td>{{ record.percentage }}%</td>
               <td>+{{ record.pagesAdvanced | thousands }}</td>
-              @if (authService.isAdmin()) {
+              @if (canWrite()) {
                 <td class="reading-progress-history-modal__row-actions">
                   <button
                     mat-icon-button

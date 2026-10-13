@@ -35,7 +35,7 @@
         </div>
         <div class="reading-daily-chart__axis">
           <span>{{ firstDate() | date: 'dd/MM/yyyy' }}</span>
-          <span>Hoy</span>
+          <span>{{ isFinished() ? (lastDate() | date: 'dd/MM/yyyy') : 'Hoy' }}</span>
         </div>
       </div>
     </div>

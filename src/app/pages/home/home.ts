@@ -53,7 +53,7 @@ interface ReadingNowView {
   percentage: number;
   pagesRead: number;
   totalPages: number;
-  /** Días transcurridos desde la fecha de inicio. */
+  /** Días de lectura contando el de inicio y el de hoy (mismo criterio que las columnas del gráfico diario). */
   daysReading: number;
   /** Estimación según el ritmo medio desde que empezó; null si aún no hay base para calcularla. */
   estimatedEnd: Date | null;
@@ -197,10 +197,11 @@ export class Home implements OnInit {
       const totalPages = Number(reading.pages) || 0;
       const pagesRead = Math.round((totalPages * percentage) / 100);
 
+      // Se cuenta el día de inicio como día 1 (igual que las columnas del gráfico diario):
+      // empezar hoy es 1 día de lectura. Si la fecha de inicio es futura, 0.
       const start = reading.startDate ? parseDate(reading.startDate) : null;
-      const daysReading = start
-        ? Math.max(0, Math.round((today.getTime() - start.getTime()) / MS_PER_DAY))
-        : 0;
+      const elapsedDays = start ? Math.round((today.getTime() - start.getTime()) / MS_PER_DAY) : -1;
+      const daysReading = elapsedDays >= 0 ? elapsedDays + 1 : 0;
 
       let estimatedEnd: Date | null = null;
       if (percentage > 0 && percentage < 100 && daysReading > 0) {
