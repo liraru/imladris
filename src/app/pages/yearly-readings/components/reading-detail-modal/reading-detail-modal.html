@@ -36,6 +36,10 @@
       <dt>Fin</dt>
       <dd>{{ reading.endDate ? (reading.endDate | date: 'dd/MM/yyyy') : 'Leyendo' }}</dd>
     </dl>
+
+    <div class="reading-detail-modal__chart">
+      <app-reading-daily-chart [reading]="reading" />
+    </div>
   </div>
 </mat-dialog-content>
 

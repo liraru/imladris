@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { YearlyReading } from '@shared/models';
 import { AuthService } from '../../../../services/auth.service';
+import { ReadingDailyChart } from '../../../../shared/components/reading-daily-chart/reading-daily-chart';
 import { ThousandsPipe } from '../../../../shared/pipes/thousands.pipe';
 
 export interface ReadingDetailModalData {
@@ -19,7 +20,14 @@ export interface ReadingDetailModalResult {
 
 @Component({
   selector: 'app-reading-detail-modal',
-  imports: [DatePipe, MatButtonModule, MatDialogModule, MatIconModule, ThousandsPipe],
+  imports: [
+    DatePipe,
+    MatButtonModule,
+    MatDialogModule,
+    MatIconModule,
+    ReadingDailyChart,
+    ThousandsPipe,
+  ],
   templateUrl: './reading-detail-modal.html',
   styleUrl: './reading-detail-modal.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

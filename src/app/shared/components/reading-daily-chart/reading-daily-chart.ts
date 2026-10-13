@@ -50,7 +50,7 @@ function parseDate(value: string): Date {
 export class ReadingDailyChart {
   private readonly _service = inject(ReadingProgressService);
 
-  /** Lectura en curso de la que se pinta el gráfico. */
+  /** Lectura de la que se pinta el gráfico (en curso en la home; también finalizada en su ficha de detalle). */
   readonly reading = input.required<YearlyReading>();
 
   protected readonly loading = signal(true);
@@ -63,7 +63,13 @@ export class ReadingDailyChart {
   /** Contador de peticiones: descarta respuestas antiguas si llegan tarde (cambio de lectura o de avances). */
   private _requestId = 0;
 
-  /** Un día por columna, desde la fecha de inicio (o el primer avance, si es anterior) hasta hoy. */
+  /** La lectura ya está finalizada: el gráfico termina en su fecha de fin en vez de en hoy. */
+  protected readonly isFinished = computed(() => !!this.reading().endDate);
+
+  /**
+   * Un día por columna, desde la fecha de inicio (o el primer avance, si es anterior) hasta hoy
+   * (lectura en curso) o hasta la fecha de fin (lectura finalizada).
+   */
   protected readonly days = computed<ChartDay[]>(() => {
     const pagesByDay = this._pagesByDay();
     const recordedDates = Object.keys(pagesByDay).sort();
@@ -75,12 +81,21 @@ export class ReadingDailyChart {
         ? startDate.slice(0, 10)
         : recordedDates[0];
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const endDate = this.reading().endDate;
+    let end: Date;
+    if (endDate) {
+      // Si hubiera algún avance posterior a la fecha de fin, no se deja fuera del gráfico.
+      const lastRecorded = recordedDates[recordedDates.length - 1];
+      const endStr = endDate.slice(0, 10);
+      end = parseDate(endStr > lastRecorded ? endStr : lastRecorded);
+    } else {
+      end = new Date();
+      end.setHours(0, 0, 0, 0);
+    }
 
     const cursor = parseDate(firstDate);
     const result: ChartDay[] = [];
-    while (cursor <= today) {
+    while (cursor <= end) {
       const date = toDateString(cursor);
       result.push({ date, pages: pagesByDay[date] ?? 0, heightPct: 0 });
       cursor.setDate(cursor.getDate() + 1);
@@ -96,6 +111,7 @@ export class ReadingDailyChart {
   protected readonly maxPages = computed(() => Math.max(0, ...this.days().map((d) => d.pages)));
   protected readonly totalPages = computed(() => this.days().reduce((sum, d) => sum + d.pages, 0));
   protected readonly firstDate = computed(() => this.days()[0]?.date ?? '');
+  protected readonly lastDate = computed(() => this.days().at(-1)?.date ?? '');
 
   constructor() {
     // Recarga al cambiar de lectura y cada vez que se registra/edita/borra un avance
@@ -106,7 +122,7 @@ export class ReadingDailyChart {
       void this._load(reading.id);
     });
 
-    // Tras pintar, deja visible el final (hoy) cuando el gráfico es más ancho que su contenedor.
+    // Tras pintar, deja visible el final (hoy / fecha de fin) cuando el gráfico es más ancho que su contenedor.
     afterRenderEffect(() => {
       this.days();
       const scroller = this._scroller()?.nativeElement;
