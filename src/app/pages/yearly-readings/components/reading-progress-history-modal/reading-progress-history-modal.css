@@ -44,3 +44,33 @@
   white-space: nowrap;
   text-align: right;
 }
+
+/* Cabecera "Fecha" ordenable: botón sin estilo de botón, con la flecha de dirección al lado. */
+.reading-progress-history-modal__sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.reading-progress-history-modal__sort-btn:hover,
+.reading-progress-history-modal__sort-btn:focus-visible {
+  color: var(--mat-sys-primary);
+}
+.reading-progress-history-modal__sort-btn:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.reading-progress-history-modal__sort-btn mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--mat-sys-primary);
+}
