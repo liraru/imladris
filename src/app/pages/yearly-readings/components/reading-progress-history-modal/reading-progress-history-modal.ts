@@ -33,6 +33,8 @@ export interface ReadingProgressHistoryModalData {
   reading: YearlyReading;
 }
 
+type SortDirection = 'asc' | 'desc';
+
 @Component({
   selector: 'app-reading-progress-history-modal',
   imports: [
@@ -62,6 +64,33 @@ export class ReadingProgressHistoryModal implements OnInit {
   protected readonly records = signal<ReadingProgress[]>([]);
   protected readonly loading = signal(true);
 
+  /**
+   * Orden de la columna Fecha. Lectura sin finalizar: de más reciente a más antigua ('desc').
+   * Lectura finalizada: cronológico ('asc'). Se invierte pulsando la cabecera.
+   */
+  protected readonly sortDirection = signal<SortDirection>(
+    this.data.reading.endDate ? 'asc' : 'desc',
+  );
+
+  /** Registros ordenados por fecha; a igualdad de fecha, por página y por id para un orden estable. */
+  protected readonly sortedRecords = computed(() => {
+    const factor = this.sortDirection() === 'asc' ? 1 : -1;
+    return [...this.records()].sort(
+      (a, b) =>
+        factor *
+        (a.recordDate.localeCompare(b.recordDate) ||
+          Number(a.page) - Number(b.page) ||
+          Number(a.id) - Number(b.id)),
+    );
+  });
+
+  /** Texto del tooltip de la cabecera: describe el orden al que se pasará al pulsarla. */
+  protected readonly sortTooltip = computed(() =>
+    this.sortDirection() === 'desc'
+      ? 'Ordenar de más antigua a más reciente'
+      : 'Ordenar de más reciente a más antigua',
+  );
+
   /** Registrar, editar y eliminar avances: solo admin y solo mientras la lectura no esté finalizada. */
   protected readonly canWrite = computed(
     () => this.authService.isAdmin() && !this.reading().endDate,
@@ -73,6 +102,10 @@ export class ReadingProgressHistoryModal implements OnInit {
 
   protected close(): void {
     this._dialogRef.close();
+  }
+
+  protected toggleSort(): void {
+    this.sortDirection.update((dir) => (dir === 'desc' ? 'asc' : 'desc'));
   }
 
   protected async registerProgress(): Promise<void> {

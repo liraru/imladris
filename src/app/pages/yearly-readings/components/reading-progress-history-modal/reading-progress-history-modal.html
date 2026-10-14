@@ -28,7 +28,19 @@
       <table class="reading-progress-history-modal__table">
         <thead>
           <tr>
-            <th>Fecha</th>
+            <th [attr.aria-sort]="sortDirection() === 'asc' ? 'ascending' : 'descending'">
+              <button
+                type="button"
+                class="reading-progress-history-modal__sort-btn"
+                [matTooltip]="sortTooltip()"
+                (click)="toggleSort()"
+              >
+                Fecha
+                <mat-icon aria-hidden="true">
+                  {{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              </button>
+            </th>
             <th>Página</th>
             <th>%</th>
             <th>Avance</th>
@@ -38,7 +50,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (record of records(); track record.id) {
+          @for (record of sortedRecords(); track record.id) {
             <tr>
               <td>{{ record.recordDate | date: 'dd/MM/yyyy' }}</td>
               <td>{{ record.page | thousands }}</td>
