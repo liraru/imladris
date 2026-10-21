@@ -16,8 +16,9 @@
   } @else if (days().length === 0) {
     <p class="reading-daily-chart__empty">Todavía no hay avances registrados.</p>
   } @else {
-    <div class="reading-daily-chart__scroll" #scroller>
-      <div class="reading-daily-chart__inner">
+    <div class="reading-daily-chart__plot">
+      <!-- El scroll envuelve solo las barras: su barra de desplazamiento queda justo debajo de ellas. -->
+      <div class="reading-daily-chart__scroll" #scroller (scroll)="onScroll(scroller)">
         <div class="reading-daily-chart__bars" [style.gap.px]="gap()">
           @for (day of days(); track day.date; let i = $index) {
             <div
@@ -34,10 +35,12 @@
             </div>
           }
         </div>
-        <div class="reading-daily-chart__axis">
-          <span>{{ firstDate() | date: 'dd/MM/yyyy' }}</span>
-          <span>{{ isFinished() ? (lastDate() | date: 'dd/MM/yyyy') : 'Hoy' }}</span>
-        </div>
+      </div>
+
+      <!-- Leyenda fuera del scroll: refleja el rango de fechas visible. -->
+      <div class="reading-daily-chart__axis">
+        <span>{{ axisStartDate() | date: 'dd/MM/yyyy' }}</span>
+        <span>{{ axisEndIsToday() ? 'Hoy' : (axisEndDate() | date: 'dd/MM/yyyy') }}</span>
       </div>
     </div>
   }
