@@ -55,36 +55,50 @@
   color: var(--text-muted);
 }
 
-.reading-daily-chart__scroll {
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-}
-
-/* Ancho mínimo = el del contenedor; crece (y hace scroll) si las columnas mínimas no caben. */
-.reading-daily-chart__inner {
+/* Barras + barra de desplazamiento + leyenda, apiladas en ese orden. */
+.reading-daily-chart__plot {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  min-width: 100%;
-  width: max-content;
+  min-width: 0;
 }
 
+/*
+ * El scroll envuelve solo las barras. El padding inferior separa 2px las barras de la barra de
+ * desplazamiento (esta se dibuja bajo el padding); la leyenda queda debajo de ambas.
+ */
+.reading-daily-chart__scroll {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  /* Permite el arrastre horizontal con el dedo (y el vertical para seguir desplazando la página). */
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ancho mínimo = el del contenedor; crece (y hace scroll) si las columnas mínimas no caben. */
 /* El `gap` real lo fija el componente (en píxeles de dispositivo enteros); 2px es solo el valor de reserva. */
 .reading-daily-chart__bars {
   display: flex;
   align-items: flex-end;
   gap: 2px;
   height: 72px;
+  min-width: 100%;
+  width: max-content;
   border-bottom: 1px solid var(--panel-border);
 }
 
-/* El ancho de cada columna lo fija el componente (entero en píxeles de dispositivo): no usar flex-grow ni max-width. */
+/*
+ * El ancho de cada columna lo fija el componente (entero en píxeles de dispositivo): no usar flex-grow ni max-width.
+ * `matTooltip` pone `touch-action: none` en línea en cada columna (para detectar la pulsación larga en táctil);
+ * como las columnas cubren todo el gráfico, eso impedía arrastrarlo. El !important lo anula.
+ */
 .reading-daily-chart__col {
   flex: none;
   height: 100%;
   display: flex;
   align-items: flex-end;
+  touch-action: auto !important;
 }
 
 .reading-daily-chart__bar {

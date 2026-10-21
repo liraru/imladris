@@ -69,6 +69,9 @@ export class ReadingDailyChart {
   private readonly _containerWidth = signal(0);
   private readonly _dpr = signal(1);
 
+  /** Posición del scroll horizontal (px), para saber qué días se ven en cada momento. */
+  private readonly _scrollLeft = signal(0);
+
   /** Contador de peticiones: descarta respuestas antiguas si llegan tarde (cambio de lectura o de avances). */
   private _requestId = 0;
 
@@ -164,10 +167,50 @@ export class ReadingDailyChart {
     );
   });
 
+  /**
+   * Primer y último día visibles (índices). Sin scroll horizontal son todos; con scroll se deducen
+   * de la posición (las columnas miden todas lo mismo cuando hay desbordamiento).
+   */
+  private readonly _visibleRange = computed(() => {
+    const n = this.days().length;
+    if (n === 0) return { first: 0, last: -1 };
+
+    const widths = this.colWidths();
+    const gap = this.gap();
+    const containerWidth = this._containerWidth();
+    const total = widths.reduce((sum, w) => sum + w, 0) + gap * (n - 1);
+
+    if (containerWidth <= 0 || total <= containerWidth + 0.5) {
+      return { first: 0, last: n - 1 };
+    }
+
+    const pitch = widths[0] + gap;
+    const scrollLeft = this._scrollLeft();
+    const first = Math.min(n - 1, Math.max(0, Math.floor(scrollLeft / pitch)));
+    const last = Math.min(
+      n - 1,
+      Math.max(first, Math.ceil((scrollLeft + containerWidth) / pitch) - 1),
+    );
+    return { first, last };
+  });
+
+  /** Fecha de la izquierda de la leyenda: primer día visible. */
+  protected readonly axisStartDate = computed(
+    () => this.days()[this._visibleRange().first]?.date ?? '',
+  );
+
+  /** Fecha de la derecha de la leyenda: último día visible. */
+  protected readonly axisEndDate = computed(
+    () => this.days()[this._visibleRange().last]?.date ?? '',
+  );
+
+  /** El último día visible es el final del gráfico y la lectura sigue en curso: se muestra "Hoy". */
+  protected readonly axisEndIsToday = computed(
+    () => !this.isFinished() && this._visibleRange().last === this.days().length - 1,
+  );
+
   protected readonly maxPages = computed(() => Math.max(0, ...this.days().map((d) => d.pages)));
   protected readonly totalPages = computed(() => this.days().reduce((sum, d) => sum + d.pages, 0));
-  protected readonly firstDate = computed(() => this.days()[0]?.date ?? '');
-  protected readonly lastDate = computed(() => this.days().at(-1)?.date ?? '');
 
   constructor() {
     // Recarga al cambiar de lectura y cada vez que se registra/edita/borra un avance
@@ -199,8 +242,15 @@ export class ReadingDailyChart {
       this.days();
       this.colWidths();
       const scroller = this._scroller()?.nativeElement;
-      if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+      if (scroller) {
+        scroller.scrollLeft = scroller.scrollWidth;
+        this._scrollLeft.set(scroller.scrollLeft);
+      }
     });
+  }
+
+  protected onScroll(scroller: HTMLElement): void {
+    this._scrollLeft.set(scroller.scrollLeft);
   }
 
   protected dayTooltip(day: ChartDay): string {
