@@ -18,10 +18,11 @@
   } @else {
     <div class="reading-daily-chart__scroll" #scroller>
       <div class="reading-daily-chart__inner">
-        <div class="reading-daily-chart__bars">
-          @for (day of days(); track day.date) {
+        <div class="reading-daily-chart__bars" [style.gap.px]="gap()">
+          @for (day of days(); track day.date; let i = $index) {
             <div
               class="reading-daily-chart__col"
+              [style.width.px]="colWidths()[i]"
               [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
               matTooltipClass="reading-heatmap-tooltip"
             >

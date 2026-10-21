@@ -61,7 +61,7 @@
   padding-bottom: 0.25rem;
 }
 
-/* Ancho mínimo = el del contenedor; crece (y hace scroll) si las columnas de 6px no caben. */
+/* Ancho mínimo = el del contenedor; crece (y hace scroll) si las columnas mínimas no caben. */
 .reading-daily-chart__inner {
   display: flex;
   flex-direction: column;
@@ -70,6 +70,7 @@
   width: max-content;
 }
 
+/* El `gap` real lo fija el componente (en píxeles de dispositivo enteros); 2px es solo el valor de reserva. */
 .reading-daily-chart__bars {
   display: flex;
   align-items: flex-end;
@@ -78,10 +79,9 @@
   border-bottom: 1px solid var(--panel-border);
 }
 
+/* El ancho de cada columna lo fija el componente (entero en píxeles de dispositivo): no usar flex-grow ni max-width. */
 .reading-daily-chart__col {
-  flex: 1 0 6px;
-  min-width: 6px;
-  max-width: 28px;
+  flex: none;
   height: 100%;
   display: flex;
   align-items: flex-end;
