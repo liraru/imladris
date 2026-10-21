@@ -27,6 +27,11 @@ interface ChartDay {
 /** Altura mínima (en %) de una barra con páginas, para que un día con pocas páginas siga viéndose. */
 const MIN_BAR_PCT = 4;
 
+/** Ancho mínimo y máximo (px CSS) de cada columna, y separación entre columnas (px CSS). */
+const MIN_COL_WIDTH = 6;
+const MAX_COL_WIDTH = 28;
+const COL_GAP = 2;
+
 function toDateString(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -59,6 +64,10 @@ export class ReadingDailyChart {
   private readonly _pagesByDay = signal<Record<string, number>>({});
 
   private readonly _scroller = viewChild<ElementRef<HTMLElement>>('scroller');
+
+  /** Ancho disponible del contenedor (px CSS) y densidad de píxeles, medidos con ResizeObserver. */
+  private readonly _containerWidth = signal(0);
+  private readonly _dpr = signal(1);
 
   /** Contador de peticiones: descarta respuestas antiguas si llegan tarde (cambio de lectura o de avances). */
   private _requestId = 0;
@@ -108,6 +117,53 @@ export class ReadingDailyChart {
     return result;
   });
 
+  /**
+   * Separación entre columnas (px CSS), ajustada a un nº entero de píxeles de dispositivo para que
+   * el navegador no la redondee de forma distinta entre barras.
+   */
+  protected readonly gap = computed(() => {
+    const dpr = this._dpr();
+    return Math.max(1, Math.round(COL_GAP * dpr)) / dpr;
+  });
+
+  /**
+   * Ancho (px CSS) de cada columna. Se calcula en píxeles de dispositivo ENTEROS: todas las columnas
+   * miden `base` y el sobrante se reparte de uno en uno entre ellas, de modo que la separación entre
+   * barras es idéntica en todo el gráfico (con anchos fraccionarios el navegador redondea cada borde
+   * por separado y los huecos salen de 1, 2 o 3 px).
+   * Si ni con el ancho mínimo caben, se usa el mínimo y el gráfico hace scroll horizontal.
+   */
+  protected readonly colWidths = computed<number[]>(() => {
+    const n = this.days().length;
+    const width = this._containerWidth();
+    const dpr = this._dpr();
+    if (n === 0) return [];
+
+    const minDev = Math.round(MIN_COL_WIDTH * dpr);
+    const maxDev = Math.round(MAX_COL_WIDTH * dpr);
+    const gapDev = Math.max(1, Math.round(COL_GAP * dpr));
+
+    // Aún sin medir el contenedor: ancho mínimo.
+    if (width <= 0) return Array.from({ length: n }, () => minDev / dpr);
+
+    const available = Math.floor(width * dpr) - gapDev * (n - 1);
+    let base = Math.floor(available / n);
+    let extra = available - base * n;
+
+    if (base <= minDev) {
+      base = minDev;
+      extra = 0;
+    } else if (base >= maxDev) {
+      base = maxDev;
+      extra = 0;
+    }
+
+    return Array.from(
+      { length: n },
+      (_, i) => (base + Math.floor(((i + 1) * extra) / n) - Math.floor((i * extra) / n)) / dpr,
+    );
+  });
+
   protected readonly maxPages = computed(() => Math.max(0, ...this.days().map((d) => d.pages)));
   protected readonly totalPages = computed(() => this.days().reduce((sum, d) => sum + d.pages, 0));
   protected readonly firstDate = computed(() => this.days()[0]?.date ?? '');
@@ -122,9 +178,26 @@ export class ReadingDailyChart {
       void this._load(reading.id);
     });
 
+    // Mide el contenedor (y la densidad de píxeles) al pintarse y cada vez que cambia de tamaño o de zoom.
+    effect((onCleanup) => {
+      const scroller = this._scroller()?.nativeElement;
+      if (!scroller) return;
+
+      const measure = () => {
+        this._dpr.set(window.devicePixelRatio || 1);
+        this._containerWidth.set(scroller.clientWidth);
+      };
+      measure();
+
+      const observer = new ResizeObserver(measure);
+      observer.observe(scroller);
+      onCleanup(() => observer.disconnect());
+    });
+
     // Tras pintar, deja visible el final (hoy / fecha de fin) cuando el gráfico es más ancho que su contenedor.
     afterRenderEffect(() => {
       this.days();
+      this.colWidths();
       const scroller = this._scroller()?.nativeElement;
       if (scroller) scroller.scrollLeft = scroller.scrollWidth;
     });
