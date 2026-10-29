@@ -14,6 +14,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { YearlyReading } from '@shared/models';
+import { AuthService } from '../../../services/auth.service';
 import { ReadingProgressService } from '../../../services/reading-progress.service';
 
 interface ChartDay {
@@ -54,11 +55,15 @@ function parseDate(value: string): Date {
 })
 export class ReadingDailyChart {
   private readonly _service = inject(ReadingProgressService);
+  private readonly _authService = inject(AuthService);
 
   /** Lectura de la que se pinta el gráfico (en curso en la home; también finalizada en su ficha de detalle). */
   readonly reading = input.required<YearlyReading>();
 
   protected readonly loading = signal(true);
+
+  /** Los tooltips de páginas leídas solo se muestran si el usuario está logado. */
+  protected readonly tooltipsDisabled = computed(() => !this._authService.isAdmin());
 
   /** Páginas avanzadas por día (yyyy-MM-dd) de esta lectura. */
   private readonly _pagesByDay = signal<Record<string, number>>({});

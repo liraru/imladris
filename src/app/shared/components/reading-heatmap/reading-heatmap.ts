@@ -13,6 +13,7 @@ import { map } from 'rxjs';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '../../../services/auth.service';
 import { ReadingProgressService } from '../../../services/reading-progress.service';
 
 interface HeatmapDay {
@@ -94,6 +95,7 @@ function levelRangeLabel(level: 1 | 2 | 3 | 4): string {
 })
 export class ReadingHeatmap {
   private readonly _service = inject(ReadingProgressService);
+  private readonly _authService = inject(AuthService);
 
   /** Muestra la línea "N páginas leídas en …" sobre el mapa. La home la oculta y la muestra en sus cifras. */
   readonly showTitle = input(true);
@@ -108,6 +110,9 @@ export class ReadingHeatmap {
       .pipe(map((result) => result.matches)),
     { initialValue: false },
   );
+
+  /** Los tooltips (páginas por día y leyenda) solo se muestran si el usuario está logado. */
+  protected readonly tooltipsDisabled = computed(() => !this._authService.isAdmin());
 
   protected readonly loading = signal(true);
   protected readonly weeks = signal<HeatmapDay[][]>([]);

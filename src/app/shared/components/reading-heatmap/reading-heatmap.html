@@ -16,9 +16,11 @@
           @for (week of weeks(); track $index) {
             <div class="reading-heatmap__week">
               @let month = monthLabelByWeek()[$index];
-              <span class="reading-heatmap__month" [class.reading-heatmap__month--end]="month?.alignEnd">{{
-                month?.label ?? ''
-              }}</span>
+              <span
+                class="reading-heatmap__month"
+                [class.reading-heatmap__month--end]="month?.alignEnd"
+                >{{ month?.label ?? '' }}</span
+              >
               @for (day of week; track $index) {
                 @if (day.empty) {
                   <div class="reading-heatmap__day reading-heatmap__day--empty"></div>
@@ -26,7 +28,12 @@
                   <div
                     class="reading-heatmap__day"
                     [attr.data-level]="day.level"
-                    [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
+                    [matTooltip]="
+                      tooltipsDisabled()
+                        ? ''
+                        : dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')
+                    "
+                    [matTooltipDisabled]="tooltipsDisabled()"
                     matTooltipClass="reading-heatmap-tooltip"
                   ></div>
                 }
@@ -40,7 +47,8 @@
             <div
               class="reading-heatmap__day"
               [attr.data-level]="item.level"
-              [matTooltip]="item.tooltip"
+              [matTooltip]="tooltipsDisabled() ? '' : item.tooltip"
+              [matTooltipDisabled]="tooltipsDisabled()"
               matTooltipClass="reading-heatmap-tooltip"
             ></div>
           }
