@@ -61,6 +61,8 @@
               class="library-table__cover"
               [src]="item.coverImageUrl"
               [alt]="'Portada de ' + item.title"
+              [appCoverPreview]="item.coverImageUrl"
+              [coverPreviewAlt]="'Portada ampliada de ' + item.title"
             />
           } @else {
             <mat-icon>menu_book</mat-icon>

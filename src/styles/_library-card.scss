@@ -234,3 +234,159 @@
 .library-menu-trigger:focus-visible {
   background: color-mix(in srgb, var(--mat-sys-on-surface) 14%, transparent) !important;
 }
+
+/* ============================================================
+ * Vista tabla de Biblioteca (novelas, manga y fanfic)
+ *
+ * - La tabla ocupa exactamente el ancho del contenedor de la página
+ *   (el mismo que filtros y pestañas), de modo que queda centrada.
+ *   El padding de celda se compacta para que las 14 columnas quepan
+ *   sin desbordar; si en pantallas estrechas no caben, el wrapper
+ *   hace scroll horizontal en vez de salirse de la página.
+ * - Sin líneas entre filas: se alternan dos tonos casi idénticos y la
+ *   fila bajo el ratón se resalta con un velo del color primario.
+ * - Las columnas de ancho previsible tienen un ancho fijo, igual en
+ *   todas las tablas, para que novelas y manga se vean idénticas
+ *   aunque su contenido difiera. Solo título, autores, editorial y
+ *   notas se reparten el espacio restante.
+ * - Los selectores llevan elemento + clase de Material
+ *   (table.library-table td.mat-mdc-cell…) para ganar en
+ *   especificidad a los estilos por defecto de Material sin !important.
+ * ============================================================ */
+.library-table-wrapper {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+table.library-table {
+  width: 100%;
+  background: transparent;
+  --mat-table-row-item-outline-width: 0;
+  --mat-table-row-item-outline-color: transparent;
+}
+
+/* Celdas: sin borde inferior y padding compacto */
+table.library-table th.mat-mdc-header-cell,
+table.library-table td.mat-mdc-cell {
+  box-sizing: border-box;
+  padding: 0 0.625rem;
+  border-bottom: none;
+}
+table.library-table th.mat-mdc-header-cell:first-of-type,
+table.library-table td.mat-mdc-cell:first-of-type {
+  padding-left: 1rem;
+}
+table.library-table th.mat-mdc-header-cell:last-of-type,
+table.library-table td.mat-mdc-cell:last-of-type {
+  padding-right: 1rem;
+}
+
+table.library-table th.mat-mdc-header-cell {
+  background: var(--mat-sys-surface-container-high);
+}
+
+/* Anchos de columna fijos (incluyen el padding de celda) */
+table.library-table .mat-column-cover {
+  width: 3.75rem;
+}
+table.library-table .mat-column-serie {
+  width: 8rem;
+}
+table.library-table .mat-column-genres {
+  width: 6.5rem;
+}
+table.library-table .mat-column-readingStatus {
+  width: 6rem;
+}
+table.library-table .mat-column-releaseDate {
+  width: 6.5rem;
+}
+table.library-table .mat-column-adquisitionDate {
+  width: 6.75rem;
+}
+table.library-table .mat-column-startDate,
+table.library-table .mat-column-finishDate {
+  width: 5.75rem;
+}
+table.library-table .mat-column-language {
+  width: 5.5rem;
+}
+table.library-table .mat-column-actions {
+  width: 3.5rem;
+}
+
+/* Miniatura de portada de tamaño fijo (2:3), igual en novelas y manga; se amplía al pasar el ratón */
+table.library-table .library-table__cover {
+  width: 2.125rem;
+  height: 3rem;
+  max-height: none;
+  border-radius: 2px;
+  cursor: zoom-in;
+}
+
+/* Filas alternas + resalte al pasar el ratón */
+table.library-table tr.mat-mdc-row {
+  background: var(--mat-sys-surface-container);
+  transition: background-color 0.15s ease;
+}
+table.library-table tr.mat-mdc-row:nth-child(even) {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 3%, var(--mat-sys-surface-container));
+}
+table.library-table tr.mat-mdc-row:hover {
+  background: color-mix(in srgb, var(--mat-sys-primary) 14%, var(--mat-sys-surface-container));
+}
+
+/* Botón de acciones de la tabla: solo el icono, sin borde ni círculo de fondo */
+.library-table .library-menu-trigger {
+  border: none !important;
+  background: transparent !important;
+}
+.library-table .library-menu-trigger:not(:focus-visible) {
+  outline: none;
+}
+.library-table .library-menu-trigger .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+.library-table .library-menu-trigger:hover,
+.library-table .library-menu-trigger:focus-visible {
+  background: transparent !important;
+  color: var(--mat-sys-primary);
+}
+
+/* ============================================================
+ * Previsualización ampliada de portada al pasar el ratón
+ * (directiva CoverPreviewDirective, que añade este overlay a <body>).
+ * Mismo aspecto que la de Plan de lectura.
+ * ============================================================ */
+.cover-hover-preview {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+  background: color-mix(in srgb, black 45%, transparent);
+  animation: cover-hover-preview-fade-in 120ms ease-out;
+}
+
+.cover-hover-preview__image {
+  height: 80vh;
+  max-width: 90vw;
+  width: auto;
+  object-fit: contain;
+  border-radius: var(--mat-sys-corner-medium, 10px);
+  box-shadow:
+    0 20px 40px -12px rgba(0, 0, 0, 0.65),
+    0 0 0 1px color-mix(in srgb, white 10%, transparent);
+}
+
+@keyframes cover-hover-preview-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
