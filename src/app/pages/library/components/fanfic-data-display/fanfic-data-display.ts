@@ -15,10 +15,12 @@ import {
 import { Fanfic } from '@shared/models';
 import { AuthService } from '../../../../services/auth.service';
 import { MODE } from '../../constants/library.constants';
+import { CoverPreviewDirective } from '../../../../shared/directives/cover-preview.directive';
 import { ThousandsPipe } from '../../../../shared/pipes/thousands.pipe';
 
 @Component({
   imports: [
+    CoverPreviewDirective,
     DatePipe,
     MatDividerModule,
     MatIconModule,

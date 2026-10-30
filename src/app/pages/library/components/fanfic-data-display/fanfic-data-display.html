@@ -77,6 +77,8 @@
               class="library-table__cover"
               [src]="item.coverUrl"
               [alt]="'Portada de ' + item.title"
+              [appCoverPreview]="item.coverUrl"
+              [coverPreviewAlt]="'Portada ampliada de ' + item.title"
             />
           } @else {
             <mat-icon>favorite_border</mat-icon>
