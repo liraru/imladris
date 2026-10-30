@@ -10,13 +10,22 @@ import {
   READING_STATUS,
   READING_STATUS_LABELS,
 } from '../../../../shared/constants/reading-status.constant';
+import { CoverPreviewDirective } from '../../../../shared/directives/cover-preview.directive';
 import { AuthService } from '../../../../services/auth.service';
 import { MODE, TYPE } from '../../constants/library.constants';
 import { LibraryItem } from '../../models/library-item.model';
 import { MatDivider } from '@angular/material/divider';
 
 @Component({
-  imports: [DatePipe, MatIconModule, MatMenuModule, MatTableModule, MatTooltipModule, MatDivider],
+  imports: [
+    CoverPreviewDirective,
+    DatePipe,
+    MatIconModule,
+    MatMenuModule,
+    MatTableModule,
+    MatTooltipModule,
+    MatDivider,
+  ],
   selector: 'app-library-data-display',
   styleUrl: './library-data-display.css',
   templateUrl: './library-data-display.html',
