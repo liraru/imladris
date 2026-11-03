@@ -1,87 +1,89 @@
-<mat-toolbar class="app-toolbar">
-  <a class="brand-link" routerLink="/" (click)="closeMobileMenu()">
-    <img src="icons/icon-192x192.png" alt="Imladris" class="brand-icon" />
-    <span class="brand">Imladris</span>
-  </a>
+<header class="app-header">
+  <mat-toolbar class="app-toolbar">
+    <a class="brand-link" routerLink="/" (click)="closeMobileMenu()">
+      <img src="icons/icon-192x192.png" alt="Imladris" class="brand-icon" />
+      <span class="brand">Imladris</span>
+    </a>
 
-  <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="app-nav" mat-stretch-tabs="false">
-    @for (route of ROUTES(); track $index) {
-      <a
-        mat-tab-link
-        routerLink="/{{ route.path }}"
-        routerLinkActive
-        #rla="routerLinkActive"
-        [routerLinkActiveOptions]="exactMatch"
-        [active]="rla.isActive"
+    <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="app-nav" mat-stretch-tabs="false">
+      @for (route of ROUTES(); track $index) {
+        <a
+          mat-tab-link
+          routerLink="/{{ route.path }}"
+          routerLinkActive
+          #rla="routerLinkActive"
+          [routerLinkActiveOptions]="exactMatch"
+          [active]="rla.isActive"
+        >
+          {{ route.title }}
+        </a>
+      }
+    </nav>
+
+    <div class="app-auth">
+      <!-- Solo escritorio: en móvil el acceso a la sesión vive dentro del menú hamburguesa. -->
+      <span class="app-auth__session">
+        @if (authService.isAdmin()) {
+          <button mat-icon-button type="button" matTooltip="Cerrar sesión" (click)="logout()">
+            <mat-icon>lock_open</mat-icon>
+          </button>
+        } @else {
+          <button mat-icon-button type="button" matTooltip="Iniciar sesión" (click)="openLogin()">
+            <mat-icon>lock</mat-icon>
+          </button>
+        }
+      </span>
+
+      <button
+        mat-icon-button
+        type="button"
+        class="app-menu-toggle"
+        [matTooltip]="mobileMenuOpen() ? 'Cerrar menú' : 'Abrir menú'"
+        (click)="toggleMobileMenu()"
       >
-        {{ route.title }}
-      </a>
-    }
-  </nav>
+        <mat-icon>{{ mobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
 
-  <div class="app-auth">
-    <!-- Solo escritorio: en móvil el acceso a la sesión vive dentro del menú hamburguesa. -->
-    <span class="app-auth__session">
+  @if (mobileMenuOpen()) {
+    <nav class="app-mobile-nav">
+      @for (route of ROUTES(); track $index) {
+        <a
+          class="app-mobile-nav__link"
+          routerLink="/{{ route.path }}"
+          routerLinkActive="app-mobile-nav__link--active"
+          [routerLinkActiveOptions]="exactMatch"
+          (click)="closeMobileMenu()"
+        >
+          {{ route.title }}
+        </a>
+      }
+
+      <div class="app-mobile-nav__divider" role="separator"></div>
+
       @if (authService.isAdmin()) {
-        <button mat-icon-button type="button" matTooltip="Cerrar sesión" (click)="logout()">
+        <button
+          type="button"
+          class="app-mobile-nav__link app-mobile-nav__session"
+          (click)="closeMobileMenu(); logout()"
+        >
           <mat-icon>lock_open</mat-icon>
+          Cerrar sesión
         </button>
       } @else {
-        <button mat-icon-button type="button" matTooltip="Iniciar sesión" (click)="openLogin()">
+        <button
+          type="button"
+          class="app-mobile-nav__link app-mobile-nav__session"
+          (click)="closeMobileMenu(); openLogin()"
+        >
           <mat-icon>lock</mat-icon>
+          Iniciar sesión
         </button>
       }
-    </span>
-
-    <button
-      mat-icon-button
-      type="button"
-      class="app-menu-toggle"
-      [matTooltip]="mobileMenuOpen() ? 'Cerrar menú' : 'Abrir menú'"
-      (click)="toggleMobileMenu()"
-    >
-      <mat-icon>{{ mobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
-    </button>
-  </div>
-</mat-toolbar>
-
-@if (mobileMenuOpen()) {
-  <nav class="app-mobile-nav">
-    @for (route of ROUTES(); track $index) {
-      <a
-        class="app-mobile-nav__link"
-        routerLink="/{{ route.path }}"
-        routerLinkActive="app-mobile-nav__link--active"
-        [routerLinkActiveOptions]="exactMatch"
-        (click)="closeMobileMenu()"
-      >
-        {{ route.title }}
-      </a>
-    }
-
-    <div class="app-mobile-nav__divider" role="separator"></div>
-
-    @if (authService.isAdmin()) {
-      <button
-        type="button"
-        class="app-mobile-nav__link app-mobile-nav__session"
-        (click)="closeMobileMenu(); logout()"
-      >
-        <mat-icon>lock_open</mat-icon>
-        Cerrar sesión
-      </button>
-    } @else {
-      <button
-        type="button"
-        class="app-mobile-nav__link app-mobile-nav__session"
-        (click)="closeMobileMenu(); openLogin()"
-      >
-        <mat-icon>lock</mat-icon>
-        Iniciar sesión
-      </button>
-    }
-  </nav>
-}
+    </nav>
+  }
+</header>
 
 <mat-tab-nav-panel #tabPanel class="app-content">
   <router-outlet></router-outlet>
