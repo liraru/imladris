@@ -1,17 +1,32 @@
 :host {
+  /*
+   * Imprescindible para el header sticky: <app-root> es inline por defecto y, con
+   * html/body a height:100%, el sticky dejaría de funcionar pasada la primera pantalla.
+   */
+  display: block;
+
   --ink: #0d0d12;
   --ink-raised: #17171f;
   --gold: var(--mat-sys-primary, #c9a86a);
   --gold-soft: #e4cc7a;
   --wine: #5c1a26;
   --text-muted: #b8b3a8;
+  --app-toolbar-height: 64px;
+}
+
+/* Contenedor sticky: toolbar + menú móvil desplegado quedan siempre visibles arriba. */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--ink);
 }
 
 .app-toolbar {
   background: var(--ink);
   border-bottom: 1px solid rgba(201, 162, 39, 0.18);
   padding-inline: 1.5rem;
-  height: 64px;
+  height: var(--app-toolbar-height);
   gap: 2rem;
 }
 
@@ -58,7 +73,7 @@
   }
 
   ::ng-deep .mdc-tab {
-    height: 64px;
+    height: var(--app-toolbar-height);
   }
 
   ::ng-deep .mdc-tab__text-label {
@@ -125,7 +140,7 @@
   display: block;
   padding: 2rem;
   background: var(--ink-raised);
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - var(--app-toolbar-height));
 }
 
 @media (max-width: 767px) {
@@ -161,6 +176,10 @@
     background: var(--ink);
     border-bottom: 1px solid rgba(201, 162, 39, 0.18);
     padding-block: 0.5rem;
+    /* Al ir dentro del header sticky, si no cabe en pantalla debe poder desplazarse por dentro. */
+    max-height: calc(100vh - var(--app-toolbar-height));
+    max-height: calc(100dvh - var(--app-toolbar-height));
+    overflow-y: auto;
   }
 
   .app-mobile-nav__link {
@@ -217,8 +236,12 @@
 }
 
 @media (max-width: 575px) {
+  :host {
+    --app-toolbar-height: 56px;
+  }
+
   .app-toolbar {
-    height: 56px;
+    height: var(--app-toolbar-height);
     padding-inline: 0.75rem;
     gap: 0.5rem;
   }
@@ -233,6 +256,6 @@
 
   .app-content {
     padding: 1rem;
-    min-height: calc(100vh - 56px);
+    min-height: calc(100vh - var(--app-toolbar-height));
   }
 }
