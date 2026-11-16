@@ -38,6 +38,8 @@ function toMangaVolume(row: MangaVolumeRow): MangaVolume {
       website: editorial.website ?? undefined,
       logo: editorial.logo ?? undefined,
     },
+    favorite: row.favorite ?? false,
+    timesRead: row.times_read ?? 0,
   };
 }
 
@@ -55,6 +57,8 @@ export interface MangaVolumeInput {
   notes?: string;
   language: MangaVolume['language'];
   editorialId: number;
+  favorite?: boolean;
+  timesRead?: number;
 }
 
 function toDateString(date?: Date): string | null {
@@ -80,6 +84,8 @@ function toRow(input: Partial<MangaVolumeInput>) {
   if (input.notes !== undefined) row['notes'] = input.notes ?? null;
   if (input.language !== undefined) row['language'] = input.language;
   if (input.editorialId !== undefined) row['editorial_id'] = input.editorialId;
+  if (input.favorite !== undefined) row['favorite'] = input.favorite;
+  if (input.timesRead !== undefined) row['times_read'] = input.timesRead;
   return row;
 }
 

@@ -155,6 +155,8 @@ export class FanficFormModal implements OnInit {
     // el usuario no pueda editarlo pero `getRawValue()` sigue incluyendo su valor al guardar.
     pages: [{ value: null as number | null, disabled: true }],
     readingStatus: [READING_STATUS.NOT_STARTED, Validators.required],
+    // Nº de veces que se ha leído (entero >= 0).
+    timesRead: [0, [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]],
     language: [LANGUAGE.EN, Validators.required],
     triggerWarnings: [''],
     tags: [''],
@@ -264,6 +266,7 @@ export class FanficFormModal implements OnInit {
       words: fanfic.words,
       chapters: fanfic.chapters,
       readingStatus: fanfic.readingStatus,
+      timesRead: fanfic.timesRead,
       language: fanfic.language,
       triggerWarnings: (fanfic.triggerWarnings ?? []).join(', '),
       tags: (fanfic.tags ?? []).join(', '),
@@ -370,6 +373,7 @@ export class FanficFormModal implements OnInit {
       chapters: raw.chapters!,
       pages: raw.pages ?? undefined,
       readingStatus: raw.readingStatus!,
+      timesRead: raw.timesRead ?? 0,
       language: raw.language!,
       triggerWarnings: raw.triggerWarnings ? toStringList(raw.triggerWarnings) : undefined,
       tags: raw.tags ? toStringList(raw.tags) : undefined,

@@ -74,13 +74,47 @@
   backdrop-filter: blur(2px);
 }
 
-/* Badge de rating: esquina opuesta al menú de opciones, superpuesto a la portada */
-.library-card__rating-badge {
+/*
+ * Esquina superior izquierda (la opuesta al menú de opciones), superpuesta a la portada.
+ * Apila en columna lo que haya: en fanfic el badge de rating y, debajo, la estrella de
+ * favorito; en novelas/manga, solo la estrella.
+ */
+.library-card__corner {
   position: absolute;
   top: 0.25rem;
   left: 0.25rem;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+/* Badge de rating: dentro de la esquina apilada, sin posicionamiento propio */
+.library-card__rating-badge {
   backdrop-filter: blur(2px);
+}
+.library-card__corner .library-card__rating-badge {
+  position: static;
+}
+
+/* Estrella de favorito: círculo del mismo tamaño que el botón de menú (32px) */
+.library-card__favorite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--mat-sys-surface) 65%, transparent);
+  backdrop-filter: blur(2px);
+  color: var(--mat-sys-primary);
+}
+.library-card__favorite mat-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 1.25rem;
+  font-variation-settings: 'FILL' 1;
 }
 
 /* Portada: tamaño de visualización fijo (2:3) y recorte, independiente del tamaño real de la imagen */
@@ -240,7 +274,7 @@
  *
  * - La tabla ocupa exactamente el ancho del contenedor de la página
  *   (el mismo que filtros y pestañas), de modo que queda centrada.
- *   El padding de celda se compacta para que las 14 columnas quepan
+ *   El padding de celda se compacta para que las columnas quepan
  *   sin desbordar; si en pantallas estrechas no caben, el wrapper
  *   hace scroll horizontal en vez de salirse de la página.
  * - Sin líneas entre filas: se alternan dos tonos casi idénticos y la
@@ -290,6 +324,9 @@ table.library-table th.mat-mdc-header-cell {
 table.library-table .mat-column-cover {
   width: 3.75rem;
 }
+table.library-table .mat-column-favorite {
+  width: 2.75rem;
+}
 table.library-table .mat-column-serie {
   width: 8rem;
 }
@@ -298,6 +335,9 @@ table.library-table .mat-column-genres {
 }
 table.library-table .mat-column-readingStatus {
   width: 6rem;
+}
+table.library-table .mat-column-timesRead {
+  width: 5rem;
 }
 table.library-table .mat-column-releaseDate {
   width: 6.5rem;
@@ -323,6 +363,22 @@ table.library-table .library-table__cover {
   max-height: none;
   border-radius: 2px;
   cursor: zoom-in;
+}
+
+/* Columna de favorito: estrella en el color de acento (relleno) y cabecera apagada */
+table.library-table .library-table__favorite,
+table.library-table .library-table__favorite-header {
+  width: 1.15rem;
+  height: 1.15rem;
+  font-size: 1.15rem;
+  vertical-align: middle;
+}
+table.library-table .library-table__favorite {
+  color: var(--mat-sys-primary);
+  font-variation-settings: 'FILL' 1;
+}
+table.library-table .library-table__favorite-header {
+  color: var(--mat-sys-on-surface-variant);
 }
 
 /* Filas alternas + resalte al pasar el ratón */

@@ -21,11 +21,13 @@
       <div class="reading-daily-chart__scroll" #scroller (scroll)="onScroll(scroller)">
         <div class="reading-daily-chart__bars" [style.gap.px]="gap()">
           @for (day of days(); track day.date; let i = $index) {
+            <!-- Una columna cortada por el borde del scroll se oculta hasta que cabe entera. -->
             <div
               class="reading-daily-chart__col"
+              [class.reading-daily-chart__col--hidden]="!colVisible()[i]"
               [style.width.px]="colWidths()[i]"
               [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
-              [matTooltipDisabled]="tooltipsDisabled()"
+              [matTooltipDisabled]="tooltipsDisabled() || !colVisible()[i]"
               matTooltipClass="reading-heatmap-tooltip"
             >
               <div

@@ -251,6 +251,34 @@ export class Library implements OnInit {
     }
   }
 
+  // ---------- Favoritos (desde el menú contextual) ----------
+
+  /**
+   * Marca/desmarca como favorito. Se actualiza solo el elemento afectado en el signal
+   * (sin recargar toda la lista), para que la vista no salte ni pierda el scroll.
+   */
+  protected async onToggleFavorite(item: LibraryItem): Promise<void> {
+    const type = this.filters().type;
+    const favorite = !item.favorite;
+    try {
+      if (type === TYPE.BOOK) {
+        await this._bookSrv.update(item.id, { favorite });
+      } else {
+        await this._mangaVolumeSrv.update(item.id, { favorite });
+      }
+      const patch = (list: LibraryItem[]) =>
+        list.map((i) => (i.id === item.id ? { ...i, favorite } : i));
+      if (type === TYPE.BOOK) {
+        this.books.update(patch);
+      } else {
+        this.mangaVolumes.update(patch);
+      }
+    } catch (err) {
+      this.error.set('No se ha podido actualizar el favorito. Inténtalo de nuevo.');
+      console.error(err);
+    }
+  }
+
   // ---------- Carga de datos ----------
 
   private async _loadReferenceData(): Promise<void> {
