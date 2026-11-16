@@ -45,6 +45,8 @@ export class LibraryDataDisplay {
   /** Se emite cuando el usuario elige "Eliminar" en el menú contextual de un elemento. */
   public readonly deleteItem = output<LibraryItem>();
   public readonly markFinished = output<LibraryItem>();
+  /** Se emite cuando el usuario elige marcar/desmarcar como favorito en el menú contextual. */
+  public readonly toggleFavorite = output<LibraryItem>();
 
   protected readonly MODE = MODE;
   protected readonly TYPE = TYPE;
@@ -55,12 +57,14 @@ export class LibraryDataDisplay {
 
   protected readonly displayedColumns = [
     'cover',
+    'favorite',
     'title',
     'authors',
     'editorial',
     'serie',
     'genres',
     'readingStatus',
+    'timesRead',
     'releaseDate',
     'adquisitionDate',
     'startDate',

@@ -30,8 +30,23 @@
           </button>
         }
 
+        <div class="management__menu-divider" role="separator"></div>
+
+        <button
+          type="button"
+          class="management__menu-item"
+          [disabled]="backingUp()"
+          [matTooltip]="collapsed() && !isMobile() ? 'Descargar backup' : ''"
+          matTooltipPosition="right"
+          (click)="downloadBackup()"
+        >
+          <mat-icon>{{ backingUp() ? 'hourglass_empty' : 'cloud_download' }}</mat-icon>
+          <span class="management__menu-item-label">{{
+            backingUp() ? 'Generando backup…' : 'Descargar backup'
+          }}</span>
+        </button>
+
         @if (canInstall()) {
-          <div class="management__menu-divider" role="separator"></div>
           <button
             type="button"
             class="management__menu-item"

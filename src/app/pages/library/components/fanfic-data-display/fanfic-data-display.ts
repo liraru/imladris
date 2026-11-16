@@ -46,12 +46,15 @@ export class FanficDataDisplay {
   public readonly editItem = output<Fanfic>();
   public readonly deleteItem = output<Fanfic>();
   public readonly markFinished = output<Fanfic>();
+  /** Se emite cuando el usuario elige marcar/desmarcar como favorito en el menú contextual. */
+  public readonly toggleFavorite = output<Fanfic>();
 
   protected readonly MODE = MODE;
   protected readonly READING_STATUS = READING_STATUS;
 
   protected readonly displayedColumns = [
     'cover',
+    'favorite',
     'title',
     'authors',
     'fandom',
@@ -60,6 +63,7 @@ export class FanficDataDisplay {
     'words',
     'chapters',
     'readingStatus',
+    'timesRead',
     'adquisitionDate',
     'finishDate',
     'actions',

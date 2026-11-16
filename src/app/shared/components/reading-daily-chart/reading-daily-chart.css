@@ -101,6 +101,14 @@
   touch-action: auto !important;
 }
 
+/*
+ * Columna cortada por el borde del scroll: se oculta pero sigue ocupando su sitio (no desplaza
+ * al resto) y no recibe el ratón. Se vuelve a ver cuando el scroll la deja entera dentro.
+ */
+.reading-daily-chart__col--hidden {
+  visibility: hidden;
+}
+
 .reading-daily-chart__bar {
   width: 100%;
   border-radius: 3px 3px 0 0;

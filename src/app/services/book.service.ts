@@ -56,6 +56,8 @@ function toBook(row: BookRow): Book {
         : undefined,
     serieVolume: row.serie_volume ?? undefined,
     genres: (row.book_genres ?? []).map(({ genre }) => genre),
+    favorite: row.favorite ?? false,
+    timesRead: row.times_read ?? 0,
   };
 }
 
@@ -75,6 +77,8 @@ export interface BookInput {
   serieId?: number;
   serieVolume?: number;
   genres: GENRE[];
+  favorite?: boolean;
+  timesRead?: number;
 }
 
 function toDateString(date?: Date): string | null {
@@ -100,6 +104,8 @@ function toRow(input: Partial<BookInput>) {
   if (input.editorialId !== undefined) row['editorial_id'] = input.editorialId;
   if (input.serieId !== undefined) row['serie_id'] = input.serieId ?? null;
   if (input.serieVolume !== undefined) row['serie_volume'] = input.serieVolume ?? null;
+  if (input.favorite !== undefined) row['favorite'] = input.favorite;
+  if (input.timesRead !== undefined) row['times_read'] = input.timesRead;
   return row;
 }
 

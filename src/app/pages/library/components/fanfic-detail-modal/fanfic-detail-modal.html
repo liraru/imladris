@@ -44,15 +44,16 @@
       <dd>{{ ratingLabels[item.rating] }}</dd>
 
       <dt>Páginas / Capítulos</dt>
-      <dd>
-        {{ item.pages | thousands }} / {{ item.chapters }}
-      </dd>
+      <dd>{{ item.pages | thousands }} / {{ item.chapters }}</dd>
 
       <dt>Idioma</dt>
       <dd>{{ languageLabels[item.language] }}</dd>
 
       <dt>Estado de lectura</dt>
       <dd>{{ readingStatusLabels[item.readingStatus] }}</dd>
+
+      <dt>Veces leído</dt>
+      <dd>{{ item.timesRead }}</dd>
 
       @if (item.triggerWarnings?.length) {
         <dt>Trigger warnings</dt>
