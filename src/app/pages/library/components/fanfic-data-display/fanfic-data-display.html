@@ -27,7 +27,7 @@
             <mat-icon>more_vert</mat-icon>
           </button>
         }
-        <!-- Esquina superior izquierda: badge de rating y, debajo, la estrella de favorito. -->
+        <!-- Esquina superior izquierda: badge de rating. -->
         <div class="library-card__corner">
           <div
             class="rating-badge library-card__rating-badge"
@@ -36,11 +36,6 @@
           >
             {{ ratingShortLabel(item) }}
           </div>
-          @if (item.favorite) {
-            <span class="library-card__favorite" matTooltip="Favorito" aria-label="Favorito">
-              <mat-icon>star</mat-icon>
-            </span>
-          }
         </div>
         <div class="library-card__cover">
           @if (item.coverUrl) {
@@ -49,6 +44,12 @@
             <div class="library-card__placeholder">
               <mat-icon>favorite_border</mat-icon>
             </div>
+          }
+          <!-- Esquina inferior derecha de la portada: estrella de favorito. -->
+          @if (item.favorite) {
+            <span class="library-card__favorite" matTooltip="Favorito" aria-label="Favorito">
+              <mat-icon>star</mat-icon>
+            </span>
           }
         </div>
         <div class="library-card__body">

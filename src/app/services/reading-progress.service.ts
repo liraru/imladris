@@ -69,6 +69,30 @@ export class ReadingProgressService {
     return result;
   }
 
+  /**
+   * Páginas leídas en una fecha concreta (yyyy-MM-dd) para cada una de las lecturas
+   * indicadas: suma de los `pages_advanced` de ese día. Una única consulta para todas.
+   * Las lecturas sin avances ese día no aparecen en el resultado (equivale a 0).
+   */
+  async getPagesOnDateByReading(
+    readingIds: number[],
+    date: string,
+  ): Promise<Record<number, number>> {
+    if (readingIds.length === 0) return {};
+    const { data, error } = await this.supabase
+      .from(this.table)
+      .select('reading_id, pages_advanced')
+      .in('reading_id', readingIds)
+      .eq('record_date', date);
+    if (error) throw error;
+
+    const result: Record<number, number> = {};
+    for (const row of (data ?? []) as { reading_id: number; pages_advanced: number }[]) {
+      result[row.reading_id] = (result[row.reading_id] ?? 0) + row.pages_advanced;
+    }
+    return result;
+  }
+
   /** Suma de páginas avanzadas por día (todas las lecturas), para el mapa de calor de la home. */
   async getPagesByDay(fromDate: string): Promise<Record<string, number>> {
     const { data, error } = await this.supabase

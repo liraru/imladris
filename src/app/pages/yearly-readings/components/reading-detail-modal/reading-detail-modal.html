@@ -35,6 +35,26 @@
 
       <dt>Fin</dt>
       <dd>{{ reading.endDate ? (reading.endDate | date: 'dd/MM/yyyy') : 'Leyendo' }}</dd>
+
+      <!-- Las dos filas se renderizan siempre (con "—" mientras carga o si no hay avances)
+           para reservar su sitio y que el gráfico de debajo no salte al llegar los datos. -->
+      <dt>Media por día</dt>
+      <dd>
+        @if (stats(); as s) {
+          {{ s.averagePerDay | number: '1.0-1' }} págs.
+        } @else {
+          —
+        }
+      </dd>
+
+      <dt>Máx. en un día</dt>
+      <dd>
+        @if (stats(); as s) {
+          {{ s.maxPages | number: '1.0-0' }} págs. · {{ s.maxDate | date: 'dd/MM/yyyy' }}
+        } @else {
+          —
+        }
+      </dd>
     </dl>
 
     <div class="reading-detail-modal__chart">
