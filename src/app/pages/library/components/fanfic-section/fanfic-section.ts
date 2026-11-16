@@ -106,6 +106,21 @@ export class FanficSection implements OnInit {
     }
   }
 
+  /**
+   * Marca/desmarca como favorito. Se actualiza solo el fanfic afectado en el signal
+   * (sin recargar toda la lista), para que la vista no salte ni pierda el scroll.
+   */
+  protected async onToggleFavorite(item: Fanfic): Promise<void> {
+    const favorite = !item.favorite;
+    try {
+      await this._fanficSrv.update(item.id, { favorite });
+      this.fanfics.update((list) => list.map((f) => (f.id === item.id ? { ...f, favorite } : f)));
+    } catch (err) {
+      this.error.set('No se ha podido actualizar el favorito. Inténtalo de nuevo.');
+      console.error(err);
+    }
+  }
+
   protected async onMarkFinished(item: Fanfic): Promise<void> {
     try {
       await this._fanficSrv.update(item.id, {

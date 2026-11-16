@@ -48,6 +48,8 @@ function toFanfic(row: FanficRow): Fanfic {
     originalUrl: row.original_url ?? undefined,
     coverUrl: row.cover_url ?? undefined,
     notes: row.notes ?? undefined,
+    favorite: row.favorite ?? false,
+    timesRead: row.times_read ?? 0,
   };
 }
 
@@ -74,6 +76,8 @@ export interface FanficInput {
   originalUrl?: string;
   coverUrl?: string;
   notes?: string;
+  favorite?: boolean;
+  timesRead?: number;
 }
 
 function toDateString(date?: Date): string | null {
@@ -106,6 +110,8 @@ function toRow(input: Partial<FanficInput>) {
   if (input.originalUrl !== undefined) row['original_url'] = input.originalUrl ?? null;
   if (input.coverUrl !== undefined) row['cover_url'] = input.coverUrl ?? null;
   if (input.notes !== undefined) row['notes'] = input.notes ?? null;
+  if (input.favorite !== undefined) row['favorite'] = input.favorite;
+  if (input.timesRead !== undefined) row['times_read'] = input.timesRead;
   return row;
 }
 

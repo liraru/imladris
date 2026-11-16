@@ -27,4 +27,6 @@ export interface Fanfic {
   originalUrl?: string;
   coverUrl?: string;
   notes?: string;
+  favorite: boolean; // default: false
+  timesRead: number; // default: 0
 }

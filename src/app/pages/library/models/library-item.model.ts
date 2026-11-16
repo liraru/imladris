@@ -20,6 +20,8 @@ export interface LibraryItem {
   serieTitle?: string;
   serieVolume?: number;
   genres?: GENRE[];
+  favorite: boolean;
+  timesRead: number;
 }
 
 export function fromBook(book: Book): LibraryItem {
@@ -40,6 +42,8 @@ export function fromBook(book: Book): LibraryItem {
     serieTitle: book.serie?.title,
     serieVolume: book.serieVolume,
     genres: book.genres,
+    favorite: book.favorite,
+    timesRead: book.timesRead,
   };
 }
 
@@ -70,5 +74,7 @@ export function fromMangaVolume(volume: MangaVolume, mangaTitle?: string): Libra
     serieId: volume.mangaId,
     serieTitle: mangaTitle,
     serieVolume: volume.volumeNumber,
+    favorite: volume.favorite,
+    timesRead: volume.timesRead,
   };
 }

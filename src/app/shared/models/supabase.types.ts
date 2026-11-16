@@ -40,6 +40,8 @@ export interface BookRow {
   editorial_id: number;
   serie_id: number | null;
   serie_volume: number | null;
+  favorite: boolean;
+  times_read: number;
   editorial?: EditorialRow;
   serie?: BookSerieRow | null;
   book_authors?: { author: AuthorRow }[];
@@ -68,6 +70,8 @@ export interface MangaVolumeRow {
   notes: string | null;
   language: LANGUAGE;
   editorial_id: number;
+  favorite: boolean;
+  times_read: number;
   editorial?: EditorialRow;
   manga_volume_authors?: { author: AuthorRow }[];
 }
@@ -135,6 +139,8 @@ export interface FanficRow {
   original_url: string | null;
   cover_url: string | null;
   notes: string | null;
+  favorite: boolean;
+  times_read: number;
   fanfic_fandoms?: { fandom: FandomRow }[];
   fanfic_ships?: { ship: ShipRow }[];
 }

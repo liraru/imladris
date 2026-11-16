@@ -309,13 +309,18 @@
         }
       }
 
-      <mat-form-field appearance="outline" class="col-12 col-md-6">
+      <mat-form-field appearance="outline" class="col-12 col-md-4">
         <mat-label>Estado de lectura</mat-label>
         <mat-select formControlName="readingStatus">
           @for (status of readingStatuses; track status) {
             <mat-option [value]="status">{{ readingStatusLabels[status] }}</mat-option>
           }
         </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-12 col-md-2">
+        <mat-label>Veces leído</mat-label>
+        <input matInput type="number" formControlName="timesRead" min="0" step="1" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="col-12 col-md-6">

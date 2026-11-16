@@ -33,6 +33,12 @@ const MIN_COL_WIDTH = 6;
 const MAX_COL_WIDTH = 28;
 const COL_GAP = 2;
 
+/**
+ * Margen (px CSS) con el que una columna se sigue considerando "entera dentro de pantalla":
+ * absorbe los decimales de `scrollLeft` y el redondeo de `scrollWidth`.
+ */
+const VISIBILITY_TOLERANCE = 0.5;
+
 function toDateString(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -172,31 +178,43 @@ export class ReadingDailyChart {
     );
   });
 
-  /**
-   * Primer y último día visibles (índices). Sin scroll horizontal son todos; con scroll se deducen
-   * de la posición (las columnas miden todas lo mismo cuando hay desbordamiento).
-   */
-  private readonly _visibleRange = computed(() => {
-    const n = this.days().length;
-    if (n === 0) return { first: 0, last: -1 };
-
-    const widths = this.colWidths();
+  /** Posición izquierda (px CSS) de cada columna dentro del área de barras. */
+  private readonly _colOffsets = computed<number[]>(() => {
     const gap = this.gap();
-    const containerWidth = this._containerWidth();
-    const total = widths.reduce((sum, w) => sum + w, 0) + gap * (n - 1);
-
-    if (containerWidth <= 0 || total <= containerWidth + 0.5) {
-      return { first: 0, last: n - 1 };
+    const offsets: number[] = [];
+    let left = 0;
+    for (const width of this.colWidths()) {
+      offsets.push(left);
+      left += width + gap;
     }
+    return offsets;
+  });
 
-    const pitch = widths[0] + gap;
-    const scrollLeft = this._scrollLeft();
-    const first = Math.min(n - 1, Math.max(0, Math.floor(scrollLeft / pitch)));
-    const last = Math.min(
-      n - 1,
-      Math.max(first, Math.ceil((scrollLeft + containerWidth) / pitch) - 1),
-    );
-    return { first, last };
+  /**
+   * Visibilidad de cada columna: solo se pinta si cabe ENTERA en la zona visible del scroll.
+   * Una columna cortada por el borde (asomando un píxel por delante o por detrás) se oculta y
+   * vuelve a pintarse cuando el scroll deja ver su ancho completo.
+   */
+  protected readonly colVisible = computed<boolean[]>(() => {
+    const widths = this.colWidths();
+    if (widths.length === 0) return [];
+
+    const viewportWidth = this._containerWidth();
+    // Aún sin medir el contenedor: no se oculta nada.
+    if (viewportWidth <= 0) return widths.map(() => true);
+
+    const offsets = this._colOffsets();
+    const viewStart = this._scrollLeft() - VISIBILITY_TOLERANCE;
+    const viewEnd = this._scrollLeft() + viewportWidth + VISIBILITY_TOLERANCE;
+    return widths.map((width, i) => offsets[i] >= viewStart && offsets[i] + width <= viewEnd);
+  });
+
+  /** Primer y último día visibles (índices), a partir de las columnas que se ven enteras. */
+  private readonly _visibleRange = computed(() => {
+    const visible = this.colVisible();
+    const first = visible.indexOf(true);
+    if (first === -1) return { first: 0, last: -1 };
+    return { first, last: visible.lastIndexOf(true) };
   });
 
   /** Fecha de la izquierda de la leyenda: primer día visible. */
@@ -234,6 +252,7 @@ export class ReadingDailyChart {
       const measure = () => {
         this._dpr.set(window.devicePixelRatio || 1);
         this._containerWidth.set(scroller.clientWidth);
+        this._scrollLeft.set(scroller.scrollLeft);
       };
       measure();
 

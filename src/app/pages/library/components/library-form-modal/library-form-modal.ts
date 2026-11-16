@@ -15,7 +15,12 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -171,6 +176,8 @@ export class LibraryFormModal implements OnInit {
     authorIds: [[] as number[], Validators.required],
     editorialId: [null as number | null, Validators.required],
     readingStatus: [READING_STATUS.NOT_STARTED, Validators.required],
+    // Nº de veces que se ha leído (entero >= 0).
+    timesRead: [0, [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]],
     language: [LANGUAGE.ES, Validators.required],
     releaseDate: [null as Date | null],
     adquisitionDate: [null as Date | null],
@@ -296,6 +303,7 @@ export class LibraryFormModal implements OnInit {
         authorIds: book.authors.map((a) => a.id),
         editorialId: book.editorial.id,
         readingStatus: book.readingStatus,
+        timesRead: book.timesRead,
         language: book.language,
         releaseDate: toDate(book.releaseDate),
         adquisitionDate: toDate(book.adquisitionDate),
@@ -320,6 +328,7 @@ export class LibraryFormModal implements OnInit {
         authorIds: volume.authors.map((a) => a.id),
         editorialId: volume.editorial.id,
         readingStatus: volume.readingStatus,
+        timesRead: volume.timesRead,
         language: volume.language,
         releaseDate: toDate(volume.releaseDate),
         adquisitionDate: toDate(volume.adquisitionDate),
@@ -506,6 +515,7 @@ export class LibraryFormModal implements OnInit {
           title: value.title!,
           authorIds: value.authorIds!,
           readingStatus: value.readingStatus!,
+          timesRead: value.timesRead ?? 0,
           releaseDate: value.releaseDate ?? undefined,
           coverImageUrl: value.coverImageUrl || undefined,
           adquisitionDate: value.adquisitionDate ?? undefined,
@@ -530,6 +540,7 @@ export class LibraryFormModal implements OnInit {
           mangaId: value.mangaId!,
           volumeNumber: value.volumeNumber,
           readingStatus: value.readingStatus!,
+          timesRead: value.timesRead ?? 0,
           releaseDate: value.releaseDate ?? undefined,
           coverImageUrl: value.coverImageUrl || undefined,
           adquisitionDate: value.adquisitionDate ?? undefined,

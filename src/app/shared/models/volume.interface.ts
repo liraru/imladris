@@ -16,4 +16,6 @@ export interface Volume {
   notes?: string;
   language: LANGUAGE;
   editorial: Editorial;
+  favorite: boolean; // default: false
+  timesRead: number; // default: 0
 }
