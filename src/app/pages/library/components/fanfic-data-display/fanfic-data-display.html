@@ -45,6 +45,12 @@
               <mat-icon>favorite_border</mat-icon>
             </div>
           }
+          <!-- Esquina inferior derecha de la portada: estrella de favorito. -->
+          @if (item.favorite) {
+            <span class="library-card__favorite" matTooltip="Favorito" aria-label="Favorito">
+              <mat-icon>star</mat-icon>
+            </span>
+          }
         </div>
         <div class="library-card__body" [class.library-card__body--favorite]="item.favorite">
           <p class="library-card__fandom-tag">{{ fandomNames(item) }}</p>
