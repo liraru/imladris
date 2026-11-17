@@ -180,6 +180,9 @@ function applyFilters(items: Fanfic[], filters: FanficFilters): Fanfic[] {
   if (filters.readingStatus != null) {
     result = result.filter((i) => i.readingStatus === filters.readingStatus);
   }
+  if (filters.onlyFavorites) {
+    result = result.filter((i) => i.favorite);
+  }
 
   const dir = filters.sortDirection === 'desc' ? -1 : 1;
   result = [...result].sort((a, b) => {

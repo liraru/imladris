@@ -45,12 +45,6 @@
               <mat-icon>favorite_border</mat-icon>
             </div>
           }
-          <!-- Esquina inferior derecha de la portada: estrella de favorito. -->
-          @if (item.favorite) {
-            <span class="library-card__favorite" matTooltip="Favorito" aria-label="Favorito">
-              <mat-icon>star</mat-icon>
-            </span>
-          }
         </div>
         <div class="library-card__body" [class.library-card__body--favorite]="item.favorite">
           <p class="library-card__fandom-tag">{{ fandomNames(item) }}</p>
@@ -82,8 +76,8 @@
     }
   </div>
 } @else {
-  <div class="library-table-wrapper">
-    <table mat-table [dataSource]="data()" class="library-table">
+  <div #tableWrapper class="library-table-wrapper">
+    <table mat-table [dataSource]="pagedData()" class="library-table">
       <ng-container matColumnDef="cover">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let item">
@@ -182,6 +176,18 @@
       ></tr>
     </table>
   </div>
+
+  @if (showPaginator()) {
+    <mat-paginator
+      class="library-table-paginator"
+      [length]="totalItems()"
+      [pageSize]="pageSize"
+      [pageIndex]="clampedPageIndex()"
+      [hidePageSize]="true"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)"
+    />
+  }
 }
 
 <mat-menu #itemMenu="matMenu">

@@ -5,6 +5,7 @@ import { debounceTime, map, startWith, tap } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionSelectionChange } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -40,6 +41,7 @@ interface StoredLibraryFilters {
   adquisitionYear: number | null;
   editorialId: number | null;
   readingStatus: READING_STATUS | null;
+  onlyFavorites: boolean;
   sortBy: SORT_FIELD[];
   sortDirection: 'asc' | 'desc';
 }
@@ -60,7 +62,9 @@ function loadStoredFilters(): StoredLibraryFilters | null {
     const validSortBy =
       Array.isArray(sortByCandidate) &&
       sortByCandidate.length > 0 &&
-      sortByCandidate.every((field: unknown) => Object.values(SORT_FIELD).includes(field as SORT_FIELD));
+      sortByCandidate.every((field: unknown) =>
+        Object.values(SORT_FIELD).includes(field as SORT_FIELD),
+      );
 
     return {
       mode: parsed?.mode === MODE.TABLE ? MODE.TABLE : MODE.GALLERY,
@@ -74,6 +78,7 @@ function loadStoredFilters(): StoredLibraryFilters | null {
       readingStatus: Object.values(READING_STATUS).includes(parsed?.readingStatus)
         ? (parsed.readingStatus as READING_STATUS)
         : null,
+      onlyFavorites: parsed?.onlyFavorites === true,
       sortBy: validSortBy ? (sortByCandidate as SORT_FIELD[]) : DEFAULT_SORT_BY[type],
       sortDirection: parsed?.sortDirection === 'desc' ? 'desc' : 'asc',
     };
@@ -98,6 +103,7 @@ function saveStoredFilters(filters: LibraryFilters): void {
     MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatCheckboxModule,
     MatExpansionModule,
     MatFormFieldModule,
     MatIconModule,
@@ -131,7 +137,9 @@ export class LibrarySearch {
   protected readonly sortFieldLabels = SORT_FIELD_LABELS;
 
   protected readonly form = new FormGroup({
-    mode: new FormControl(this._stored?.mode ?? DEFAULT_LIBRARY_FILTERS.mode, { nonNullable: true }),
+    mode: new FormControl(this._stored?.mode ?? DEFAULT_LIBRARY_FILTERS.mode, {
+      nonNullable: true,
+    }),
     title: new FormControl(this._stored?.title ?? '', { nonNullable: true }),
     author: new FormControl<NameableRef<Author>>(null),
     serie: new FormControl<NameableRef<BookSerie>>(null),
@@ -140,10 +148,19 @@ export class LibrarySearch {
     adquisitionYear: new FormControl<number | null>(this._stored?.adquisitionYear ?? null),
     editorial: new FormControl<NameableRef<Editorial>>(null),
     readingStatus: new FormControl<READING_STATUS | null>(this._stored?.readingStatus ?? null),
-    sortBy: new FormControl(this._stored?.sortBy ?? DEFAULT_LIBRARY_FILTERS.sortBy, { nonNullable: true }),
-    sortDirection: new FormControl(this._stored?.sortDirection ?? DEFAULT_LIBRARY_FILTERS.sortDirection, {
+    onlyFavorites: new FormControl(
+      this._stored?.onlyFavorites ?? DEFAULT_LIBRARY_FILTERS.onlyFavorites,
+      { nonNullable: true },
+    ),
+    sortBy: new FormControl(this._stored?.sortBy ?? DEFAULT_LIBRARY_FILTERS.sortBy, {
       nonNullable: true,
     }),
+    sortDirection: new FormControl(
+      this._stored?.sortDirection ?? DEFAULT_LIBRARY_FILTERS.sortDirection,
+      {
+        nonNullable: true,
+      },
+    ),
   });
 
   /**
@@ -161,9 +178,15 @@ export class LibrarySearch {
       .join(' → '),
   );
 
-  private readonly authorQuery = toSignal(this.form.controls.author.valueChanges, { initialValue: null });
-  private readonly serieQuery = toSignal(this.form.controls.serie.valueChanges, { initialValue: null });
-  private readonly mangaQuery = toSignal(this.form.controls.manga.valueChanges, { initialValue: null });
+  private readonly authorQuery = toSignal(this.form.controls.author.valueChanges, {
+    initialValue: null,
+  });
+  private readonly serieQuery = toSignal(this.form.controls.serie.valueChanges, {
+    initialValue: null,
+  });
+  private readonly mangaQuery = toSignal(this.form.controls.manga.valueChanges, {
+    initialValue: null,
+  });
   private readonly editorialQuery = toSignal(this.form.controls.editorial.valueChanges, {
     initialValue: null,
   });
@@ -186,8 +209,17 @@ export class LibrarySearch {
       startWith(this.form.getRawValue()),
       map(
         (v) =>
-          [v.title, v.author, v.serie, v.manga, v.finishYear, v.adquisitionYear, v.editorial, v.readingStatus]
-            .filter((value) => value !== null && value !== '').length,
+          [
+            v.title,
+            v.author,
+            v.serie,
+            v.manga,
+            v.finishYear,
+            v.adquisitionYear,
+            v.editorial,
+            v.readingStatus,
+            v.onlyFavorites,
+          ].filter((value) => value !== null && value !== '' && value !== false).length,
       ),
     ),
     { initialValue: 0 },
@@ -213,21 +245,20 @@ export class LibrarySearch {
     this.form.valueChanges.pipe(
       startWith(this.form.getRawValue()),
       debounceTime(200),
-      map(
-        (value): LibraryFilters => ({
-          mode: value.mode ?? DEFAULT_LIBRARY_FILTERS.mode,
-          type: this.type(),
-          title: value.title ?? '',
-          authorId: idOf(value.author),
-          serieId: this.type() === TYPE.MANGA ? idOf(value.manga) : idOf(value.serie),
-          finishYear: value.finishYear ?? null,
-          adquisitionYear: value.adquisitionYear ?? null,
-          editorialId: idOf(value.editorial),
-          readingStatus: value.readingStatus ?? null,
-          sortBy: this.manualSortOrder(),
-          sortDirection: value.sortDirection ?? 'asc',
-        }),
-      ),
+      map((value): LibraryFilters => ({
+        mode: value.mode ?? DEFAULT_LIBRARY_FILTERS.mode,
+        type: this.type(),
+        title: value.title ?? '',
+        authorId: idOf(value.author),
+        serieId: this.type() === TYPE.MANGA ? idOf(value.manga) : idOf(value.serie),
+        finishYear: value.finishYear ?? null,
+        adquisitionYear: value.adquisitionYear ?? null,
+        editorialId: idOf(value.editorial),
+        readingStatus: value.readingStatus ?? null,
+        onlyFavorites: value.onlyFavorites ?? false,
+        sortBy: this.manualSortOrder(),
+        sortDirection: value.sortDirection ?? 'asc',
+      })),
       tap((filters) => {
         // Mientras haya una selección de autor/serie/manga/editorial pendiente de restaurar, no
         // persistimos todavía: ese primer valor aún no incluye el id guardado (el objeto no ha llegado).
@@ -246,7 +277,13 @@ export class LibrarySearch {
     const series = this.series();
     const mangas = this.mangas();
     const editorials = this.editorials();
-    if (authors.length === 0 && series.length === 0 && mangas.length === 0 && editorials.length === 0) return;
+    if (
+      authors.length === 0 &&
+      series.length === 0 &&
+      mangas.length === 0 &&
+      editorials.length === 0
+    )
+      return;
 
     const patch: Partial<{
       author: NameableRef<Author>;
@@ -292,10 +329,14 @@ export class LibrarySearch {
     this.manualSortOrder.set(defaultSort);
   });
 
-  protected displayAuthor = (v: NameableRef<Author>) => (typeof v === 'string' ? v : v?.name ?? '');
-  protected displaySerie = (v: NameableRef<BookSerie>) => (typeof v === 'string' ? v : v?.title ?? '');
-  protected displayManga = (v: NameableRef<Manga>) => (typeof v === 'string' ? v : v?.title ?? '');
-  protected displayEditorial = (v: NameableRef<Editorial>) => (typeof v === 'string' ? v : v?.name ?? '');
+  protected displayAuthor = (v: NameableRef<Author>) =>
+    typeof v === 'string' ? v : (v?.name ?? '');
+  protected displaySerie = (v: NameableRef<BookSerie>) =>
+    typeof v === 'string' ? v : (v?.title ?? '');
+  protected displayManga = (v: NameableRef<Manga>) =>
+    typeof v === 'string' ? v : (v?.title ?? '');
+  protected displayEditorial = (v: NameableRef<Editorial>) =>
+    typeof v === 'string' ? v : (v?.name ?? '');
 
   protected sortPosition(field: SORT_FIELD): number | null {
     const index = this.manualSortOrder().indexOf(field);

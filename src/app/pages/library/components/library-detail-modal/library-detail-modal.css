@@ -84,8 +84,19 @@
 
 .library-detail-modal__facts dd {
   margin: 0;
+  min-width: 0; /* la URL de portada (larga) se ajusta en su celda sin ensanchar la rejilla */
+  overflow-wrap: anywhere;
   font-weight: 500;
   font-size: 0.95rem;
+}
+
+.library-detail-modal__link {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+}
+
+.library-detail-modal__link:hover {
+  text-decoration: underline;
 }
 
 .library-detail-modal__notes {
