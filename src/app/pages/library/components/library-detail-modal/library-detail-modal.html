@@ -24,7 +24,8 @@
     <h2 class="library-detail-modal__title">{{ item.title }}</h2>
     <p class="library-detail-modal__author">{{ authorNames }}</p>
 
-    <!-- Mismos campos (y mismo orden) que la modal de edición; los vacíos se muestran con "—". -->
+    <!-- Mismos campos (y mismo orden) que la modal de edición, salvo la URL de portada;
+         los vacíos se muestran con "—". En escritorio se reparten en dos columnas. -->
     <dl class="library-detail-modal__facts">
       <dt>Editorial</dt>
       <dd>{{ item.editorial?.name ?? '—' }}</dd>
@@ -54,21 +55,6 @@
 
       <dt>Veces leído</dt>
       <dd>{{ item.timesRead }}</dd>
-
-      <dt>Portada (URL)</dt>
-      <dd>
-        @if (item.coverImageUrl) {
-          <a
-            class="library-detail-modal__link"
-            [href]="item.coverImageUrl"
-            target="_blank"
-            rel="noopener"
-            >{{ item.coverImageUrl }}</a
-          >
-        } @else {
-          —
-        }
-      </dd>
 
       <dt>Publicación</dt>
       <dd>{{ (item.releaseDate | date: 'dd/MM/yyyy') ?? '—' }}</dd>

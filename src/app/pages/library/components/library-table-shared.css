@@ -5,13 +5,19 @@
  * Cabecera sticky:
  * - Escritorio (>= 1024px): el wrapper no puede ser un contenedor de scroll (con
  *   `overflow-x: auto` el sticky se calculaba contra el wrapper y no contra la página), así que
- *   se usa `overflow-x: clip`. La cabecera se pega justo debajo de la navbar sticky.
+ *   se usa `overflow-x: clip`. La cabecera se pega debajo de la navbar sticky, dejando un hueco
+ *   (`--library-table-sticky-gap`) que se tapa con una sombra del color de fondo para que las
+ *   filas no se vean pasar por él.
  * - Pantallas menores: el wrapper hace scroll en los dos ejes y la cabecera se pega arriba dentro de él.
  */
 
 .library-table-wrapper {
+  --library-table-sticky-gap: 0.75rem;
+
   /* Al paginar se hace scrollIntoView del wrapper: que no quede tapado por la navbar. */
-  scroll-margin-top: calc(var(--app-toolbar-height, 64px) + 0.5rem);
+  scroll-margin-top: calc(
+    var(--app-toolbar-height, 64px) + var(--library-table-sticky-gap) + 0.5rem
+  );
 }
 
 /* CDK pone z-index: 100 inline a las celdas sticky; se baja para no pisar la navbar ni su menú móvil. */
@@ -32,7 +38,9 @@ table.library-table th.mat-mdc-header-cell {
   }
 
   table.library-table th.mat-mdc-header-cell {
-    top: var(--app-toolbar-height, 64px) !important;
+    top: calc(var(--app-toolbar-height, 64px) + var(--library-table-sticky-gap)) !important;
+    /* Tapa el hueco entre navbar y cabecera con el color de fondo de la página. */
+    box-shadow: 0 calc(-1 * var(--library-table-sticky-gap)) 0 0 var(--ink-raised, #17171f);
   }
 }
 

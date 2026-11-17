@@ -71,10 +71,18 @@
 
 .library-detail-modal__facts {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 0.4rem 1rem;
   padding-top: 0.75rem;
   border-top: 1px solid color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
+}
+
+/* Escritorio: dos columnas de "etiqueta: valor" (etiqueta, valor, etiqueta, valor). */
+@media (min-width: 768px) {
+  .library-detail-modal__facts {
+    grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr);
+    column-gap: 1.25rem;
+  }
 }
 
 .library-detail-modal__facts dt {
@@ -84,19 +92,10 @@
 
 .library-detail-modal__facts dd {
   margin: 0;
-  min-width: 0; /* la URL de portada (larga) se ajusta en su celda sin ensanchar la rejilla */
+  min-width: 0; /* un valor largo se ajusta en su celda sin ensanchar la rejilla */
   overflow-wrap: anywhere;
   font-weight: 500;
   font-size: 0.95rem;
-}
-
-.library-detail-modal__link {
-  color: var(--mat-sys-primary);
-  text-decoration: none;
-}
-
-.library-detail-modal__link:hover {
-  text-decoration: underline;
 }
 
 .library-detail-modal__notes {

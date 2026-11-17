@@ -8,11 +8,13 @@ import {
   LOCALE_ID,
 } from '@angular/core';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
 import { routes } from './app.routes';
 import { APP_DATE_FORMATS } from './shared/constants';
 import { AppDateAdapter } from './shared/adapters/app-date-adapter';
+import { SpanishPaginatorIntl } from './shared/adapters/spanish-paginator-intl';
 import { PwaInstallService } from './services/pwa-install.service';
 import { PwaUpdateService } from './services/pwa-update.service';
 
@@ -24,6 +26,7 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'es-ES' },
     { provide: DateAdapter, useClass: AppDateAdapter },
     { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS },
+    { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl },
     provideRouter(routes, withComponentInputBinding()),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
