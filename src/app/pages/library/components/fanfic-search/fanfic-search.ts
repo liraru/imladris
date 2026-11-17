@@ -5,6 +5,7 @@ import { debounceTime, map, startWith } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,6 +30,7 @@ type NameableRef<T> = T | string | null;
     MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatCheckboxModule,
     MatExpansionModule,
     MatFormFieldModule,
     MatIconModule,
@@ -59,6 +61,7 @@ export class FanficSearch {
     fandom: new FormControl<NameableRef<Fandom>>(null),
     rating: new FormControl<RATING | null>(null),
     readingStatus: new FormControl<READING_STATUS | null>(null),
+    onlyFavorites: new FormControl(DEFAULT_FANFIC_FILTERS.onlyFavorites, { nonNullable: true }),
     sortBy: new FormControl(DEFAULT_FANFIC_SORT, { nonNullable: true }),
     sortDirection: new FormControl(DEFAULT_FANFIC_SORT_DIRECTION, { nonNullable: true }),
   });
@@ -80,8 +83,8 @@ export class FanficSearch {
       startWith(this.form.getRawValue()),
       map(
         (v) =>
-          [v.title, v.fandom, v.rating, v.readingStatus].filter(
-            (value) => value !== null && value !== '',
+          [v.title, v.fandom, v.rating, v.readingStatus, v.onlyFavorites].filter(
+            (value) => value !== null && value !== '' && value !== false,
           ).length,
       ),
     ),
@@ -101,6 +104,7 @@ export class FanficSearch {
         fandomId: idOf(value.fandom),
         rating: value.rating ?? null,
         readingStatus: value.readingStatus ?? null,
+        onlyFavorites: value.onlyFavorites ?? false,
         sortBy: value.sortBy ?? DEFAULT_FANFIC_SORT,
         sortDirection: value.sortDirection === 'desc' ? 'desc' : 'asc',
       })),

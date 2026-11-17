@@ -13,6 +13,7 @@ export interface FanficFilters {
   fandomId: number | null;
   rating: RATING | null;
   readingStatus: READING_STATUS | null;
+  onlyFavorites: boolean;
   sortBy: FANFIC_SORT_FIELD;
   sortDirection: 'asc' | 'desc';
 }
@@ -23,6 +24,7 @@ export const DEFAULT_FANFIC_FILTERS: FanficFilters = {
   fandomId: null,
   rating: null,
   readingStatus: null,
+  onlyFavorites: false,
   sortBy: DEFAULT_FANFIC_SORT,
   sortDirection: DEFAULT_FANFIC_SORT_DIRECTION,
 };

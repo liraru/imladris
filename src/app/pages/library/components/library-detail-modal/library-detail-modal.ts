@@ -51,14 +51,7 @@ export class LibraryDetailModal {
   protected get genreNames(): string {
     return this.item.genres?.length
       ? this.item.genres.map((g) => this.genreLabels[g]).join(', ')
-      : '';
-  }
-
-  protected get serieLabel(): string {
-    if (!this.item.serieTitle) return '';
-    return this.item.serieVolume
-      ? `${this.item.serieTitle} #${this.item.serieVolume}`
-      : this.item.serieTitle;
+      : '—';
   }
 
   protected close(): void {
