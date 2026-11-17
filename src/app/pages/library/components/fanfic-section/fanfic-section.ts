@@ -85,7 +85,10 @@ export class FanficSection implements OnInit {
     this._openFormModal({ mode: FORM_MODE.EDICION, fanficId: item.id });
   }
 
+  /** Punto único de apertura del formulario (alta y edición): sin sesión no se abre nunca. */
   private _openFormModal(data: FanficFormModalData): void {
+    if (!this.authService.isAdmin()) return;
+
     const ref = this._dialog.open<FanficFormModal, FanficFormModalData, FanficFormModalResult>(
       FanficFormModal,
       { data, width: '760px', maxWidth: '95vw', disableClose: true, autoFocus: false },
@@ -96,6 +99,7 @@ export class FanficSection implements OnInit {
   }
 
   protected async onDeleteItem(item: Fanfic): Promise<void> {
+    if (!this.authService.isAdmin()) return;
     if (!confirm(`¿Eliminar "${item.title}"? Esta acción no se puede deshacer.`)) return;
     try {
       await this._fanficSrv.remove(item.id);
@@ -111,6 +115,8 @@ export class FanficSection implements OnInit {
    * (sin recargar toda la lista), para que la vista no salte ni pierda el scroll.
    */
   protected async onToggleFavorite(item: Fanfic): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
     const favorite = !item.favorite;
     try {
       await this._fanficSrv.update(item.id, { favorite });
@@ -122,6 +128,8 @@ export class FanficSection implements OnInit {
   }
 
   protected async onMarkFinished(item: Fanfic): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
     try {
       await this._fanficSrv.update(item.id, {
         readingStatus: 'finished' as Fanfic['readingStatus'],

@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 
 import { LANGUAGE_LABELS, READING_STATUS_LABELS } from '@shared/constants';
+import { AuthService } from '../../../../services/auth.service';
 import { GENRE_LABELS } from '../../../../shared/constants/categories.constant';
 import { TYPE, TYPE_LABELS } from '../../constants/library.constants';
 import { LibraryItem } from '../../models/library-item.model';
@@ -29,6 +30,8 @@ export interface LibraryDetailModalResult {
 export class LibraryDetailModal {
   private readonly dialogRef = inject(MatDialogRef<LibraryDetailModal, LibraryDetailModalResult>);
   protected readonly data = inject<LibraryDetailModalData>(MAT_DIALOG_DATA);
+
+  protected readonly authService = inject(AuthService);
 
   protected readonly TYPE = TYPE;
   protected readonly typeLabels = TYPE_LABELS;
@@ -63,6 +66,11 @@ export class LibraryDetailModal {
   }
 
   protected edit(): void {
+    // Solo el administrador (usuario logeado) puede pasar al modo edición.
+    if (!this.authService.isAdmin()) {
+      this.close();
+      return;
+    }
     this.dialogRef.close({ edit: true });
   }
 }

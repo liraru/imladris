@@ -13,6 +13,7 @@ import {
   READING_STATUS_LABELS,
 } from '@shared/constants';
 import { Fanfic } from '@shared/models';
+import { AuthService } from '../../../../services/auth.service';
 import { ThousandsPipe } from '../../../../shared/pipes/thousands.pipe';
 
 export interface FanficDetailModalData {
@@ -42,6 +43,8 @@ export class FanficDetailModal {
   private readonly dialogRef = inject(MatDialogRef<FanficDetailModal, FanficDetailModalResult>);
   protected readonly data = inject<FanficDetailModalData>(MAT_DIALOG_DATA);
 
+  protected readonly authService = inject(AuthService);
+
   protected readonly languageLabels = LANGUAGE_LABELS;
   protected readonly readingStatusLabels = READING_STATUS_LABELS;
   protected readonly ratingLabels = RATING_LABELS;
@@ -51,10 +54,6 @@ export class FanficDetailModal {
   /** Código corto y color del badge de rating: el mismo que se muestra en la tarjeta de galería. */
   protected readonly ratingShortLabel = RATING_SHORT_LABELS[this.item.rating];
   protected readonly ratingColor = RATING_COLORS[this.item.rating];
-
-  constructor() {
-    console.log('pages: ', this.item.pages, typeof this.item.pages)
-  }
 
   protected get authorNames(): string {
     return this.item.authors.length ? this.item.authors.join(', ') : 'Autor desconocido';
@@ -73,6 +72,11 @@ export class FanficDetailModal {
   }
 
   protected edit(): void {
+    // Solo el administrador (usuario logeado) puede pasar al modo edición.
+    if (!this.authService.isAdmin()) {
+      this.close();
+      return;
+    }
     this.dialogRef.close({ edit: true });
   }
 }

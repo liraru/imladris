@@ -158,6 +158,8 @@ export class Library implements OnInit {
 
   /** Botón "Añadir" de la cabecera común: delega en el modal de libro/tomo o en el de fanfic. */
   protected onAddClick(): void {
+    if (!this.authService.isAdmin()) return;
+
     if (this.activeTab() === LIBRARY_TAB.FANFIC) {
       this.fanficSectionRef()?.openCreate();
     } else {
@@ -198,7 +200,10 @@ export class Library implements OnInit {
     this.openFormModal({ mode: FORM_MODE.EDICION, type: this.filters().type, itemId: item.id });
   }
 
+  /** Punto único de apertura del formulario (alta y edición): sin sesión no se abre nunca. */
   private openFormModal(data: LibraryFormModalData): void {
+    if (!this.authService.isAdmin()) return;
+
     const ref = this._dialog.open<LibraryFormModal, LibraryFormModalData, LibraryFormModalResult>(
       LibraryFormModal,
       {
@@ -217,6 +222,8 @@ export class Library implements OnInit {
   // ---------- Eliminar (desde el menú contextual, con confirmación previa) ----------
 
   protected async onDeleteItem(item: LibraryItem): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
     const type = this.filters().type;
 
     const dialogData: LibraryDeleteDialogData = {
@@ -258,6 +265,8 @@ export class Library implements OnInit {
    * (sin recargar toda la lista), para que la vista no salte ni pierda el scroll.
    */
   protected async onToggleFavorite(item: LibraryItem): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
     const type = this.filters().type;
     const favorite = !item.favorite;
     try {
@@ -320,6 +329,8 @@ export class Library implements OnInit {
   }
 
   protected async onMarkFinished(item: LibraryItem): Promise<void> {
+    if (!this.authService.isAdmin()) return;
+
     const type = this.filters().type;
     try {
       if (type === TYPE.BOOK) {
