@@ -147,26 +147,40 @@
                       </div>
                     </div>
 
-                    <!-- El cuarto dato ("Leído hoy") solo existe para el usuario logado: la rejilla
-                         pasa a 4 columnas (el 4.º con ancho a contenido) en vez de añadir una fila,
-                         de modo que el resto de la tarjeta no se mueve. -->
-                    <dl
-                      class="reading-hero__facts"
-                      [class.reading-hero__facts--today]="authService.isAdmin()"
-                    >
+                    <!-- Estadísticas, en este orden: Empezado · Fin estimado · Días leyendo ·
+                         Media diaria · Leído hoy (solo usuario logado).
+                         Todas las líneas llevan justify-content: space-between.
+                         Móvil: 1.ª línea = las dos fechas; 2.ª línea = el resto. El separador
+                         .reading-hero__facts-break fuerza el salto de línea (en escritorio se
+                         oculta y todo va en una sola línea).
+                         La disposición vive en home.css (.reading-hero__facts). -->
+                    <dl class="reading-hero__facts">
                       <div>
                         <dt>Empezado</dt>
                         <dd>{{ item.reading.startDate | date: 'dd/MM/yyyy' }}</dd>
-                      </div>
-                      <div>
-                        <dt>Días leyendo</dt>
-                        <dd>{{ item.daysReading }}</dd>
                       </div>
                       <div>
                         <dt>Fin estimado</dt>
                         <dd matTooltip="Estimación según tu ritmo medio desde que empezaste">
                           @if (item.estimatedEnd) {
                             {{ item.estimatedEnd | date: 'dd/MM/yyyy' }}
+                          } @else {
+                            —
+                          }
+                        </dd>
+                      </div>
+                      <div class="reading-hero__facts-break" role="presentation"></div>
+                      <div>
+                        <dt>Días leyendo</dt>
+                        <dd>{{ item.daysReading }}</dd>
+                      </div>
+                      <div>
+                        <dt>Media diaria</dt>
+                        <dd
+                          matTooltip="Media de páginas por día: páginas leídas entre los días transcurridos desde que empezaste"
+                        >
+                          @if (item.daysReading > 0 && item.pagesRead > 0) {
+                            {{ item.pagesRead / item.daysReading | number: '1.0-0' }} págs.
                           } @else {
                             —
                           }

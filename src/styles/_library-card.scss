@@ -77,8 +77,8 @@
 /*
  * Esquina superior izquierda (la opuesta al menú de opciones), superpuesta a la portada.
  * Apila en columna lo que haya: en fanfic, el badge de rating.
- * La estrella de favorito ya no va aquí: se coloca dentro de la portada, en su esquina
- * inferior derecha (ver `.library-card__cover > .library-card__favorite`).
+ * La estrella de favorito ya no va aquí ni sobre la portada: va en la zona de texto de la
+ * tarjeta (ver `.library-card__body > .library-card__favorite`).
  */
 .library-card__corner {
   position: absolute;
@@ -99,16 +99,16 @@
   position: static;
 }
 
-/* Estrella de favorito: círculo del mismo tamaño que el botón de menú (32px) */
+/*
+ * Estrella de favorito: icono suelto en el color de acento (sin círculo de fondo, ya no va
+ * sobre la portada).
+ */
 .library-card__favorite {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--mat-sys-surface) 65%, transparent);
-  backdrop-filter: blur(2px);
+  width: 1.25rem;
+  height: 1.25rem;
   color: var(--mat-sys-primary);
 }
 .library-card__favorite mat-icon {
@@ -119,20 +119,31 @@
 }
 
 /*
- * Estrella de favorito colocada dentro de la portada: esquina inferior derecha.
- * Va en posición absoluta respecto a la portada (que es `position: relative`), así que
- * no ocupa sitio en el flujo y no descoloca portada, título ni resto de la tarjeta.
+ * Estrella de favorito en la zona de texto: primera línea del cuerpo de la tarjeta, pegada a
+ * la derecha (en fanfic, a la altura de la etiqueta de fandom). Va en posición absoluta
+ * respecto al cuerpo (que es `position: relative`), así que no ocupa sitio en el flujo y no
+ * descoloca el resto de la tarjeta. Se coloca como ÚLTIMO hijo del cuerpo.
  */
-.library-card__cover > .library-card__favorite {
+.library-card__body > .library-card__favorite {
   position: absolute;
-  right: 0.25rem;
-  bottom: 0.25rem;
-  z-index: 1;
+  top: 0.6rem;
+  right: 0.75rem;
+}
+
+/*
+ * Con estrella, el primer elemento del cuerpo deja hueco a la derecha para no pisarla:
+ * la etiqueta de fandom (fanfic) o el título cuando es el primer hijo (novelas y manga).
+ */
+.library-card__body--favorite > .library-card__fandom-tag {
+  max-width: calc(100% - 1.75rem);
+}
+.library-card__body--favorite > .library-card__title:first-child {
+  padding-right: 1.75rem;
 }
 
 /* Portada: tamaño de visualización fijo (2:3) y recorte, independiente del tamaño real de la imagen */
 .library-card__cover {
-  position: relative; /* ancla de elementos superpuestos (estrella de favorito) */
+  position: relative; /* ancla de elementos superpuestos a la portada */
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
@@ -168,6 +179,7 @@
 }
 
 .library-card__body {
+  position: relative; /* ancla de la estrella de favorito */
   padding: 0.625rem 0.75rem 0.875rem;
   display: flex;
   flex-direction: column;
