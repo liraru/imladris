@@ -98,6 +98,15 @@
   font-size: 0.95rem;
 }
 
+.library-detail-modal__link {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+}
+
+.library-detail-modal__link:hover {
+  text-decoration: underline;
+}
+
 .library-detail-modal__notes {
   margin-top: 1rem;
   padding-top: 0.75rem;
