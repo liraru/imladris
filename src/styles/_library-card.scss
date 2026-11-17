@@ -94,6 +94,13 @@
 /* Badge de rating: dentro de la esquina apilada, sin posicionamiento propio */
 .library-card__rating-badge {
   backdrop-filter: blur(2px);
+  color: var(--mat-sys-primary);
+}
+.library-card__favorite mat-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 1.25rem;
+  font-variation-settings: 'FILL' 1;
 }
 .library-card__corner .library-card__rating-badge {
   position: static;
