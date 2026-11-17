@@ -526,6 +526,29 @@
 }
 
 /*
+ * Usuario logado: la rejilla de estadísticas lleva un cuarto dato ("Leído hoy"). En lugar de
+ * añadir una fila (que empujaría el gráfico y descuadraría el alto de la tarjeta), se añade una
+ * cuarta columna con ancho a contenido y las tres primeras se reparten el resto, de modo que
+ * todo sigue en una sola línea. Las etiquetas se recortan con puntos suspensivos si no caben.
+ * Va ANTES de los bloques @media de abajo: en móvil (≤575px) la regla de ese bloque, que fija
+ * tres columnas, sigue ganando y el cuarto dato pasa a una segunda fila en vez de apretarse.
+ */
+.reading-hero__facts--today {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 1rem 0.75rem;
+}
+
+.reading-hero__facts--today dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reading-hero__facts--today dd {
+  white-space: nowrap;
+}
+
+/*
  * Escritorio/tablet — colocación de los elementos en la rejilla de la tarjeta:
  *   · Portada: columna 1, filas 1-2, pegada arriba.
  *   · Cuerpo (kicker, título, autor, progreso, estadísticas): columna 2, fila 1, empezando

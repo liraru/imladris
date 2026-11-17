@@ -147,7 +147,13 @@
                       </div>
                     </div>
 
-                    <dl class="reading-hero__facts">
+                    <!-- El cuarto dato ("Leído hoy") solo existe para el usuario logado: la rejilla
+                         pasa a 4 columnas (el 4.º con ancho a contenido) en vez de añadir una fila,
+                         de modo que el resto de la tarjeta no se mueve. -->
+                    <dl
+                      class="reading-hero__facts"
+                      [class.reading-hero__facts--today]="authService.isAdmin()"
+                    >
                       <div>
                         <dt>Empezado</dt>
                         <dd>{{ item.reading.startDate | date: 'dd/MM/yyyy' }}</dd>
@@ -166,6 +172,15 @@
                           }
                         </dd>
                       </div>
+                      @if (authService.isAdmin()) {
+                        <div>
+                          <dt>Leído hoy</dt>
+                          <dd>
+                            {{ item.pagesToday | number: '1.0-0' }}
+                            {{ item.pagesToday === 1 ? 'pág.' : 'págs.' }}
+                          </dd>
+                        </div>
+                      }
                     </dl>
                   </div>
 

@@ -76,8 +76,9 @@
 
 /*
  * Esquina superior izquierda (la opuesta al menú de opciones), superpuesta a la portada.
- * Apila en columna lo que haya: en fanfic el badge de rating y, debajo, la estrella de
- * favorito; en novelas/manga, solo la estrella.
+ * Apila en columna lo que haya: en fanfic, el badge de rating.
+ * La estrella de favorito ya no va aquí: se coloca dentro de la portada, en su esquina
+ * inferior derecha (ver `.library-card__cover > .library-card__favorite`).
  */
 .library-card__corner {
   position: absolute;
@@ -117,8 +118,21 @@
   font-variation-settings: 'FILL' 1;
 }
 
+/*
+ * Estrella de favorito colocada dentro de la portada: esquina inferior derecha.
+ * Va en posición absoluta respecto a la portada (que es `position: relative`), así que
+ * no ocupa sitio en el flujo y no descoloca portada, título ni resto de la tarjeta.
+ */
+.library-card__cover > .library-card__favorite {
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  z-index: 1;
+}
+
 /* Portada: tamaño de visualización fijo (2:3) y recorte, independiente del tamaño real de la imagen */
 .library-card__cover {
+  position: relative; /* ancla de elementos superpuestos (estrella de favorito) */
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
