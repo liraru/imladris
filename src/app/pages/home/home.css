@@ -505,11 +505,47 @@
   transition: width 0.3s ease;
 }
 
+/*
+ * Estadísticas de la tarjeta, en este orden:
+ *   Empezado · Fin estimado · Días leyendo · Media diaria · Leído hoy (solo logado).
+ *
+ * Todas las líneas llevan `justify-content: space-between`: cada dato ocupa solo su ancho
+ * natural y el espacio sobrante se reparte entre ellos, de borde a borde.
+ *
+ * Base (móvil y tablet pequeña, ≤767px): flex con salto de línea. El separador
+ * `.reading-hero__facts-break` (entre "Fin estimado" y "Días leyendo") ocupa el 100 % del
+ * ancho y fuerza la 2.ª línea:
+ *   · 1.ª línea: Empezado · Fin estimado.
+ *   · 2.ª línea: Días leyendo · Media diaria · (Leído hoy).
+ * Los datos no se encogen (flex: 0 0 auto) y no hay recorte con puntos suspensivos: las
+ * etiquetas son lo bastante cortas para caber enteras incluso en móviles estrechos.
+ *
+ * Escritorio (≥768px): una sola línea (sin salto, el separador se oculta). Aquí sí pueden
+ * encogerse, con las etiquetas recortadas con puntos suspensivos como red de seguridad en
+ * anchos justos (tablet), de modo que el dato nuevo nunca descoloca el resto de la tarjeta
+ * ni el gráfico.
+ *
+ * Va ANTES de los bloques @media de colocación de abajo (son los que fijan en qué fila/columna
+ * de la tarjeta va cada cosa).
+ */
 .reading-hero__facts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 0.75rem 1rem;
   margin: 0.9rem 0 0;
+}
+
+.reading-hero__facts > div {
+  flex: 0 0 auto;
+}
+
+/* Separador de línea: invisible, 100 % de ancho, sin alto. El margen negativo compensa el
+   hueco extra que añade el `gap` de fila al tener el separador su propia línea. */
+.reading-hero__facts-break {
+  flex: 0 0 100% !important;
+  height: 0;
+  margin-top: -0.75rem;
 }
 
 .reading-hero__facts dt {
@@ -517,12 +553,58 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .reading-hero__facts dd {
   margin: 0.15rem 0 0;
   font-size: 0.9rem;
   color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .reading-hero__facts {
+    flex-wrap: nowrap;
+    gap: 1rem 1.5rem;
+  }
+
+  .reading-hero__facts > div {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .reading-hero__facts-break {
+    display: none;
+  }
+
+  .reading-hero__facts dt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/*
+ * Usuario logado: la rejilla de estadísticas lleva un cuarto dato ("Leído hoy"). En lugar de
+ * añadir una fila (que empujaría el gráfico y descuadraría el alto de la tarjeta), se añade una
+ * cuarta columna con ancho a contenido y las tres primeras se reparten el resto, de modo que
+ * todo sigue en una sola línea. Las etiquetas se recortan con puntos suspensivos si no caben.
+ * Va ANTES de los bloques @media de abajo: en móvil (≤575px) la regla de ese bloque, que fija
+ * tres columnas, sigue ganando y el cuarto dato pasa a una segunda fila en vez de apretarse.
+ */
+.reading-hero__facts--today {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 1rem 0.75rem;
+}
+
+.reading-hero__facts--today dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reading-hero__facts--today dd {
+  white-space: nowrap;
 }
 
 /*
@@ -564,7 +646,8 @@
  *     portada (filas 1-3; la 3ª es 1fr y absorbe el alto sobrante) y el bloque de
  *     porcentaje + barra ocupa la fila 4, pegado abajo, de modo que el borde inferior de la
  *     barra coincide con el borde inferior de la portada.
- *   · Debajo, a todo el ancho: estadísticas y gráfico diario.
+ *   · Debajo, a todo el ancho: estadísticas (2 líneas, ver .reading-hero__facts) y gráfico
+ *     diario.
  * Solo afecta a la vista móvil; escritorio y tablet no cambian.
  */
 @media (max-width: 575px) {
@@ -618,8 +701,6 @@
   .reading-hero__facts {
     grid-column: 1 / -1;
     grid-row: 5;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
     margin-top: 1rem;
   }
 

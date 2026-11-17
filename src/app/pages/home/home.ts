@@ -53,6 +53,8 @@ interface ReadingNowView {
   percentage: number;
   pagesRead: number;
   totalPages: number;
+  /** Páginas leídas hoy en esta lectura (0 si no hay avances hoy). Solo se muestra al usuario logado. */
+  pagesToday: number;
   /** Días de lectura contando el de inicio y el de hoy (mismo criterio que las columnas del gráfico diario). */
   daysReading: number;
   /** Estimación según el ritmo medio desde que empezó; null si aún no hay base para calcularla. */
@@ -186,9 +188,13 @@ export class Home implements OnInit {
   /** Último porcentaje de avance registrado para cada lectura en curso, por id. */
   protected readonly progressByReadingId = signal<Record<number, number>>({});
 
+  /** Páginas leídas hoy en cada lectura en curso, por id (las que no tienen avances hoy no aparecen). */
+  protected readonly pagesTodayByReadingId = signal<Record<number, number>>({});
+
   /** Lecturas en curso con porcentaje, páginas leídas, días y fecha estimada de fin ya calculados. */
   protected readonly readingNowView = computed<ReadingNowView[]>(() => {
     const progress = this.progressByReadingId();
+    const pagesTodayById = this.pagesTodayByReadingId();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -196,6 +202,7 @@ export class Home implements OnInit {
       const percentage = Math.min(100, Math.max(0, progress[reading.id] ?? 0));
       const totalPages = Number(reading.pages) || 0;
       const pagesRead = Math.round((totalPages * percentage) / 100);
+      const pagesToday = pagesTodayById[reading.id] ?? 0;
 
       // Se cuenta el día de inicio como día 1 (igual que las columnas del gráfico diario):
       // empezar hoy es 1 día de lectura. Si la fecha de inicio es futura, 0.
@@ -210,7 +217,15 @@ export class Home implements OnInit {
         estimatedEnd.setDate(estimatedEnd.getDate() + remainingDays);
       }
 
-      return { reading, percentage, pagesRead, totalPages, daysReading, estimatedEnd };
+      return {
+        reading,
+        percentage,
+        pagesRead,
+        totalPages,
+        pagesToday,
+        daysReading,
+        estimatedEnd,
+      };
     });
   });
 
@@ -391,12 +406,25 @@ export class Home implements OnInit {
     }
   }
 
-  /** Último porcentaje de avance de cada lectura en curso, para la barra de progreso de su tarjeta. */
+  /**
+   * Último porcentaje de avance de cada lectura en curso (barra de progreso de su tarjeta) y
+   * páginas leídas hoy en cada una. Se piden juntos y en paralelo (una consulta cada uno para
+   * todas las lecturas), de modo que la tarjeta se pinta completa de una vez y no "salta".
+   */
   private async _loadProgress(): Promise<void> {
     const ids = this._readingNow().map((r) => r.id);
-    this.progressByReadingId.set(
-      ids.length ? await this._readingProgressSrv.getLatestPercentages(ids) : {},
-    );
+    if (ids.length === 0) {
+      this.progressByReadingId.set({});
+      this.pagesTodayByReadingId.set({});
+      return;
+    }
+
+    const [percentages, pagesToday] = await Promise.all([
+      this._readingProgressSrv.getLatestPercentages(ids),
+      this._readingProgressSrv.getPagesOnDateByReading(ids, toDateString(new Date())),
+    ]);
+    this.progressByReadingId.set(percentages);
+    this.pagesTodayByReadingId.set(pagesToday);
   }
 
   /** Páginas leídas en el último año y racha actual, a partir de las páginas avanzadas por día. */
