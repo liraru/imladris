@@ -1,8 +1,21 @@
-import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
@@ -15,6 +28,7 @@ import {
 import { Fanfic } from '@shared/models';
 import { AuthService } from '../../../../services/auth.service';
 import { MODE } from '../../constants/library.constants';
+import { LIBRARY_TABLE_PAGE_SIZE } from '../../constants/library-table.constants';
 import { CoverPreviewDirective } from '../../../../shared/directives/cover-preview.directive';
 import { ThousandsPipe } from '../../../../shared/pipes/thousands.pipe';
 
@@ -25,12 +39,13 @@ import { ThousandsPipe } from '../../../../shared/pipes/thousands.pipe';
     MatDividerModule,
     MatIconModule,
     MatMenuModule,
+    MatPaginatorModule,
     MatTableModule,
     MatTooltipModule,
     ThousandsPipe,
   ],
   selector: 'app-fanfic-data-display',
-  styleUrl: './fanfic-data-display.css',
+  styleUrls: ['../library-table-shared.css', './fanfic-data-display.css'],
   templateUrl: './fanfic-data-display.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -68,6 +83,40 @@ export class FanficDataDisplay {
     'finishDate',
     'actions',
   ];
+
+  // ---------- Paginación (en front, solo vista tabla) ----------
+
+  protected readonly pageSize = LIBRARY_TABLE_PAGE_SIZE;
+  protected readonly pageIndex = signal(0);
+
+  private readonly tableWrapper = viewChild<ElementRef<HTMLElement>>('tableWrapper');
+
+  protected readonly totalItems = computed(() => this.data().length);
+
+  /** El control de paginación solo se muestra si hay más registros de los que caben en una página. */
+  protected readonly showPaginator = computed(() => this.totalItems() > this.pageSize);
+
+  /** Ajusta el índice si el filtrado deja menos páginas de las que había. */
+  protected readonly clampedPageIndex = computed(() => {
+    const maxIndex = Math.max(0, Math.ceil(this.totalItems() / this.pageSize) - 1);
+    return Math.min(this.pageIndex(), maxIndex);
+  });
+
+  protected readonly pagedData = computed(() => {
+    const start = this.clampedPageIndex() * this.pageSize;
+    return this.data().slice(start, start + this.pageSize);
+  });
+
+  /** Vuelve a la primera página cuando cambia el nº de resultados (filtros). */
+  private readonly _resetPageOnChange = effect(() => {
+    void this.totalItems();
+    untracked(() => this.pageIndex.set(0));
+  });
+
+  protected onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.tableWrapper()?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   protected authorNames(item: Fanfic): string {
     return item.authors.length ? item.authors.join(', ') : 'Autor desconocido';

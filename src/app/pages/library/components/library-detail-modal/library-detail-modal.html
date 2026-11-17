@@ -24,22 +24,30 @@
     <h2 class="library-detail-modal__title">{{ item.title }}</h2>
     <p class="library-detail-modal__author">{{ authorNames }}</p>
 
+    <!-- Mismos campos (y mismo orden) que la modal de edición; los vacíos se muestran con "—". -->
     <dl class="library-detail-modal__facts">
       <dt>Editorial</dt>
       <dd>{{ item.editorial?.name ?? '—' }}</dd>
 
-      @if (serieLabel) {
-        <dt>{{ isManga ? 'Manga' : 'Serie' }}</dt>
-        <dd>{{ serieLabel }}</dd>
-      }
+      <dt>Idioma</dt>
+      <dd>{{ languageLabels[item.language] }}</dd>
 
-      @if (genreNames) {
+      @if (isManga) {
+        <dt>Manga</dt>
+        <dd>{{ item.serieTitle ?? '—' }}</dd>
+
+        <dt>Nº de tomo</dt>
+        <dd>{{ item.serieVolume ?? '—' }}</dd>
+      } @else {
+        <dt>Serie</dt>
+        <dd>{{ item.serieTitle ?? '—' }}</dd>
+
+        <dt>Vol. de la serie</dt>
+        <dd>{{ item.serieVolume ?? '—' }}</dd>
+
         <dt>Géneros</dt>
         <dd>{{ genreNames }}</dd>
       }
-
-      <dt>Idioma</dt>
-      <dd>{{ languageLabels[item.language] }}</dd>
 
       <dt>Estado de lectura</dt>
       <dd>{{ readingStatusLabels[item.readingStatus] }}</dd>
@@ -47,33 +55,38 @@
       <dt>Veces leído</dt>
       <dd>{{ item.timesRead }}</dd>
 
-      @if (item.releaseDate) {
-        <dt>Publicación</dt>
-        <dd>{{ item.releaseDate | date: 'dd/MM/yyyy' }}</dd>
-      }
+      <dt>Portada (URL)</dt>
+      <dd>
+        @if (item.coverImageUrl) {
+          <a
+            class="library-detail-modal__link"
+            [href]="item.coverImageUrl"
+            target="_blank"
+            rel="noopener"
+            >{{ item.coverImageUrl }}</a
+          >
+        } @else {
+          —
+        }
+      </dd>
 
-      @if (item.adquisitionDate) {
-        <dt>Adquisición</dt>
-        <dd>{{ item.adquisitionDate | date: 'dd/MM/yyyy' }}</dd>
-      }
+      <dt>Publicación</dt>
+      <dd>{{ (item.releaseDate | date: 'dd/MM/yyyy') ?? '—' }}</dd>
 
-      @if (item.startDate) {
-        <dt>Inicio de lectura</dt>
-        <dd>{{ item.startDate | date: 'dd/MM/yyyy' }}</dd>
-      }
+      <dt>Adquisición</dt>
+      <dd>{{ (item.adquisitionDate | date: 'dd/MM/yyyy') ?? '—' }}</dd>
 
-      @if (item.finishDate) {
-        <dt>Fin de lectura</dt>
-        <dd>{{ item.finishDate | date: 'dd/MM/yyyy' }}</dd>
-      }
+      <dt>Inicio de lectura</dt>
+      <dd>{{ (item.startDate | date: 'dd/MM/yyyy') ?? '—' }}</dd>
+
+      <dt>Fin de lectura</dt>
+      <dd>{{ (item.finishDate | date: 'dd/MM/yyyy') ?? '—' }}</dd>
     </dl>
 
-    @if (item.notes) {
-      <div class="library-detail-modal__notes">
-        <p class="library-detail-modal__notes-label">Notas</p>
-        <p class="library-detail-modal__notes-text">{{ item.notes }}</p>
-      </div>
-    }
+    <div class="library-detail-modal__notes">
+      <p class="library-detail-modal__notes-label">Notas</p>
+      <p class="library-detail-modal__notes-text">{{ item.notes || '—' }}</p>
+    </div>
   </div>
 </mat-dialog-content>
 

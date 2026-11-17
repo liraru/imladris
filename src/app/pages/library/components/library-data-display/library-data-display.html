@@ -57,8 +57,8 @@
     }
   </div>
 } @else {
-  <div class="library-table-wrapper">
-    <table mat-table [dataSource]="data()" class="library-table">
+  <div #tableWrapper class="library-table-wrapper">
+    <table mat-table [dataSource]="pagedData()" class="library-table">
       <ng-container matColumnDef="cover">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let item">
@@ -115,36 +115,6 @@
         <th mat-header-cell *matHeaderCellDef matTooltip="Veces leído">Lecturas</th>
         <td mat-cell *matCellDef="let item">{{ item.timesRead }}</td>
       </ng-container>
-      <ng-container matColumnDef="releaseDate">
-        <th mat-header-cell *matHeaderCellDef>Publicación</th>
-        <td mat-cell *matCellDef="let item">
-          {{ (item.releaseDate | date: 'dd/MM/yyyy') ?? '—' }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="adquisitionDate">
-        <th mat-header-cell *matHeaderCellDef>Adquisición</th>
-        <td mat-cell *matCellDef="let item">
-          {{ (item.adquisitionDate | date: 'dd/MM/yyyy') ?? '—' }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="startDate">
-        <th mat-header-cell *matHeaderCellDef>Inicio</th>
-        <td mat-cell *matCellDef="let item">{{ (item.startDate | date: 'dd/MM/yyyy') ?? '—' }}</td>
-      </ng-container>
-      <ng-container matColumnDef="finishDate">
-        <th mat-header-cell *matHeaderCellDef>Fin</th>
-        <td mat-cell *matCellDef="let item">{{ (item.finishDate | date: 'dd/MM/yyyy') ?? '—' }}</td>
-      </ng-container>
-      <ng-container matColumnDef="language">
-        <th mat-header-cell *matHeaderCellDef>Idioma</th>
-        <td mat-cell *matCellDef="let item">{{ languageLabel(item) }}</td>
-      </ng-container>
-      <ng-container matColumnDef="notes">
-        <th mat-header-cell *matHeaderCellDef>Notas</th>
-        <td mat-cell *matCellDef="let item" [matTooltip]="item.notes ?? ''">
-          {{ item.notes ?? '—' }}
-        </td>
-      </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let item">
@@ -164,15 +134,27 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
       <tr
         mat-row
-        *matRowDef="let row; columns: displayedColumns"
+        *matRowDef="let row; columns: displayedColumns()"
         style="cursor: pointer"
         (click)="viewDetail.emit(row)"
       ></tr>
     </table>
   </div>
+
+  @if (showPaginator()) {
+    <mat-paginator
+      class="library-table-paginator"
+      [length]="totalItems()"
+      [pageSize]="pageSize"
+      [pageIndex]="clampedPageIndex()"
+      [hidePageSize]="true"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)"
+    />
+  }
 }
 
 <mat-menu #itemMenu="matMenu">

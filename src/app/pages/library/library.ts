@@ -416,6 +416,9 @@ function applyFilters(items: LibraryItem[], filters: LibraryFilters): LibraryIte
   if (filters.adquisitionYear != null) {
     result = result.filter((i) => i.adquisitionDate?.startsWith(String(filters.adquisitionYear)));
   }
+  if (filters.onlyFavorites) {
+    result = result.filter((i) => i.favorite);
+  }
 
   const dir = filters.sortDirection === 'desc' ? -1 : 1;
   const sortBy = filters.sortBy.length ? filters.sortBy : [SORT_FIELD.TITLE];

@@ -82,8 +82,8 @@
     }
   </div>
 } @else {
-  <div class="library-table-wrapper">
-    <table mat-table [dataSource]="data()" class="library-table">
+  <div #tableWrapper class="library-table-wrapper">
+    <table mat-table [dataSource]="pagedData()" class="library-table">
       <ng-container matColumnDef="cover">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let item">
@@ -182,6 +182,18 @@
       ></tr>
     </table>
   </div>
+
+  @if (showPaginator()) {
+    <mat-paginator
+      class="library-table-paginator"
+      [length]="totalItems()"
+      [pageSize]="pageSize"
+      [pageIndex]="clampedPageIndex()"
+      [hidePageSize]="true"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)"
+    />
+  }
 }
 
 <mat-menu #itemMenu="matMenu">

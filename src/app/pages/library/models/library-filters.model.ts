@@ -17,6 +17,7 @@ export interface LibraryFilters {
   adquisitionYear: number | null;
   editorialId: number | null;
   readingStatus: READING_STATUS | null;
+  onlyFavorites: boolean;
   sortBy: SORT_FIELD[];
   sortDirection: 'asc' | 'desc';
 }
@@ -31,6 +32,7 @@ export const DEFAULT_LIBRARY_FILTERS: LibraryFilters = {
   adquisitionYear: null,
   editorialId: null,
   readingStatus: null,
+  onlyFavorites: false,
   sortBy: DEFAULT_SORT_BY[TYPE.BOOK],
   sortDirection: DEFAULT_SORT_DIRECTION,
 };
