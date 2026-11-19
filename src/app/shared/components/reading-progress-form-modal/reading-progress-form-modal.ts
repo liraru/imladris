@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   OnInit,
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -148,7 +150,20 @@ export class ReadingProgressFormModal implements OnInit {
    * ni se envían al guardar, y no afectan a la pregunta "¿Deseas irte sin guardar?".
    */
   protected readonly calcCurrentPosition = new FormControl<number | null>(null);
-  protected readonly calcTotalPosition = new FormControl<number | null>(loadStoredTotalPosition());
+
+  /**
+   * La posición total nace bloqueada (deshabilitada): solo se puede cambiar pulsando el botón
+   * de editar, y el valor se persiste únicamente con el botón de guardar cambios.
+   */
+  protected readonly calcTotalPosition = new FormControl<number | null>(
+    { value: loadStoredTotalPosition(), disabled: true },
+    { validators: [Validators.min(1)] },
+  );
+
+  /** `true` mientras la posición total está desbloqueada para edición. */
+  protected readonly calcTotalEditing = signal(false);
+
+  private readonly _calcTotalInput = viewChild<ElementRef<HTMLInputElement>>('calcTotalInput');
 
   private readonly _calcCurrent = toSignal(this.calcCurrentPosition.valueChanges, {
     initialValue: this.calcCurrentPosition.value,
@@ -201,17 +216,32 @@ export class ReadingProgressFormModal implements OnInit {
     this.calcOpen.update((open) => !open);
   }
 
-  /** Guarda la posición total al confirmarla (blur/enter), igual que en la calculadora. */
-  protected onCalcTotalPositionChange(): void {
-    saveStoredTotalPosition(this.calcTotalPosition.value);
+  /** Desbloquea la posición total para editarla y le da el foco. */
+  protected startEditCalcTotal(): void {
+    this.calcTotalPosition.enable();
+    this.calcTotalEditing.set(true);
+    setTimeout(() => this._calcTotalInput()?.nativeElement.focus());
+  }
+
+  /** Guarda la posición total en `localStorage` (igual que la calculadora de Folio) y vuelve a bloquear el control. */
+  protected saveCalcTotal(): void {
+    const control = this.calcTotalPosition;
+    if (control.invalid) {
+      control.markAsTouched();
+      return;
+    }
+
+    saveStoredTotalPosition(control.value);
+    control.markAsPristine();
+    control.markAsUntouched();
+    control.disable();
+    this.calcTotalEditing.set(false);
   }
 
   /** Vuelca la página calculada en el campo "Página", recalcula el porcentaje y oculta el panel. */
   protected applyCalculatedPage(): void {
     const page = this.calcPage();
     if (page == null || this.calcError()) return;
-
-    saveStoredTotalPosition(this.calcTotalPosition.value);
 
     const { page: pageControl, percentage } = this.form.controls;
     pageControl.setValue(page);
