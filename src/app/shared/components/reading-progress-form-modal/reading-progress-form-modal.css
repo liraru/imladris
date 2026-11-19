@@ -70,7 +70,7 @@
   margin: 0;
 }
 
-/* Botón activo (panel abierto): icono dorado y fondo suave. */
+/* Botón activo (panel abierto / posición total en edición): icono dorado y fondo suave. */
 .reading-progress-form-modal__calc-toggle {
   flex: 0 0 auto;
   --mat-icon-button-icon-color: var(--mat-sys-on-surface-variant);
@@ -84,6 +84,28 @@
   --mat-icon-button-icon-color: var(--gold);
   --mdc-icon-button-icon-color: var(--gold);
   background-color: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+/*
+ * Posición total + botón editar/guardar: comparten la celda de la rejilla que antes ocupaba
+ * solo el campo. El campo cede el ancho justo al botón (flex + min-width: 0, sin desbordar).
+ */
+.reading-progress-form-modal__total {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.reading-progress-form-modal__total .reading-progress-form-modal__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+/* Centra el botón (48px) con la altura del campo outline (56px), sin contar la pista inferior. */
+.reading-progress-form-modal__total-btn {
+  margin-top: 4px;
 }
 
 /*

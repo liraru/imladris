@@ -16,6 +16,7 @@ export const DEMOGRAPHIC_LABELS: Record<DEMOGRAPHIC, string> = {
 
 export enum GENRE {
   ACTION = 'action',
+  AUTOBIOGRAPHY = 'autobiography',
   ADVENTURE = 'adventure',
   BL = 'bl',
   COMEDY = 'comedy',
@@ -42,6 +43,7 @@ export enum GENRE {
 
 export const GENRE_LABELS: Record<GENRE, string> = {
   [GENRE.ACTION]: 'Acción',
+  [GENRE.AUTOBIOGRAPHY]: 'Autobiografía',
   [GENRE.ADVENTURE]: 'Aventura',
   [GENRE.BL]: 'Boys Love',
   [GENRE.DANMEI]: 'Danmei',
