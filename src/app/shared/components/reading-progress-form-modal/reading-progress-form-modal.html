@@ -92,11 +92,11 @@
     >
       <div class="reading-progress-form-modal__calc-inner">
         <div class="reading-progress-form-modal__calc-box">
-          <p class="reading-progress-form-modal__calc-title">Calculadora de página</p>
+          <p class="reading-progress-form-modal__calc-title">Obtener página por posición</p>
 
           <div class="reading-progress-form-modal__calc-row">
             <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
-              <mat-label>Posición actual</mat-label>
+              <mat-label>Actual</mat-label>
               <input
                 matInput
                 type="number"
@@ -108,20 +108,52 @@
               />
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
-              <mat-label>Posición total</mat-label>
-              <input
-                matInput
-                type="number"
-                min="0"
-                step="1"
-                inputmode="numeric"
-                placeholder="ej. 6840"
-                [formControl]="calcTotalPosition"
-                (change)="onCalcTotalPositionChange()"
-              />
-              <mat-hint>Guardado</mat-hint>
-            </mat-form-field>
+            <!-- Posición total: bloqueada por defecto; el botón la desbloquea y luego guarda los cambios. -->
+            <div class="reading-progress-form-modal__total">
+              <mat-form-field appearance="outline" class="reading-progress-form-modal__field">
+                <mat-label>Total</mat-label>
+                <input
+                  #calcTotalInput
+                  matInput
+                  type="number"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="ej. 6840"
+                  [formControl]="calcTotalPosition"
+                  (keydown.enter)="$event.preventDefault(); saveCalcTotal()"
+                />
+                @if (calcTotalPosition.hasError('min')) {
+                  <mat-error>Debe ser mayor que 0.</mat-error>
+                } @else {
+                  <mat-hint>{{ calcTotalEditing() ? 'Sin guardar' : 'Guardado' }}</mat-hint>
+                }
+              </mat-form-field>
+
+              @if (calcTotalEditing()) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="reading-progress-form-modal__calc-toggle reading-progress-form-modal__total-btn is-active"
+                  matTooltip="Guardar cambios"
+                  aria-label="Guardar la posición total"
+                  (click)="saveCalcTotal()"
+                >
+                  <mat-icon>save</mat-icon>
+                </button>
+              } @else {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="reading-progress-form-modal__calc-toggle reading-progress-form-modal__total-btn"
+                  matTooltip="Editar posición total"
+                  aria-label="Editar la posición total"
+                  (click)="startEditCalcTotal()"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+              }
+            </div>
           </div>
 
           <div class="reading-progress-form-modal__calc-result" aria-live="polite">
