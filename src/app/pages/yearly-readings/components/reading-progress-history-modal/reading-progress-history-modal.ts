@@ -35,6 +35,15 @@ export interface ReadingProgressHistoryModalData {
 
 type SortDirection = 'asc' | 'desc';
 
+/** Fecha de hoy en hora local como yyyy-MM-dd (comparable con los primeros 10 caracteres de `recordDate`). */
+function todayString(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 @Component({
   selector: 'app-reading-progress-history-modal',
   imports: [
@@ -61,7 +70,22 @@ export class ReadingProgressHistoryModal implements OnInit {
 
   /** Signal (y no una constante) porque la lectura puede pasar a finalizada mientras la modal está abierta. */
   protected readonly reading = signal<YearlyReading>(this.data.reading);
-  protected readonly records = signal<ReadingProgress[]>([]);
+
+  /** Registros tal como vienen de la base de datos. */
+  private readonly _allRecords = signal<ReadingProgress[]>([]);
+
+  /**
+   * Registros visibles. Los invitados no ven los avances de hoy (las páginas leídas de hoy
+   * cuentan como cero), así que esos registros se omiten.
+   */
+  protected readonly records = computed(() => {
+    const all = this._allRecords();
+    if (this.authService.isAdmin()) return all;
+
+    const today = todayString();
+    return all.filter((record) => record.recordDate.slice(0, 10) !== today);
+  });
+
   protected readonly loading = signal(true);
 
   /**
@@ -158,7 +182,7 @@ export class ReadingProgressHistoryModal implements OnInit {
 
   private async _loadRecords(): Promise<void> {
     this.loading.set(true);
-    this.records.set(await this._service.getByReadingId(this.reading().id));
+    this._allRecords.set(await this._service.getByReadingId(this.reading().id));
     this.loading.set(false);
   }
 }

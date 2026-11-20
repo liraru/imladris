@@ -28,12 +28,7 @@
                   <div
                     class="reading-heatmap__day"
                     [attr.data-level]="day.level"
-                    [matTooltip]="
-                      tooltipsDisabled()
-                        ? ''
-                        : dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')
-                    "
-                    [matTooltipDisabled]="tooltipsDisabled()"
+                    [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
                     matTooltipClass="reading-heatmap-tooltip"
                   ></div>
                 }
@@ -47,8 +42,7 @@
             <div
               class="reading-heatmap__day"
               [attr.data-level]="item.level"
-              [matTooltip]="tooltipsDisabled() ? '' : item.tooltip"
-              [matTooltipDisabled]="tooltipsDisabled()"
+              [matTooltip]="item.tooltip"
               matTooltipClass="reading-heatmap-tooltip"
             ></div>
           }
