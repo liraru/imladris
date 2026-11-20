@@ -27,7 +27,7 @@
               [class.reading-daily-chart__col--hidden]="!colVisible()[i]"
               [style.width.px]="colWidths()[i]"
               [matTooltip]="dayTooltip(day) + '\n' + (day.date | date: 'dd/MM/yyyy')"
-              [matTooltipDisabled]="tooltipsDisabled() || !colVisible()[i]"
+              [matTooltipDisabled]="!colVisible()[i]"
               matTooltipClass="reading-heatmap-tooltip"
             >
               <div
