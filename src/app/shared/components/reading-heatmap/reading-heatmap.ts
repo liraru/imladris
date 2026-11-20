@@ -111,9 +111,6 @@ export class ReadingHeatmap {
     { initialValue: false },
   );
 
-  /** Los tooltips (páginas por día y leyenda) solo se muestran si el usuario está logado. */
-  protected readonly tooltipsDisabled = computed(() => !this._authService.isAdmin());
-
   protected readonly loading = signal(true);
   protected readonly weeks = signal<HeatmapDay[][]>([]);
   protected readonly monthLabels = signal<HeatmapMonthLabel[]>([]);
@@ -164,12 +161,14 @@ export class ReadingHeatmap {
   ];
 
   constructor() {
-    // Recarga al cambiar de breakpoint (recorte a 4 meses en móvil) y cada vez que se
-    // registra/edita/borra un avance de lectura desde cualquier punto de la app.
+    // Recarga al cambiar de breakpoint (recorte a 4 meses en móvil), al iniciar/cerrar sesión
+    // (los invitados ven 0 páginas en el día de hoy) y cada vez que se registra/edita/borra un
+    // avance de lectura desde cualquier punto de la app.
     effect(() => {
       const mobile = this.isMobile();
+      const isAdmin = this._authService.isAdmin();
       this._service.progressChanged();
-      this._load(mobile);
+      void this._load(mobile, isAdmin);
     });
   }
 
@@ -179,7 +178,7 @@ export class ReadingHeatmap {
       : 'Sin páginas leídas';
   }
 
-  private async _load(mobile: boolean): Promise<void> {
+  private async _load(mobile: boolean, isAdmin: boolean): Promise<void> {
     this.loading.set(true);
 
     const today = new Date();
@@ -190,7 +189,13 @@ export class ReadingHeatmap {
     const start = this._shiftMonths(today, mobile ? MOBILE_MONTHS_BACK : DESKTOP_MONTHS_BACK);
     start.setDate(start.getDate() + 1);
 
-    const pagesByDay = await this._service.getPagesByDay(this._toDateString(start));
+    const rawPagesByDay = await this._service.getPagesByDay(this._toDateString(start));
+
+    // Los invitados no ven las páginas de hoy: se fuerzan a 0 antes de calcular niveles,
+    // total y resumen, para que todo el mapa sea coherente con ese 0.
+    const pagesByDay: Record<string, number> = isAdmin
+      ? rawPagesByDay
+      : { ...rawPagesByDay, [this._toDateString(today)]: 0 };
 
     const days: HeatmapDay[] = [];
 

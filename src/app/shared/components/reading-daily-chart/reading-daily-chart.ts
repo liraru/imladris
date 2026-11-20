@@ -68,11 +68,20 @@ export class ReadingDailyChart {
 
   protected readonly loading = signal(true);
 
-  /** Los tooltips de páginas leídas solo se muestran si el usuario está logado. */
-  protected readonly tooltipsDisabled = computed(() => !this._authService.isAdmin());
+  /** Páginas avanzadas por día (yyyy-MM-dd) de esta lectura, tal como vienen de la base de datos. */
+  private readonly _rawPagesByDay = signal<Record<string, number>>({});
 
-  /** Páginas avanzadas por día (yyyy-MM-dd) de esta lectura. */
-  private readonly _pagesByDay = signal<Record<string, number>>({});
+  /**
+   * Páginas por día que se pintan. Los invitados no ven las páginas de hoy: se fuerzan a 0.
+   * Es un computed para que se actualice solo al iniciar/cerrar sesión.
+   */
+  private readonly _pagesByDay = computed<Record<string, number>>(() => {
+    const raw = this._rawPagesByDay();
+    if (this._authService.isAdmin()) return raw;
+
+    const today = toDateString(new Date());
+    return today in raw ? { ...raw, [today]: 0 } : raw;
+  });
 
   private readonly _scroller = viewChild<ElementRef<HTMLElement>>('scroller');
 
@@ -294,11 +303,11 @@ export class ReadingDailyChart {
         const date = record.recordDate.slice(0, 10);
         pagesByDay[date] = (pagesByDay[date] ?? 0) + record.pagesAdvanced;
       }
-      this._pagesByDay.set(pagesByDay);
+      this._rawPagesByDay.set(pagesByDay);
     } catch (err) {
       if (requestId !== this._requestId) return;
       console.error(err);
-      this._pagesByDay.set({});
+      this._rawPagesByDay.set({});
     } finally {
       if (requestId === this._requestId) this.loading.set(false);
     }
