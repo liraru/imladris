@@ -54,6 +54,11 @@
   grid-template-columns: repeat(7, 220px);
 }
 
+/* La imagen exportada se ve como la vería un invitado: sin el botón de menú contextual. */
+.capture-area--capturing .library-card__menu-trigger {
+  display: none !important;
+}
+
 .capture-area__header {
   display: none;
   text-align: center;
