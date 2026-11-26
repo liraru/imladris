@@ -56,4 +56,20 @@
       </aside>
     </div>
   }
+
+  <!-- Fila del panel "En cifras": la comparten la versión de escritorio/tablet y la de móvil. -->
+  <ng-template #statRow let-stat>
+    <li class="home__stat">
+      <span class="home__stat-icon" aria-hidden="true">
+        <mat-icon>{{ stat.icon }}</mat-icon>
+      </span>
+      <div class="home__stat-text">
+        <span class="home__stat-label">{{ stat.label }}</span>
+        @if (stat.detail) {
+          <span class="home__stat-detail">{{ stat.detail }}</span>
+        }
+      </div>
+      <span class="home__stat-value" [matTooltip]="stat.tooltip">{{ stat.value }}</span>
+    </li>
+  </ng-template>
 </section>

@@ -128,6 +128,12 @@ export class Home implements OnInit {
     }
   }
 
+  /** Fecha formateada con la primera letra en mayúscula (p. ej. "Noviembre 2026"). */
+  private _formatCapitalized(date: string, format: string): string {
+    const text = formatDate(date, format, this._locale);
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
   private async _loadData(): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
