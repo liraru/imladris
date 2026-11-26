@@ -18,6 +18,26 @@
   }
 }
 
+/*
+ * Escritorio (columna lateral junto a la principal): home.css convierte el host en una columna
+ * flex que ocupa todo el alto de la fila. La lista absorbe ese alto y reparte el espacio
+ * sobrante entre las tarjetas (space-between): la primera queda pegada a la cabecera y la
+ * última al borde inferior, alineada con "Últimas lecturas". Las tarjetas conservan su tamaño
+ * natural (flex: 0 0 auto), solo crece el hueco entre ellas.
+ */
+@media (min-width: 1100px) {
+  .home__list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .home__list-item {
+    flex: 0 0 auto;
+  }
+}
+
 .home__list-item {
   display: flex;
   gap: 0.85rem;

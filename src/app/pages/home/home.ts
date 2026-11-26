@@ -25,10 +25,15 @@ import { ReadingNow } from './components/reading-now/reading-now';
 import { fromBook, fromMangaVolume, HomeItem } from './models/home-item.model';
 import { toDateString } from './utils/date.utils';
 
-/** Nº máximo de entradas por sección en escritorio. */
+/** Nº máximo de lecturas finalizadas ("Últimas lecturas") en escritorio. */
 const DESKTOP_RECENT_COUNT = 5;
 /** Nº máximo de entradas por sección en móvil. */
 const MOBILE_RECENT_COUNT = 4;
+/**
+ * Nº máximo de "Últimas incorporaciones" en escritorio. Calculado para que la columna lateral
+ * llene el alto de la columna principal (a 1920px de ancho) sin dejar hueco vacío debajo.
+ */
+const DESKTOP_ADDITIONS_COUNT = 7;
 
 @Component({
   selector: 'app-home',
@@ -65,9 +70,14 @@ export class Home implements OnInit {
     { initialValue: false },
   );
 
-  /** Nº de entradas a mostrar por sección según el tamaño de pantalla actual. */
+  /** Nº de lecturas finalizadas a mostrar según el tamaño de pantalla actual. */
   protected readonly recentCount = computed(() =>
     this.isMobile() ? MOBILE_RECENT_COUNT : DESKTOP_RECENT_COUNT,
+  );
+
+  /** Nº de incorporaciones a mostrar según el tamaño de pantalla actual. */
+  protected readonly additionsCount = computed(() =>
+    this.isMobile() ? MOBILE_RECENT_COUNT : DESKTOP_ADDITIONS_COUNT,
   );
 
   /**
