@@ -135,9 +135,10 @@
 
 /* ───────────── Resumen del periodo (opcional, solo escritorio) ───────────── */
 
+/* Cinco cifras en una sola fila: días con lectura, racha, mejor mes, media y páginas del mes. */
 .reading-heatmap__summary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1rem;
   margin: 1rem 0 0;
   padding-top: 1rem;
@@ -180,4 +181,22 @@
 .reading-heatmap__summary-detail {
   font-size: 0.72rem;
   color: var(--mat-sys-on-surface-variant);
+}
+
+.reading-heatmap__summary-detail--capitalize {
+  text-transform: capitalize;
+}
+
+/*
+ * Panel de la home con las columnas lado a lado (1100px+): el mapa tiene menos ancho y las
+ * cinco cifras necesitan algo menos de hueco y de tamaño para no recortarse.
+ */
+@media (min-width: 1100px) and (max-width: 1279px) {
+  .reading-heatmap__summary {
+    gap: 0.75rem;
+  }
+
+  .reading-heatmap__summary-value {
+    font-size: 1.2rem;
+  }
 }

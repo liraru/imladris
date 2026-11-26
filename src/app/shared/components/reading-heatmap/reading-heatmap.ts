@@ -25,18 +25,20 @@ interface HeatmapDay {
   empty: boolean;
 }
 
-/** Resumen del periodo mostrado (mismo rango que la cuadrícula). */
-interface HeatmapSummary {
-  /** Días del rango con al menos una página leída. */
+/** Resumen del último año (rango de escritorio), con independencia del rango que dibuje la cuadrícula. */
+export interface HeatmapSummary {
+  /** Días del año con al menos una página leída. */
   readingDays: number;
-  /** Días totales del rango. */
+  /** Días totales del año. */
   totalDays: number;
-  /** Mayor nº de días consecutivos leyendo dentro del rango. */
+  /** Mayor nº de días consecutivos leyendo dentro del año. */
   longestStreak: number;
   /** Mes con más páginas leídas; `date` es el día 1 de ese mes (yyyy-MM-dd). */
   bestMonth: { date: string; pages: number } | null;
   /** Media de páginas por día con lectura (0 si no hay ninguno). */
   pagesPerReadingDay: number;
+  /** Páginas leídas en el mes en curso; `date` es el día 1 de ese mes (yyyy-MM-dd). */
+  thisMonth: { date: string; pages: number };
 }
 
 /** Una intensidad de la leyenda con el texto de su tooltip. */
@@ -100,7 +102,11 @@ export class ReadingHeatmap {
   /** Muestra la línea "N páginas leídas en …" sobre el mapa. La home la oculta y la muestra en sus cifras. */
   readonly showTitle = input(true);
 
-  /** Muestra bajo el mapa un resumen del periodo (días con lectura, racha más larga, mejor mes, media). Solo en escritorio. */
+  /**
+   * Muestra bajo el mapa un resumen anual (días con lectura, racha más larga, mejor mes, media
+   * y páginas de este mes). Solo en escritorio: en móvil la home muestra esas mismas cifras en
+   * su panel "En cifras", leyéndolas de `summary`.
+   */
   readonly showSummary = input(false);
 
   /** true por debajo de 768px, igual que el resto de la app (navbar, gestión, home, etc.). */
@@ -115,7 +121,13 @@ export class ReadingHeatmap {
   protected readonly weeks = signal<HeatmapDay[][]>([]);
   protected readonly monthLabels = signal<HeatmapMonthLabel[]>([]);
   protected readonly totalPages = signal(0);
-  protected readonly summary = signal<HeatmapSummary | null>(null);
+
+  /**
+   * Resumen anual (null mientras no se ha calculado). Es el mismo en móvil y en escritorio: se
+   * calcula siempre sobre el último año. Es público: la home lo lee para mostrar estas cifras en
+   * su panel "En cifras" cuando el resumen bajo el mapa no se ve.
+   */
+  readonly summary = signal<HeatmapSummary | null>(null);
 
   /** Intensidades de la leyenda (de menos a más) con el rango de páginas de cada una como tooltip. */
   protected readonly legendLevels: readonly HeatmapLegendLevel[] = [
@@ -140,7 +152,7 @@ export class ReadingHeatmap {
     return byWeek;
   });
 
-  /** Texto del periodo mostrado, acorde al rango real cargado (recortado a 4 meses en móvil). */
+  /** Texto del periodo mostrado, acorde al rango real de la cuadrícula (recortado a 4 meses en móvil). */
   protected readonly rangeLabel = computed(() =>
     this.isMobile() ? 'en los últimos 4 meses' : 'en el último año',
   );
@@ -184,12 +196,10 @@ export class ReadingHeatmap {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Primer día del rango: hoy menos N meses, más un día (p. ej. hoy 28/09 → 29/09 del año
-    // anterior en escritorio y 29/05 en móvil).
-    const start = this._shiftMonths(today, mobile ? MOBILE_MONTHS_BACK : DESKTOP_MONTHS_BACK);
-    start.setDate(start.getDate() + 1);
-
-    const rawPagesByDay = await this._service.getPagesByDay(this._toDateString(start));
+    // Se pide siempre el rango anual: el resumen es el mismo en móvil y en escritorio. En móvil
+    // la cuadrícula se recorta después a los últimos 4 meses.
+    const yearStart = this._rangeStart(today, DESKTOP_MONTHS_BACK);
+    const rawPagesByDay = await this._service.getPagesByDay(this._toDateString(yearStart));
 
     // Los invitados no ven las páginas de hoy: se fuerzan a 0 antes de calcular niveles,
     // total y resumen, para que todo el mapa sea coherente con ese 0.
@@ -197,22 +207,12 @@ export class ReadingHeatmap {
       ? rawPagesByDay
       : { ...rawPagesByDay, [this._toDateString(today)]: 0 };
 
-    const days: HeatmapDay[] = [];
+    const yearDays = this._buildDays(yearStart, today, pagesByDay);
+    const days = mobile
+      ? this._buildDays(this._rangeStart(today, MOBILE_MONTHS_BACK), today, pagesByDay)
+      : yearDays;
 
-    // Relleno hasta el lunes de la primera semana, para alinear las filas por día de la
-    // semana (lunes arriba, domingo abajo) sin mostrar días anteriores al inicio del rango.
-    const leadingBlanks = (start.getDay() + 6) % 7;
-    for (let i = 0; i < leadingBlanks; i++) {
-      days.push({ date: '', count: 0, level: 0, empty: true });
-    }
-
-    const cursor = new Date(start);
-    while (cursor <= today) {
-      const dateStr = this._toDateString(cursor);
-      const count = pagesByDay[dateStr] ?? 0;
-      days.push({ date: dateStr, count, level: this._level(count), empty: false });
-      cursor.setDate(cursor.getDate() + 1);
-    }
+    const start = mobile ? this._rangeStart(today, MOBILE_MONTHS_BACK) : yearStart;
 
     const weeks: HeatmapDay[][] = [];
     for (let i = 0; i < days.length; i += 7) {
@@ -246,13 +246,52 @@ export class ReadingHeatmap {
 
     this.weeks.set(weeks);
     this.monthLabels.set(monthLabels);
-    this.totalPages.set(Object.values(pagesByDay).reduce((s, n) => s + n, 0));
-    this.summary.set(this._buildSummary(days));
+    // Total del rango dibujado (4 meses en móvil, 1 año en escritorio).
+    this.totalPages.set(days.reduce((sum, day) => sum + day.count, 0));
+    // Resumen siempre anual.
+    this.summary.set(this._buildSummary(yearDays, today));
     this.loading.set(false);
   }
 
-  /** Días con lectura, racha más larga, mes con más páginas y media por día, a partir de los días reales del rango. */
-  private _buildSummary(days: HeatmapDay[]): HeatmapSummary {
+  /**
+   * Días reales desde `start` hasta `today`, precedidos del relleno hasta el lunes de la primera
+   * semana para alinear las filas por día de la semana (lunes arriba, domingo abajo) sin mostrar
+   * días anteriores al inicio del rango.
+   */
+  private _buildDays(start: Date, today: Date, pagesByDay: Record<string, number>): HeatmapDay[] {
+    const days: HeatmapDay[] = [];
+
+    const leadingBlanks = (start.getDay() + 6) % 7;
+    for (let i = 0; i < leadingBlanks; i++) {
+      days.push({ date: '', count: 0, level: 0, empty: true });
+    }
+
+    const cursor = new Date(start);
+    while (cursor <= today) {
+      const dateStr = this._toDateString(cursor);
+      const count = pagesByDay[dateStr] ?? 0;
+      days.push({ date: dateStr, count, level: this._level(count), empty: false });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return days;
+  }
+
+  /**
+   * Primer día de un rango que acaba hoy: hoy menos N meses, más un día (p. ej. hoy 28/09 →
+   * 29/09 del año anterior con 12 meses y 29/05 con 4).
+   */
+  private _rangeStart(today: Date, monthsBack: number): Date {
+    const start = this._shiftMonths(today, monthsBack);
+    start.setDate(start.getDate() + 1);
+    return start;
+  }
+
+  /**
+   * Días con lectura, racha más larga, mes con más páginas, media por día y páginas del mes en
+   * curso, a partir de los días reales del rango anual.
+   */
+  private _buildSummary(days: HeatmapDay[], today: Date): HeatmapSummary {
     let readingDays = 0;
     let totalDays = 0;
     let longestStreak = 0;
@@ -286,7 +325,14 @@ export class ReadingHeatmap {
 
     const pagesPerReadingDay = readingDays > 0 ? pagesOnReadingDays / readingDays : 0;
 
-    return { readingDays, totalDays, longestStreak, bestMonth, pagesPerReadingDay };
+    // El mes en curso siempre cabe entero en el rango anual; sin lecturas este mes son 0.
+    const currentMonthKey = this._toDateString(today).slice(0, 7);
+    const thisMonth = {
+      date: `${currentMonthKey}-01`,
+      pages: pagesByMonth.get(currentMonthKey) ?? 0,
+    };
+
+    return { readingDays, totalDays, longestStreak, bestMonth, pagesPerReadingDay, thisMonth };
   }
 
   /** Retrocede `months` meses conservando el día, ajustándolo si el mes destino es más corto. */
