@@ -7,11 +7,18 @@ import {
   effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom, map } from 'rxjs';
-import { DatePipe, DecimalPipe, formatNumber } from '@angular/common';
+import {
+  DatePipe,
+  DecimalPipe,
+  NgTemplateOutlet,
+  formatDate,
+  formatNumber,
+} from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -123,6 +130,7 @@ function currentStreak(pagesByDay: Record<string, number>, today: Date): number 
     RouterLink,
     DatePipe,
     DecimalPipe,
+    NgTemplateOutlet,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
@@ -157,6 +165,16 @@ export class Home implements OnInit {
       .pipe(map((result) => result.matches)),
     { initialValue: false },
   );
+
+  /**
+   * Mapa de calor del panel de actividad. De él se leen las cifras del resumen (días con
+   * lectura, racha más larga, mes con más páginas, media por día y páginas de este mes) para
+   * mostrarlas en "En cifras" en móvil, donde el resumen bajo el mapa no se pinta.
+   */
+  private readonly _heatmap = viewChild(ReadingHeatmap);
+
+  /** Móvil: true cuando el panel "En cifras" está desplegado (muestra todas las cifras). */
+  protected readonly statsExpanded = signal(false);
 
   /** Nº de entradas a mostrar por sección según el tamaño de pantalla actual. */
   protected readonly recentCount = computed(() =>
@@ -263,8 +281,8 @@ export class Home implements OnInit {
     return top;
   });
 
-  /** Cifras destacadas que acompañan al mapa de calor. */
-  protected readonly stats = computed<HomeStat[]>(() => {
+  /** Cifras propias de la home (las que no salen del mapa de calor), cada una con su clave. */
+  private readonly _homeStats = computed(() => {
     const ready = !this.loading() && !this.error();
     const activity = this._activity();
     const year = new Date().getFullYear();
@@ -280,23 +298,23 @@ export class Home implements OnInit {
     const topAuthor = this._topAuthor();
     const streak = activity?.streak ?? 0;
 
-    return [
-      {
+    return {
+      readThisYear: {
         icon: 'menu_book',
         label: `Leídos en ${year}`,
         value: ready ? this._format(finishedThisYear) : NO_VALUE,
       },
-      {
+      pagesLastYear: {
         icon: 'description',
         label: 'Páginas · último año',
         value: activity ? this._format(activity.pagesYear) : NO_VALUE,
       },
-      {
+      streak: {
         icon: 'local_fire_department',
         label: 'Racha actual',
         value: activity ? `${streak} ${streak === 1 ? 'día' : 'días'}` : NO_VALUE,
       },
-      {
+      library: {
         icon: 'collections_bookmark',
         label: 'En la biblioteca',
         value: ready ? this._format(additions.length) : NO_VALUE,
@@ -304,7 +322,7 @@ export class Home implements OnInit {
           ? `${this._format(books)} libros · ${this._format(mangaVolumes)} tomos de manga`
           : undefined,
       },
-      {
+      topAuthor: {
         icon: 'person',
         label: 'Autor más leído',
         value: ready && topAuthor ? topAuthor.name : NO_VALUE,
@@ -314,6 +332,84 @@ export class Home implements OnInit {
             : undefined,
         tooltip: ready && topAuthor ? topAuthor.name : undefined,
       },
+    } satisfies Record<string, HomeStat>;
+  });
+
+  /**
+   * Cifras del resumen del mapa de calor (las mismas, anuales, que se ven bajo el mapa en
+   * escritorio), para el panel "En cifras" en móvil. Mientras el mapa no ha cargado se
+   * muestran con "—", así el panel no cambia de alto al llegar los datos.
+   */
+  private readonly _heatmapStats = computed(() => {
+    const summary = this._heatmap()?.summary() ?? null;
+    const best = summary?.bestMonth ?? null;
+
+    return {
+      readingDays: {
+        icon: 'event_available',
+        label: 'Días con lectura',
+        value: summary ? this._format(summary.readingDays) : NO_VALUE,
+        detail: summary ? `de ${this._format(summary.totalDays)} días` : undefined,
+      },
+      longestStreak: {
+        icon: 'emoji_events',
+        label: 'Racha más larga',
+        value: summary
+          ? `${this._format(summary.longestStreak)} ${summary.longestStreak === 1 ? 'día' : 'días'}`
+          : NO_VALUE,
+        detail: summary ? 'consecutivos' : undefined,
+      },
+      bestMonth: {
+        icon: 'calendar_month',
+        label: 'Mes con más páginas',
+        value: best ? this._formatCapitalized(best.date, 'MMMM') : NO_VALUE,
+        detail: best
+          ? `${this._format(best.pages)} págs. · ${formatDate(best.date, 'y', this._locale)}`
+          : undefined,
+      },
+      pagesPerDay: {
+        icon: 'speed',
+        label: 'Media por día',
+        value:
+          summary && summary.readingDays > 0
+            ? `${this._format(summary.pagesPerReadingDay)} págs.`
+            : NO_VALUE,
+        detail: summary && summary.readingDays > 0 ? 'en días con lectura' : undefined,
+      },
+      pagesThisMonth: {
+        icon: 'auto_stories',
+        label: 'Páginas este mes',
+        value: summary ? `${this._format(summary.thisMonth.pages)} págs.` : NO_VALUE,
+        detail: summary ? this._formatCapitalized(summary.thisMonth.date, 'MMMM y') : undefined,
+      },
+    } satisfies Record<string, HomeStat>;
+  });
+
+  /** Escritorio y tablet: cifras destacadas que acompañan al mapa de calor. */
+  protected readonly stats = computed<HomeStat[]>(() => {
+    const s = this._homeStats();
+    return [s.readThisYear, s.pagesLastYear, s.streak, s.library, s.topAuthor];
+  });
+
+  /** Móvil: las tres cifras siempre visibles en "En cifras" (con el panel recogido). */
+  protected readonly mobilePrimaryStats = computed<HomeStat[]>(() => {
+    const s = this._homeStats();
+    const h = this._heatmapStats();
+    return [s.pagesLastYear, h.pagesThisMonth, s.streak];
+  });
+
+  /** Móvil: resto de cifras, solo visibles con el panel "En cifras" desplegado. */
+  protected readonly mobileExtraStats = computed<HomeStat[]>(() => {
+    const s = this._homeStats();
+    const h = this._heatmapStats();
+    return [
+      s.readThisYear,
+      s.library,
+      s.topAuthor,
+      h.readingDays,
+      h.longestStreak,
+      h.bestMonth,
+      h.pagesPerDay,
     ];
   });
 
@@ -340,6 +436,11 @@ export class Home implements OnInit {
    */
   protected isRead(item: HomeItem): boolean {
     return this._readTitles().has(normalizeTitle(item.title));
+  }
+
+  /** Móvil: despliega o recoge el panel "En cifras". */
+  protected toggleStats(): void {
+    this.statsExpanded.update((expanded) => !expanded);
   }
 
   /** Opción "Añadir" del menú de la tarjeta: abre la modal de registro de avance de la lectura. */
@@ -374,6 +475,12 @@ export class Home implements OnInit {
 
   private _format(value: number): string {
     return formatNumber(value, this._locale, '1.0-0');
+  }
+
+  /** Fecha formateada con la primera letra en mayúscula (p. ej. "Noviembre 2026"). */
+  private _formatCapitalized(date: string, format: string): string {
+    const text = formatDate(date, format, this._locale);
+    return text.charAt(0).toUpperCase() + text.slice(1);
   }
 
   private async _loadData(): Promise<void> {

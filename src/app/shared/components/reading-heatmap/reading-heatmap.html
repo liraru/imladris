@@ -107,6 +107,20 @@
             }
           </dd>
         </div>
+
+        <div class="reading-heatmap__summary-item">
+          <dt>Páginas este mes</dt>
+          <dd>
+            <span class="reading-heatmap__summary-value">
+              {{ s.thisMonth.pages | number: '1.0-0' }} págs.
+            </span>
+            <span
+              class="reading-heatmap__summary-detail reading-heatmap__summary-detail--capitalize"
+            >
+              {{ s.thisMonth.date | date: 'MMMM y' }}
+            </span>
+          </dd>
+        </div>
       </dl>
     }
   }
