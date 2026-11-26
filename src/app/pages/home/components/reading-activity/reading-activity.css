@@ -1,0 +1,20 @@
+/*
+ * El mapa de calor se centra verticalmente cuando la columna de cifras lo hace más alto.
+ */
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+app-reading-heatmap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.home__panel-note {
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}

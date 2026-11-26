@@ -1,0 +1,140 @@
+<div class="home__section-header">
+  <h2>Leyendo</h2>
+  <a class="home__section-link" routerLink="/{{ ROUTES.YEARLY_READINGS }}">Ver lecturas anuales</a>
+</div>
+
+@if (readingNowView().length === 0) {
+  <p class="home__empty">No estás leyendo nada ahora mismo.</p>
+} @else {
+  <div class="home__reading-list">
+    @for (item of readingNowView(); track item.reading.id) {
+      <article class="reading-hero">
+        @if (item.reading.coverUrl) {
+          <img
+            class="reading-hero__backdrop"
+            [src]="item.reading.coverUrl"
+            alt=""
+            aria-hidden="true"
+          />
+        }
+
+        <div class="reading-hero__cover">
+          @if (authService.isAdmin()) {
+            <button
+              mat-icon-button
+              class="library-card__menu-trigger library-menu-trigger"
+              type="button"
+              [matMenuTriggerFor]="readingMenu"
+              (click)="$event.stopPropagation()"
+              aria-label="Opciones"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #readingMenu="matMenu">
+              <button mat-menu-item type="button" (click)="registerProgress(item.reading)">
+                <mat-icon>add</mat-icon>
+                <span>Añadir</span>
+              </button>
+              <button mat-menu-item type="button" (click)="openHistory(item.reading)">
+                <mat-icon>history</mat-icon>
+                <span>Historial</span>
+              </button>
+            </mat-menu>
+          }
+          @if (item.reading.coverUrl) {
+            <img
+              [src]="item.reading.coverUrl"
+              [alt]="'Portada de ' + item.reading.title"
+              loading="lazy"
+            />
+          } @else {
+            <div class="home__card-placeholder">
+              <mat-icon>menu_book</mat-icon>
+            </div>
+          }
+        </div>
+
+        <div class="reading-hero__body">
+          <p class="reading-hero__kicker">Leyendo ahora</p>
+          <h3 class="reading-hero__title">{{ item.reading.title }}</h3>
+          <p class="reading-hero__author">
+            {{ item.reading.authors.join(', ') || 'Autor desconocido' }}
+          </p>
+
+          <div class="reading-hero__progress">
+            <div class="reading-hero__progress-head">
+              <span class="reading-hero__percentage">{{ item.percentage | number: '1.0-0' }}%</span>
+              @if (item.totalPages > 0) {
+                <span
+                  >{{ item.pagesRead | number: '1.0-0' }} de
+                  {{ item.totalPages | number: '1.0-0' }} páginas</span
+                >
+              }
+            </div>
+            <div
+              class="reading-hero__bar"
+              role="progressbar"
+              [attr.aria-valuenow]="item.percentage"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <div class="reading-hero__bar-fill" [style.width.%]="item.percentage"></div>
+            </div>
+          </div>
+
+          <!-- Estadísticas, en este orden: Empezado · Fin estimado · Días leyendo ·
+               Media diaria · Leído hoy (solo usuario logado).
+               Todas las líneas llevan justify-content: space-between.
+               Móvil: 1.ª línea = las dos fechas; 2.ª línea = el resto. El separador
+               .reading-hero__facts-break fuerza el salto de línea (en escritorio se
+               oculta y todo va en una sola línea).
+               La disposición vive en reading-now.css (.reading-hero__facts). -->
+          <dl class="reading-hero__facts">
+            <div>
+              <dt>Empezado</dt>
+              <dd>{{ item.reading.startDate | date: 'dd/MM/yyyy' }}</dd>
+            </div>
+            <div>
+              <dt>Fin estimado</dt>
+              <dd matTooltip="Estimación según tu ritmo medio desde que empezaste">
+                @if (item.estimatedEnd) {
+                  {{ item.estimatedEnd | date: 'dd/MM/yyyy' }}
+                } @else {
+                  —
+                }
+              </dd>
+            </div>
+            <div class="reading-hero__facts-break" role="presentation"></div>
+            <div>
+              <dt>Días leyendo</dt>
+              <dd>{{ item.daysReading }}</dd>
+            </div>
+            <div>
+              <dt>Media diaria</dt>
+              <dd
+                matTooltip="Media de páginas por día: páginas leídas entre los días transcurridos desde que empezaste"
+              >
+                @if (item.daysReading > 0 && item.pagesRead > 0) {
+                  {{ item.pagesRead / item.daysReading | number: '1.0-0' }} págs.
+                } @else {
+                  —
+                }
+              </dd>
+            </div>
+            @if (authService.isAdmin()) {
+              <div>
+                <dt>Leído hoy</dt>
+                <dd>
+                  {{ item.pagesToday | number: '1.0-0' }}
+                  {{ item.pagesToday === 1 ? 'pág.' : 'págs.' }}
+                </dd>
+              </div>
+            }
+          </dl>
+        </div>
+
+        <app-reading-daily-chart [reading]="item.reading" />
+      </article>
+    }
+  </div>
+}
