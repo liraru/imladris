@@ -1,0 +1,173 @@
+:host {
+  display: block;
+}
+
+.home__stats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+/*
+ * Escritorio (paneles lado a lado): el panel de cifras se estira a la altura del mapa de
+ * calor (la rejilla de .home__overview ya los iguala) y sus filas se reparten ese alto a
+ * partes iguales (grid-auto-rows: 1fr), con el contenido centrado en cada una. Así no queda
+ * hueco debajo y los separadores quedan espaciados. En tablet y móvil no se aplica.
+ */
+@media (min-width: 1100px) {
+  :host {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home__stats-list {
+    flex: 1;
+    grid-auto-rows: 1fr;
+  }
+}
+
+.home__stat {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0;
+  min-width: 0;
+}
+
+.home__stat + .home__stat {
+  border-top: 1px solid var(--panel-border);
+}
+
+.home__stat-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+}
+
+.home__stat-icon mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+.home__stat-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.home__stat-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home__stat-detail {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home__stat-value {
+  flex: 0 1 auto;
+  max-width: 55%;
+  min-width: 0;
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  line-height: 1.15;
+  text-align: right;
+  color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ * Tablet: las cinco cifras en una fila de tarjetas bajo el mapa de calor
+ * (icono, valor y etiqueta apilados).
+ */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .home__stats-list {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .home__stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+  }
+
+  .home__stat + .home__stat {
+    border-top: 0;
+  }
+
+  .home__stat-icon {
+    order: 0;
+  }
+
+  .home__stat-value {
+    order: 1;
+    max-width: 100%;
+    font-size: 1.35rem;
+    text-align: left;
+  }
+
+  .home__stat-text {
+    order: 2;
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .home__stat-label,
+  .home__stat-detail {
+    white-space: normal;
+  }
+}
+
+/*
+ * Móvil (≤767px): el panel es desplegable. El botón "Ver más"/"Ver menos" va al pie del
+ * panel, con el chevron girado al desplegar. Solo se pinta en móvil (ver home-stats.html).
+ */
+.home__stats-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.65rem 0 0.15rem;
+  border: 0;
+  border-top: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--gold);
+  font: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.home__stats-toggle mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.2s ease;
+}
+
+.home__stats-toggle[aria-expanded='true'] mat-icon {
+  transform: rotate(180deg);
+}

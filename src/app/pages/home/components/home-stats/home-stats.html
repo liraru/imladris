@@ -1,0 +1,55 @@
+<!--
+  "En cifras". Escritorio y tablet: las cinco cifras de siempre. Móvil: panel desplegable con
+  tres cifras visibles (páginas del último año, páginas de este mes y racha actual); el resto,
+  tras "Ver más".
+-->
+<div class="home__panel-header">
+  <h2 class="home__panel-title">En cifras</h2>
+</div>
+<ul class="home__stats-list" id="home-stats-list">
+  @if (isMobile()) {
+    @for (stat of mobilePrimaryStats(); track stat.label) {
+      <ng-container [ngTemplateOutlet]="statRow" [ngTemplateOutletContext]="{ $implicit: stat }" />
+    }
+    @if (statsExpanded()) {
+      @for (stat of mobileExtraStats(); track stat.label) {
+        <ng-container
+          [ngTemplateOutlet]="statRow"
+          [ngTemplateOutletContext]="{ $implicit: stat }"
+        />
+      }
+    }
+  } @else {
+    @for (stat of stats(); track stat.label) {
+      <ng-container [ngTemplateOutlet]="statRow" [ngTemplateOutletContext]="{ $implicit: stat }" />
+    }
+  }
+</ul>
+@if (isMobile()) {
+  <button
+    type="button"
+    class="home__stats-toggle"
+    aria-controls="home-stats-list"
+    [attr.aria-expanded]="statsExpanded()"
+    (click)="toggleStats()"
+  >
+    <span>{{ statsExpanded() ? 'Ver menos' : 'Ver más' }}</span>
+    <mat-icon aria-hidden="true">expand_more</mat-icon>
+  </button>
+}
+
+<!-- Fila del panel: la comparten la versión de escritorio/tablet y la de móvil. -->
+<ng-template #statRow let-stat>
+  <li class="home__stat">
+    <span class="home__stat-icon" aria-hidden="true">
+      <mat-icon>{{ stat.icon }}</mat-icon>
+    </span>
+    <div class="home__stat-text">
+      <span class="home__stat-label">{{ stat.label }}</span>
+      @if (stat.detail) {
+        <span class="home__stat-detail">{{ stat.detail }}</span>
+      }
+    </div>
+    <span class="home__stat-value" [matTooltip]="stat.tooltip">{{ stat.value }}</span>
+  </li>
+</ng-template>

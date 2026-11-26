@@ -1,0 +1,41 @@
+<div class="home__section-header">
+  <h2>Últimas incorporaciones</h2>
+  <a class="home__section-link" routerLink="/{{ ROUTES.LIBRARY }}">Ver biblioteca completa</a>
+</div>
+
+@if (lastAdditions().length === 0) {
+  <p class="home__empty">Todavía no hay incorporaciones registradas.</p>
+} @else {
+  <ul class="home__list">
+    @for (item of lastAdditions(); track item.type + '-' + item.id) {
+      <li class="home__list-item">
+        <div class="home__list-cover">
+          @if (item.coverImageUrl) {
+            <img [src]="item.coverImageUrl" [alt]="'Portada de ' + item.title" loading="lazy" />
+          } @else {
+            <div class="home__card-placeholder">
+              <mat-icon>{{
+                item.type === HOME_ITEM_TYPE.MANGA ? 'auto_stories' : 'menu_book'
+              }}</mat-icon>
+            </div>
+          }
+        </div>
+        <div class="home__list-info">
+          <h3 class="home__list-title" [matTooltip]="item.title">{{ item.title }}</h3>
+          <p class="home__card-author">{{ authorNames(item) }}</p>
+          <div class="home__list-foot">
+            <span class="home__card-meta"
+              >Adquirido: {{ item.adquisitionDate | date: 'dd/MM/yyyy' }}</span
+            >
+            @if (isRead(item)) {
+              <span class="home__badge" matTooltip="Ya lo has leído">
+                <mat-icon>check</mat-icon>
+                Leído
+              </span>
+            }
+          </div>
+        </div>
+      </li>
+    }
+  </ul>
+}
